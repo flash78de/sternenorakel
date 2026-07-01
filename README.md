@@ -1,2 +1,0 @@
-# sternenorakel
-Sternenorakel App
