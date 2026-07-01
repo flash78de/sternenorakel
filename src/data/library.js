@@ -202,6 +202,32 @@ export function lunaSays() {
   return 'Bevor du ruhst – möchtest du noch einen letzten Stern für heute sammeln?'
 }
 
+// ---- Sternbilder-Sammlung (12) ----
+// Jedes vollendete 7-Tage-Band schaltet das nächste Sternbild frei.
+export const CONSTELLATIONS = [
+  { name: 'Der Mond', glyph: '☾', motto: 'Gefühl & Intuition' },
+  { name: 'Der Pfad', glyph: '✧', motto: 'Richtung & Entscheidung' },
+  { name: 'Das Herz', glyph: '❤', motto: 'Nähe & Verbindung' },
+  { name: 'Die Quelle', glyph: '☀', motto: 'Kraft von innen' },
+  { name: 'Die Weite', glyph: '✦', motto: 'Ruhe & Raum' },
+  { name: 'Der Wandel', glyph: '✺', motto: 'Übergang & Mut' },
+  { name: 'Der Anker', glyph: '⚓', motto: 'Halt & Werte' },
+  { name: 'Die Brücke', glyph: '⌢', motto: 'Versöhnung' },
+  { name: 'Der Stern', glyph: '★', motto: 'Sehnsucht & Ziel' },
+  { name: 'Die Feder', glyph: '❦', motto: 'Loslassen & Vertrauen' },
+  { name: 'Das Tor', glyph: '⟡', motto: 'Neue Möglichkeit' },
+  { name: 'Die Krone', glyph: '♛', motto: 'Vollendung' },
+]
+
+// Fortschritt zur Sammlung: wie viele frei, wie viele Tage bis zum nächsten.
+export function constellationProgress(constellationsDone = 0, streak = 0) {
+  const total = CONSTELLATIONS.length
+  const done = Math.min(constellationsDone, total)
+  const rem = streak % 7
+  const daysToNext = rem === 0 ? 7 : 7 - rem
+  return { total, done, daysToNext, next: CONSTELLATIONS[done] || null }
+}
+
 // ---- Datum auf Deutsch ----
 const WEEKDAYS = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']
 export function formatDate(d = new Date()) {

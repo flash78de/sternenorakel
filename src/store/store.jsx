@@ -32,6 +32,7 @@ const DEFAULT_STATE = {
   },
   journal: [], // {id, ts, iso, title, symbol, constellation, theme, mantra, text, reflection}
   seenReward: null, // id der zuletzt gezeigten Belohnung
+  seenReturnISO: null, // Tag, an dem der Rückkehr-Screen zuletzt gezeigt wurde
 }
 
 function load() {
@@ -125,8 +126,9 @@ export function StoreProvider({ children }) {
         ? s.stats.drawDays
         : [...new Set([...(s.stats.drawDays || []), today])].slice(-60)
 
+      const entryId = `${Date.now()}`
       const entry = {
-        id: `${Date.now()}`,
+        id: entryId,
         ts: Date.now(),
         iso: today,
         mid: message.id,
@@ -140,6 +142,7 @@ export function StoreProvider({ children }) {
       }
 
       result = {
+        id: entryId,
         gainedDust: gain,
         newStreak: streak,
         rankUp,
@@ -166,6 +169,32 @@ export function StoreProvider({ children }) {
     setState((s) => ({ ...s, seenReward: id }))
   }, [])
 
+  // Rückkehr nach Pause: erkannt, wenn zuletzt vor mehr als „gestern" gezogen wurde
+  const yesterdayISO = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+  const pausedReturn =
+    state.journal.length > 0 &&
+    state.stats.lastDrawISO &&
+    state.stats.lastDrawISO !== formatDate().iso &&
+    state.stats.lastDrawISO !== yesterdayISO &&
+    state.seenReturnISO !== formatDate().iso
+
+  const markReturnSeen = useCallback(() => {
+    setState((s) => ({ ...s, seenReturnISO: formatDate().iso }))
+  }, [])
+
+  // Reflexion eines vorhandenen Eintrags nachträglich setzen (kein Duplikat)
+  const updateReflection = useCallback((id, reflection) => {
+    setState((s) => ({
+      ...s,
+      journal: s.journal.map((e) => (e.id === id ? { ...e, reflection: (reflection || '').trim() } : e)),
+    }))
+  }, [])
+
+  // Einzelnen Tagebuch-Eintrag löschen
+  const deleteEntry = useCallback((id) => {
+    setState((s) => ({ ...s, journal: s.journal.filter((e) => e.id !== id) }))
+  }, [])
+
   const resetAll = useCallback(() => {
     try {
       localStorage.removeItem(KEY)
@@ -183,7 +212,11 @@ export function StoreProvider({ children }) {
       updateProfile,
       updateSettings,
       saveEntry,
+      updateReflection,
+      deleteEntry,
       dismissReward,
+      markReturnSeen,
+      pausedReturn,
       resetAll,
       drawnToday,
       rank: rankInfo(state.stats.stardust),
@@ -195,7 +228,11 @@ export function StoreProvider({ children }) {
       updateProfile,
       updateSettings,
       saveEntry,
+      updateReflection,
+      deleteEntry,
       dismissReward,
+      markReturnSeen,
+      pausedReturn,
       resetAll,
       drawnToday,
     ]
