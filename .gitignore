@@ -4,3 +4,7 @@ dist-ssr
 *.local
 .DS_Store
 .vite
+
+# Standalone-Build-Artefakte (generiert via npm run build:standalone)
+standalone.html
+standalone-dist
