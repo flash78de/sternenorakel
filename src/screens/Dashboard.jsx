@@ -1,26 +1,31 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import Luna, { LunaAvatar } from '../components/Luna.jsx'
 import RewardModal from '../components/RewardModal.jsx'
 import { IcBell, IcCalendar, IcCompass, IcBook } from '../components/icons.jsx'
 import { useStore } from '../store/store.jsx'
-import { formatDate, greeting, lunaSays } from '../data/library.js'
+import { formatDate, greeting, lunaSays, constellationProgress } from '../data/library.js'
 
 const WD = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
 
 export default function Dashboard() {
   const nav = useNavigate()
   const loc = useLocation()
-  const { profile, stats, journal, rank, drawnToday } = useStore()
+  const { profile, stats, journal, rank, drawnToday, pausedReturn } = useStore()
   const [reward, setReward] = useState(loc.state?.reward || null)
+
+  // Rückkehr nach Pause → eigener Screen (23)
+  useEffect(() => {
+    if (pausedReturn) nav('/rueckkehr', { replace: true })
+  }, [pausedReturn, nav])
 
   const date = formatDate()
   const last = journal[0]
   const firstDay = journal.length === 0 && stats.streak === 0
 
-  // 7-Tage-Serie als Sternreihe (heute hervorgehoben)
   const todayIdx = (new Date().getDay() + 6) % 7 // Mo=0
   const filled = Math.min(stats.streak, 7)
+  const cprog = constellationProgress(stats.constellationsDone, stats.streak)
 
   if (firstDay) return <EmptyDashboard />
 
@@ -51,9 +56,9 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Status-Chips */}
+        {/* Status-Chips — Rang klickbar → Rang-Leiter */}
         <div className="chips-row" style={{ marginTop: 11 }}>
-          <div className="stat-chip" style={{ flex: 1.7 }}>
+          <div className="stat-chip" style={{ flex: 1.7, cursor: 'pointer' }} onClick={() => nav('/profil/raenge')}>
             <span className="gd">✦</span>
             <span>{rank.rank} · Lvl {rank.level}</span>
           </div>
@@ -68,7 +73,7 @@ export default function Dashboard() {
         </div>
 
         {/* XP */}
-        <div className="xp-card" style={{ marginTop: 9 }}>
+        <div className="xp-card" style={{ marginTop: 9, cursor: 'pointer' }} onClick={() => nav('/profil/raenge')}>
           <div className="bar">
             <div className="fill" style={{ width: `${Math.round(rank.progress * 100)}%` }} />
             <span className="marker" style={{ left: `${Math.round(rank.progress * 100)}%` }}>✦</span>
@@ -82,11 +87,11 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Luna-Hero */}
-        <div className="hero" style={{ marginTop: 10, minHeight: 188 }}>
-          <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 0 }}>
+        {/* Luna-Hero · vollflächig (randlos) */}
+        <div className="hero hero--bleed" style={{ marginTop: 10, minHeight: 300 }}>
+          <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', minHeight: 0 }}>
             <div className="hero-bubble">„{lunaSays()}"</div>
-            <Luna state="idle" width={150} glowSize={150} glow={false} float style={{ alignSelf: 'center' }} />
+            <Luna state="idle" width={330} glow={false} float style={{ alignSelf: 'flex-end' }} />
           </div>
           <button
             className="btn-gold uppercase"
@@ -102,7 +107,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* 7-Tage-Serie */}
+        {/* 7-Tage-Serie + FOMO nächstes Sternbild */}
         <div className="card" style={{ marginTop: 10, borderRadius: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span className="card-title" style={{ fontSize: 13 }}>Deine 7-Tage-Serie</span>
@@ -127,11 +132,17 @@ export default function Dashboard() {
               )
             })}
           </div>
+          <div onClick={() => nav('/profil/sternbilder')} style={{ marginTop: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,.07)', paddingTop: 9 }}>
+            <span style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)' }}>
+              Noch <b style={{ color: 'var(--gold-1)' }}>{cprog.daysToNext}</b> {cprog.daysToNext === 1 ? 'Tag' : 'Tage'} bis <b style={{ color: 'var(--gold-1)' }}>{cprog.next?.name || 'zum nächsten Sternbild'}</b>
+            </span>
+            <span style={{ color: 'var(--purple-2)', font: '600 11px var(--font-body)' }}>{cprog.done}/{cprog.total} ›</span>
+          </div>
         </div>
 
-        {/* Teaser zuletzt empfangen */}
+        {/* Teaser zuletzt empfangen — anklickbar */}
         {last && (
-          <div className="card" style={{ marginTop: 10, borderRadius: 16 }}>
+          <div className="card" style={{ marginTop: 10, borderRadius: 16, cursor: 'pointer' }} onClick={() => nav(`/tagebuch/${last.id}`)}>
             <div style={{ fontFamily: 'var(--font-head)', color: 'var(--gold-1)', fontSize: 11.5, fontWeight: 600, letterSpacing: 0.5 }}>
               Zuletzt empfangen
             </div>
@@ -146,12 +157,9 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => nav('/tagebuch')}
-              style={{ marginTop: 9, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, border: '1px solid rgba(232,199,122,.35)', background: 'rgba(232,199,122,.06)', borderRadius: 11, padding: 8, color: 'var(--gold-1)', font: '600 12px var(--font-body)', cursor: 'pointer' }}
-            >
+            <div style={{ marginTop: 9, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, border: '1px solid rgba(232,199,122,.35)', background: 'rgba(232,199,122,.06)', borderRadius: 11, padding: 8, color: 'var(--gold-1)', font: '600 12px var(--font-body)' }}>
               <IcBook s={14} /> <span>Im Tagebuch öffnen</span> <span style={{ marginLeft: 2 }}>›</span>
-            </button>
+            </div>
           </div>
         )}
       </div>

@@ -120,6 +120,20 @@
   flex-direction: column;
   padding: 10px 12px 12px;
 }
+/* Vollflächige Start-Hero: randlos bis an die Telefonkanten (ggf. Pixel-Crop) */
+.hero--bleed {
+  margin-left: -15px;
+  margin-right: -15px;
+  border: none;
+  border-radius: 0;
+  padding-left: 12px;
+  padding-right: 12px;
+  background:
+    radial-gradient(130% 100% at 50% 34%, rgba(120, 72, 232, 0.55), rgba(45, 32, 72, 0.5) 55%, rgba(19, 17, 28, 0) 100%),
+    radial-gradient(1px 1px at 22% 26%, rgba(255, 255, 255, 0.85), transparent),
+    radial-gradient(1px 1px at 72% 20%, rgba(232, 199, 122, 0.8), transparent),
+    radial-gradient(1px 1px at 62% 58%, rgba(255, 255, 255, 0.5), transparent);
+}
 .hero-bubble {
   position: absolute;
   top: 4px;
@@ -245,6 +259,19 @@
 .orb span {
   color: rgba(255, 255, 255, 0.85);
   font-size: 30px;
+}
+
+/* Goldener Sternenwürfel als Auslöser (statt Kugel) */
+.dice-orb {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 35% 30%, rgba(232, 199, 122, 0.32), rgba(106, 59, 232, 0.28) 58%, transparent 72%);
 }
 
 /* ---------- Lade-Punkte ---------- */

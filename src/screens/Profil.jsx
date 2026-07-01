@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { LunaAvatar } from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
-import { RANKS } from '../data/library.js'
+import { RANKS, constellationProgress } from '../data/library.js'
 
 export default function Profil() {
   const nav = useNavigate()
   const { profile, stats, rank } = useStore()
+  const cprog = constellationProgress(stats.constellationsDone, stats.streak)
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 20px 16px' }}>
@@ -27,8 +28,8 @@ export default function Profil() {
         </div>
       </div>
 
-      {/* Sternenband */}
-      <div className="glass" style={{ marginTop: 16, padding: '14px 16px' }}>
+      {/* Sternenband — anklickbar → Rang-Leiter */}
+      <div className="glass" style={{ marginTop: 16, padding: '14px 16px', cursor: 'pointer' }} onClick={() => nav('/profil/raenge')}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
           <span style={{ color: '#7a7494', font: '600 10px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>Sternenband</span>
           <span style={{ color: 'var(--gold-1)', font: '700 13px var(--font-body)' }}>
@@ -52,6 +53,7 @@ export default function Profil() {
             </span>
           ))}
         </div>
+        <div style={{ marginTop: 8, color: 'var(--purple-2)', font: '600 10.5px var(--font-body)' }}>Tippen für Details &amp; Aufstiegslogik ›</div>
       </div>
 
       {/* Liste */}
@@ -60,13 +62,13 @@ export default function Profil() {
           <span>👤 Name · Geburtstag · Sternzeichen</span>
           <span className="chev">›</span>
         </button>
-        <button className="list-row" onClick={() => nav('/tagebuch')}>
-          <span>✦ Sternenstaub &amp; Sammlung</span>
+        <button className="list-row" onClick={() => nav('/profil/raenge')}>
+          <span>✦ Sternenstaub &amp; Rang</span>
           <span style={{ color: 'var(--gold-1)', fontWeight: 600 }}>{stats.stardust} ›</span>
         </button>
-        <button className="list-row" onClick={() => nav('/profil/settings')}>
+        <button className="list-row" onClick={() => nav('/profil/sternbilder')}>
           <span>☾ Meine Sternbilder</span>
-          <span className="chev">{stats.constellationsDone} / 12 ›</span>
+          <span className="chev">{cprog.done} / {cprog.total} ›</span>
         </button>
       </div>
 

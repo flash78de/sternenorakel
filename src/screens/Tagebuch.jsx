@@ -8,10 +8,18 @@ export default function Tagebuch() {
   const nav = useNavigate()
   const { journal } = useStore()
   const [q, setQ] = useState('')
+  const [filter, setFilter] = useState('Alle')
 
   // Gratis: die letzten 7 Botschaften
+  const pool = useMemo(() => journal.slice(0, 7), [journal])
+
+  const themes = useMemo(() => {
+    const set = [...new Set(pool.map((e) => e.theme).filter(Boolean))]
+    return ['Alle', ...set]
+  }, [pool])
+
   const visible = useMemo(() => {
-    const base = journal.slice(0, 7)
+    let base = filter === 'Alle' ? pool : pool.filter((e) => e.theme === filter)
     if (!q.trim()) return base
     const needle = q.toLowerCase()
     return base.filter(
@@ -21,7 +29,7 @@ export default function Tagebuch() {
         (e.reflection || '').toLowerCase().includes(needle) ||
         (e.theme || '').toLowerCase().includes(needle)
     )
-  }, [journal, q])
+  }, [pool, q, filter])
 
   if (journal.length === 0) {
     return (
@@ -44,7 +52,7 @@ export default function Tagebuch() {
   }
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '16px 17px 16px' }}>
+    <div className="screen-scroll" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '16px 17px 16px' }}>
       <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 21, color: 'var(--gold-1)', textAlign: 'center' }}>
         Dein Tagebuch
       </div>
@@ -61,9 +69,31 @@ export default function Tagebuch() {
         />
       </div>
 
+      {themes.length > 1 && (
+        <div style={{ marginTop: 11, display: 'flex', gap: 7, overflowX: 'auto', paddingBottom: 2 }}>
+          {themes.map((t) => (
+            <span
+              key={t}
+              onClick={() => setFilter(t)}
+              style={{
+                whiteSpace: 'nowrap', cursor: 'pointer', borderRadius: 999, padding: '6px 13px',
+                font: '600 11px var(--font-body)',
+                background: filter === t ? 'rgba(232,199,122,.14)' : 'rgba(255,255,255,.04)',
+                border: '1px solid ' + (filter === t ? 'var(--gold-1)' : 'rgba(255,255,255,.12)'),
+                color: filter === t ? 'var(--gold-1)' : 'var(--text-dim)',
+              }}
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
+
       <div style={{ marginTop: 13, display: 'flex', flexDirection: 'column', gap: 12 }}>
         {visible.map((e) => (
-          <div key={e.id} className="journal-item">
+          <div key={e.id} className="journal-item" role="button" tabIndex={0} style={{ cursor: 'pointer' }}
+            onClick={() => nav(`/tagebuch/${e.id}`)}
+            onKeyDown={(ev) => (ev.key === 'Enter' || ev.key === ' ') && nav(`/tagebuch/${e.id}`)}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
               <span style={{ fontFamily: 'var(--font-head)', color: 'var(--gold-1)', fontSize: 15, fontWeight: 600 }}>{e.title}</span>
               <span style={{ color: '#7a7494', font: '400 10.5px var(--font-body)', whiteSpace: 'nowrap' }}>{formatDate(new Date(e.ts)).short}</span>

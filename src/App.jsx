@@ -11,9 +11,14 @@ import OracleRitual from './screens/OracleRitual.jsx'
 import OracleDraw from './screens/OracleDraw.jsx'
 import Wissen from './screens/Wissen.jsx'
 import Tagebuch from './screens/Tagebuch.jsx'
+import JournalEntry from './screens/JournalEntry.jsx'
 import Profil from './screens/Profil.jsx'
 import Settings from './screens/Settings.jsx'
 import Privacy from './screens/Privacy.jsx'
+import Sternbilder from './screens/Sternbilder.jsx'
+import RankLadder from './screens/RankLadder.jsx'
+import Celebration from './screens/Celebration.jsx'
+import Rueckkehr from './screens/Rueckkehr.jsx'
 
 // Schützt Tab-Bereich, bis Onboarding abgeschlossen ist.
 function Gate({ children }) {
@@ -54,6 +59,11 @@ export default function App() {
             </Gate>
           }
         />
+        <Route path="/tagebuch/:id" element={<Gate><JournalEntry /></Gate>} />
+        <Route path="/profil/sternbilder" element={<Gate><Sternbilder /></Gate>} />
+        <Route path="/profil/raenge" element={<Gate><RankLadder /></Gate>} />
+        <Route path="/feier" element={<Gate><Celebration /></Gate>} />
+        <Route path="/rueckkehr" element={<Gate><Rueckkehr /></Gate>} />
       </Route>
 
       {/* Tab-Bereich — mit unterer Navigation */}

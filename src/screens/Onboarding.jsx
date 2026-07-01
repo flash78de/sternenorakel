@@ -4,7 +4,7 @@ import Luna, { LunaAvatar } from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
 import { THEMES, MONTHS, zodiacOf } from '../data/library.js'
 
-// 4-Schritt-Flow: Name → Themen → Stimmung → Geburtstag (Sternzeichen automatisch)
+// 4-Schritt-Flow: Name (optional) → Themen → Stimmung → Geburtstag (Sternzeichen automatisch)
 export default function Onboarding() {
   const nav = useNavigate()
   const { completeOnboarding } = useStore()
@@ -17,10 +17,7 @@ export default function Onboarding() {
   const [month, setMonth] = useState('')
   const [year, setYear] = useState('')
 
-  const zodiac = useMemo(
-    () => zodiacOf(Number(day), Number(month)),
-    [day, month]
-  )
+  const zodiac = useMemo(() => zodiacOf(Number(day), Number(month)), [day, month])
 
   const years = useMemo(() => {
     const now = new Date().getFullYear()
@@ -38,7 +35,7 @@ export default function Onboarding() {
   }
 
   const canNext =
-    step === 0 ? name.trim().length > 0 :
+    step === 0 ? true : // Name ist optional
     step === 1 ? themes.length > 0 :
     step === 2 ? true :
     Boolean(day && month && year)
@@ -61,7 +58,6 @@ export default function Onboarding() {
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 26px 32px' }}>
-      {/* Kopf: zurück + Fortschritt */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 6 }}>
         <button className="back" onClick={back} aria-label="Zurück">‹</button>
         <div className="steps">
@@ -79,10 +75,13 @@ export default function Onboarding() {
           <div className="title-lg" style={{ textAlign: 'center', marginTop: 8 }}>
             Wie darf ich<br />dich nennen?
           </div>
+          <div style={{ marginTop: 6, color: 'var(--purple-2)', font: '600 12px var(--font-body)', textAlign: 'center' }}>
+            optional · jederzeit änderbar
+          </div>
           <input
             className="field"
-            style={{ marginTop: 22 }}
-            placeholder="Dein Name"
+            style={{ marginTop: 16 }}
+            placeholder="Dein Name (optional)"
             value={name}
             autoFocus
             onChange={(e) => setName(e.target.value)}
@@ -157,7 +156,7 @@ export default function Onboarding() {
             Wann bist du<br />geboren?
           </div>
           <div style={{ marginTop: 8, color: 'var(--text-dim)', font: '400 13px var(--font-body)', textAlign: 'center' }}>
-            Daraus webt Luna deine persönlichen Impulse.
+            Daraus webt Luna deine persönlichen Impulse. (Später in den Einstellungen änderbar.)
           </div>
           <div className="dob" style={{ marginTop: 26 }}>
             <div className="col">
