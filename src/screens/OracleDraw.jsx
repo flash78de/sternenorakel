@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import Luna from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
-import { MESSAGES, pickMessage, formatDate } from '../data/library.js'
+import { formatDate } from '../data/library.js'
+import { generateMessage } from '../data/generator.js'
 import { speak, speechSupported } from '../lib/audio.js'
 
 // Kern-Flow: trigger (Würfel) → listening (Luna erwacht) → revelation → message
 // (auto-gespeichert) → reflection. Fehler = sanfter Zwischenzustand.
 export default function OracleDraw() {
   const nav = useNavigate()
+  const loc = useLocation()
+  const ritual = loc.state?.ritual || 'wuerfel' // von OracleRitual durchgereicht
   const { profile, journal, drawnToday, saveEntry, updateReflection, settings } = useStore()
 
   const listen = () => {
@@ -27,11 +30,12 @@ export default function OracleDraw() {
 
   useEffect(() => {
     if (drawnToday && todaysEntry) {
-      const full = MESSAGES.find((m) => m.id === todaysEntry.mid) || {
+      // Wiederansicht direkt aus dem Eintrag (generierte Botschaften stehen nicht in MESSAGES).
+      const full = {
         ...todaysEntry,
-        luck: '—',
-        energy: { label: '—', value: 0.5 },
-        reflection: 'Was bleibt von dieser Botschaft heute bei dir?',
+        luck: todaysEntry.luck ?? '—',
+        energy: todaysEntry.energy ?? { label: '—', value: 0.5 },
+        reflection: todaysEntry.question ?? 'Was bleibt von dieser Botschaft heute bei dir?',
       }
       setMessage(full)
       setNote(todaysEntry.reflection || '')
@@ -54,7 +58,12 @@ export default function OracleDraw() {
         setPhase('revelation')
         timers.current.push(
           setTimeout(() => {
-            const msg = pickMessage(profile.themes, todaysEntry?.mid)
+            const msg = generateMessage({
+              name: profile.name,
+              themes: profile.themes,
+              mood: profile.mood,
+              ritual,
+            })
             const res = saveEntry(msg, '')
             setMessage(msg)
             setSaved(res)
@@ -63,7 +72,7 @@ export default function OracleDraw() {
         )
       }, 2300)
     )
-  }, [profile.themes, todaysEntry, saveEntry])
+  }, [profile.name, profile.themes, profile.mood, ritual, saveEntry])
 
   // Belohnung → eigener Feier-Screen (22); sonst Dashboard
   const finish = () => {
@@ -190,7 +199,7 @@ export default function OracleDraw() {
         <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 30, lineHeight: 1.1, color: 'var(--gold-1)', textAlign: 'center', marginTop: 10, textShadow: '0 2px 16px rgba(232,199,122,.4)' }}>
           {message.title}
         </div>
-        <div style={{ color: 'var(--text)', font: '400 14px/1.7 var(--font-body)', textAlign: 'center', marginTop: 12, padding: '0 2px' }}>
+        <div style={{ color: 'var(--text)', font: '400 14px/1.7 var(--font-body)', textAlign: 'center', marginTop: 12, padding: '0 2px', whiteSpace: 'pre-line' }}>
           {message.text}
         </div>
 

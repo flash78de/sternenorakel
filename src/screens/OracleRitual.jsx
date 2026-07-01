@@ -27,7 +27,7 @@ export default function OracleRitual() {
 
       <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 13 }}>
         {/* Sternenwürfel — frei */}
-        <button className="ritual" onClick={() => nav('/oracle/draw')}>
+        <button className="ritual" onClick={() => nav('/oracle/draw', { state: { ritual: 'wuerfel' } })}>
           <span className="ico">
             <img src="/uploads/wuerfel.png" alt="Würfel" style={{ width: 50, height: 50, objectFit: 'contain', filter: 'drop-shadow(0 4px 10px rgba(232,199,122,.45))' }} />
           </span>
@@ -40,8 +40,8 @@ export default function OracleRitual() {
           <span style={{ color: 'var(--purple-2)', fontSize: 20 }}>›</span>
         </button>
 
-        <Ritual premium={premium} nav={nav} title="Sternenkarten" desc="Ein Bild aus dem Deck der inneren Bilder." icon={cards.icon} />
-        <Ritual premium={premium} nav={nav} title="Runen" desc="Alte Zeichen, die in die Gegenwart sprechen."
+        <Ritual premium={premium} nav={nav} ritual="karten" title="Sternenkarten" desc="Ein Bild aus dem Deck der inneren Bilder." icon={cards.icon} />
+        <Ritual premium={premium} nav={nav} ritual="runen" title="Runen" desc="Alte Zeichen, die in die Gegenwart sprechen."
           icon={<span style={{ fontFamily: 'var(--font-head)', color: 'var(--gold-1)', fontSize: 26 }}>ᚱ</span>} />
       </div>
 
@@ -57,10 +57,10 @@ export default function OracleRitual() {
   )
 }
 
-function Ritual({ premium, nav, title, desc, icon }) {
+function Ritual({ premium, nav, ritual, title, desc, icon }) {
   if (premium)
     return (
-      <button className="ritual" onClick={() => nav('/oracle/draw')}>
+      <button className="ritual" onClick={() => nav('/oracle/draw', { state: { ritual } })}>
         <span className="ico">{icon}</span>
         <span style={{ flex: 1, minWidth: 0 }}>
           <span style={{ display: 'block', fontFamily: 'var(--font-head)', color: 'var(--gold-1)', fontSize: 16, fontWeight: 600 }}>{title}</span>

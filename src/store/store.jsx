@@ -32,7 +32,7 @@ const DEFAULT_STATE = {
     tone: 'Sanft',
     premium: false, // Sternenorakel Plus (Demo)
   },
-  journal: [], // {id, ts, iso, title, symbol, constellation, theme, mantra, text, reflection}
+  journal: [], // {id, ts, iso, mid, title, symbol, constellation, theme, mantra, text, luck, energy, question, reflection}
   seenReward: null, // id der zuletzt gezeigten Belohnung
   seenReturnISO: null, // Tag, an dem der Rückkehr-Screen zuletzt gezeigt wurde
 }
@@ -140,7 +140,12 @@ export function StoreProvider({ children }) {
         theme: message.theme,
         mantra: message.mantra,
         text: message.text,
-        reflection: reflection || '',
+        // Generierte Botschaften stehen nicht in MESSAGES → volle Felder mitspeichern,
+        // damit Wiederansicht & Detailseite unabhängig funktionieren.
+        luck: message.luck ?? null,
+        energy: message.energy ?? null,
+        question: message.reflection ?? null, // Reflexionsfrage (NICHT die Nutzer-Notiz)
+        reflection: reflection || '', // Nutzer-Notiz
       }
 
       result = {

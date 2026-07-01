@@ -40,8 +40,11 @@ export default function JournalEntry() {
   }
 
   const dateStr = formatDate(new Date(entry.ts))
-  const luck = full?.luck
-  const energy = full?.energy
+  // Bevorzugt die im Eintrag gespeicherten Felder (generierte Botschaften);
+  // Fallback auf die kuratierte MESSAGES-Vorlage für ältere Einträge.
+  const luck = entry.luck ?? full?.luck
+  const energy = entry.energy ?? full?.energy
+  const question = entry.question ?? full?.reflection
 
   const saveNote = () => {
     updateReflection(entry.id, note)
@@ -100,7 +103,7 @@ export default function JournalEntry() {
         </div>
       </div>
 
-      <div style={{ color: 'var(--text)', font: '400 14px/1.7 var(--font-body)', textAlign: 'center', marginTop: 14 }}>
+      <div style={{ color: 'var(--text)', font: '400 14px/1.7 var(--font-body)', textAlign: 'center', marginTop: 14, whiteSpace: 'pre-line' }}>
         {entry.text}
       </div>
 
@@ -120,6 +123,17 @@ export default function JournalEntry() {
           <div style={{ flex: 1, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 13, padding: '9px 11px' }}>
             <div style={{ color: '#7a7494', font: '600 8.5px var(--font-body)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Tagesenergie</div>
             <div style={{ color: 'var(--purple-2)', font: '600 12px var(--font-body)', marginTop: 4 }}>{energy?.label || '—'}</div>
+          </div>
+        </div>
+      )}
+
+      {question && (
+        <div className="glass-purple" style={{ marginTop: 14, padding: '12px 14px' }}>
+          <div style={{ color: 'var(--purple-2)', font: '600 9px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 5 }}>
+            Lunas Frage an dich
+          </div>
+          <div style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 14.5, color: 'var(--text)', lineHeight: 1.4 }}>
+            {question}
           </div>
         </div>
       )}
