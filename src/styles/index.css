@@ -99,6 +99,10 @@ img {
     padding: 22px 0;
   }
   .phone {
+    /* Feste Breite am Desktop: verhindert das Kollabieren auf ~0px, wenn ein
+       Screen ausschließlich absolut positionierte Elemente enthält (z. B. der
+       „Luna erwacht …"-Lade-Screen, dessen Bild + Punkte absolut liegen). */
+    width: var(--maxw);
     min-height: min(880px, calc(100dvh - 44px));
     height: min(880px, calc(100dvh - 44px));
     border-radius: 40px;
