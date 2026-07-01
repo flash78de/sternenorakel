@@ -1,0 +1,440 @@
+/* ============================================================
+   Sternenorakel — Design System
+   Farben, Typografie, Glassmorphism 2.0, Animationen
+   ============================================================ */
+:root {
+  /* Hintergründe */
+  --bg-0: #0b0a12;
+  --bg-1: #13111c;
+  --bg-deep: #08070e;
+  --bg-card-raise: #241d36;
+
+  /* Lila-Verlauf */
+  --purple-1: #6a3be8;
+  --purple-2: #a66bff;
+
+  /* Gold-Akzent */
+  --gold-1: #e8c77a;
+  --gold-2: #d9b45a;
+  --gold-ink: #1a1206; /* dunkle Schrift auf Gold-CTA */
+
+  /* Text */
+  --text: #f5f4fa;
+  --text-dim: #b6b0ce;
+  --text-faint: #7a7494;
+  --text-mute: #8a83a6;
+
+  /* Gefahr (sanftes Rotviolett) */
+  --danger: #ff7a9a;
+
+  --radius-card: 18px;
+  --radius-lg: 20px;
+  --radius-sm: 14px;
+
+  --maxw: 420px;
+
+  --font-head: 'Cinzel', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--bg-0);
+  /* Umgebungsraum hinter dem Telefon (Desktop) */
+  background:
+    radial-gradient(900px 700px at 12% -5%, rgba(106, 59, 232, 0.22), transparent 60%),
+    radial-gradient(900px 700px at 92% 0%, rgba(166, 107, 255, 0.14), transparent 60%),
+    #07060c;
+  overscroll-behavior: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* ---------- Telefon-Hülle (mobil-first, zentriert auf Desktop) ---------- */
+.phone {
+  position: relative;
+  width: 100%;
+  max-width: var(--maxw);
+  min-height: 100dvh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Sternenfeld + Lila-Orbs + Anthrazit-Aubergine-Verlauf */
+  background:
+    radial-gradient(1px 1px at 18% 10%, rgba(245, 244, 250, 0.7), transparent),
+    radial-gradient(1.4px 1.4px at 80% 16%, rgba(232, 199, 122, 0.55), transparent),
+    radial-gradient(1px 1px at 40% 48%, rgba(245, 244, 250, 0.4), transparent),
+    radial-gradient(1px 1px at 66% 74%, rgba(245, 244, 250, 0.35), transparent),
+    radial-gradient(1.2px 1.2px at 28% 86%, rgba(232, 199, 122, 0.4), transparent),
+    radial-gradient(260px 260px at 86% 0%, rgba(106, 59, 232, 0.28), transparent 70%),
+    radial-gradient(130% 75% at 50% -8%, var(--bg-card-raise), var(--bg-1) 45%, var(--bg-0));
+}
+
+@media (min-width: 460px) {
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 22px 0;
+  }
+  .phone {
+    min-height: min(880px, calc(100dvh - 44px));
+    height: min(880px, calc(100dvh - 44px));
+    border-radius: 40px;
+    border: 1px solid rgba(232, 199, 122, 0.14);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+}
+
+/* Scrollbarer Inhaltsbereich innerhalb der Hülle */
+.screen {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.screen-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.screen-scroll::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+.pad {
+  padding: 14px 20px;
+}
+.pad-x {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* Statusleiste (Mock) */
+.statusbar {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+  color: var(--text);
+  font: 600 13px var(--font-body);
+  flex-shrink: 0;
+}
+.statusbar .glyphs {
+  opacity: 0.8;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+/* ---------- Typografie ---------- */
+.h-serif {
+  font-family: var(--font-head);
+  color: var(--text);
+}
+.gold {
+  color: var(--gold-1);
+}
+.title-xl {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 30px;
+  color: var(--gold-1);
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 18px rgba(232, 199, 122, 0.35);
+}
+.title-lg {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 23px;
+  color: var(--text);
+  line-height: 1.3;
+}
+.subtle {
+  color: var(--text-dim);
+  font: 400 13.5px/1.55 var(--font-body);
+}
+.faint {
+  color: var(--text-faint);
+}
+
+/* ---------- Glas-Karten ---------- */
+.glass {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(232, 199, 122, 0.18);
+  border-radius: var(--radius-card);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(10px);
+}
+.glass-soft {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+}
+.glass-purple {
+  background: rgba(166, 107, 255, 0.1);
+  border: 1px solid rgba(166, 107, 255, 0.26);
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- Buttons ---------- */
+.btn-gold {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+  color: var(--gold-ink);
+  font: 700 15px var(--font-body);
+  letter-spacing: 0.3px;
+  box-shadow: 0 12px 30px rgba(232, 199, 122, 0.32);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+.btn-gold:active {
+  transform: translateY(1px) scale(0.99);
+  box-shadow: 0 6px 18px rgba(232, 199, 122, 0.28);
+}
+.btn-gold:disabled {
+  filter: grayscale(0.4) brightness(0.7);
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.btn-gold.uppercase {
+  font-family: var(--font-head);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.btn-ghost {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 122, 154, 0.1);
+  border: 1px solid rgba(255, 122, 154, 0.45);
+  color: var(--danger);
+  font: 600 14px var(--font-body);
+  cursor: pointer;
+}
+.link-soft {
+  color: var(--text-dim);
+  font: 500 13px var(--font-body);
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+.link-soft b {
+  color: var(--purple-2);
+}
+
+.back {
+  opacity: 0.85;
+  cursor: pointer;
+  font-size: 20px;
+  background: none;
+  border: none;
+  color: var(--text);
+  line-height: 1;
+  padding: 2px 4px;
+}
+
+/* ---------- Fortschrittsbalken (Onboarding) ---------- */
+.steps {
+  flex: 1;
+  display: flex;
+  gap: 6px;
+}
+.steps span {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.steps span.on {
+  background: linear-gradient(90deg, var(--gold-1), var(--gold-2));
+}
+
+/* ---------- Chips / Pills ---------- */
+.pill {
+  background: rgba(166, 107, 255, 0.16);
+  border: 1px solid rgba(166, 107, 255, 0.3);
+  border-radius: 999px;
+  padding: 4px 12px;
+  color: var(--gold-1);
+  font: 600 11px var(--font-body);
+}
+.chip {
+  padding: 11px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text);
+  font: 500 13px var(--font-body);
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+.chip.sel {
+  background: linear-gradient(135deg, rgba(106, 59, 232, 0.45), rgba(166, 107, 255, 0.4));
+  border: 1px solid var(--gold-1);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 6px 16px rgba(106, 59, 232, 0.35);
+}
+
+/* ---------- Eingabefelder ---------- */
+.field {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(232, 199, 122, 0.22);
+  border-radius: 16px;
+  padding: 16px;
+  color: var(--text);
+  font: 500 16px var(--font-body);
+  outline: none;
+}
+.field:focus {
+  border-color: var(--gold-1);
+  box-shadow: 0 0 0 3px rgba(232, 199, 122, 0.12);
+}
+.field::placeholder {
+  color: var(--text-faint);
+}
+
+/* ---------- Umschalter ---------- */
+.toggle {
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  position: relative;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.toggle .knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.toggle.on {
+  background: linear-gradient(135deg, var(--purple-1), var(--purple-2));
+  border-color: transparent;
+  box-shadow: 0 0 12px rgba(166, 107, 255, 0.5);
+}
+.toggle.on .knob {
+  transform: translateX(20px);
+  background: #fff;
+}
+
+/* ---------- Luna ---------- */
+.luna {
+  position: relative;
+  display: block;
+}
+.luna-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(16px);
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Sprechblase */
+.bubble {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(232, 199, 122, 0.18);
+  border-radius: 16px;
+  padding: 14px 16px;
+  color: var(--text);
+  font: 400 14px/1.55 var(--font-body);
+  backdrop-filter: blur(10px);
+}
+.bubble b {
+  color: var(--gold-1);
+  font-weight: 600;
+}
+
+/* ---------- Animationen ---------- */
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+@keyframes orbpulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 42px 8px rgba(166, 107, 255, 0.45), 0 0 90px 24px rgba(106, 59, 232, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 64px 14px rgba(232, 199, 122, 0.4), 0 0 130px 36px rgba(106, 59, 232, 0.4);
+  }
+}
+@keyframes burst {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pop {
+  0% { opacity: 0; transform: scale(0.9); }
+  60% { transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.anim-float { animation: floaty 6s ease-in-out infinite; }
+.anim-orb { animation: orbpulse 3.4s ease-in-out infinite; }
+.anim-burst { animation: burst 3s ease-in-out infinite; }
+.fade-up { animation: fadeUp 0.5s ease both; }
+.pop { animation: pop 0.45s ease both; }
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* Routen-Übergang */
+.route-fade { animation: fadeUp 0.34s ease both; }
