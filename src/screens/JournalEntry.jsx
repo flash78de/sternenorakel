@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useStore } from '../store/store.jsx'
 import { MESSAGES, formatDate } from '../data/library.js'
+import { speak, speechSupported } from '../lib/audio.js'
 
 const softBtn = {
   flex: 1,
@@ -18,7 +19,7 @@ const softBtn = {
 export default function JournalEntry() {
   const nav = useNavigate()
   const { id } = useParams()
-  const { journal, updateReflection, deleteEntry } = useStore()
+  const { journal, updateReflection, deleteEntry, settings } = useStore()
 
   const entry = journal.find((e) => e.id === id)
   const full = useMemo(() => MESSAGES.find((m) => m.id === entry?.mid) || null, [entry])
@@ -138,6 +139,12 @@ export default function JournalEntry() {
       <div style={{ marginTop: 10, display: 'flex', gap: 10 }}>
         <button onClick={share} style={softBtn}>⇪ Teilen</button>
         <button onClick={exportTxt} style={softBtn}>⬇ Export</button>
+        {speechSupported && (
+          <button style={softBtn} onClick={() => {
+            if (!settings.premium) { nav('/profil/plus'); return }
+            speak(`${entry.title}. ${entry.text} Dein Mantra: ${entry.mantra}`, settings.tone)
+          }}>🔊 Anhören</button>
+        )}
       </div>
 
       <button className="btn-ghost" style={{ marginTop: 10 }} onClick={() => setConfirm(true)}>

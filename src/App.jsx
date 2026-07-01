@@ -19,6 +19,8 @@ import Sternbilder from './screens/Sternbilder.jsx'
 import RankLadder from './screens/RankLadder.jsx'
 import Celebration from './screens/Celebration.jsx'
 import Rueckkehr from './screens/Rueckkehr.jsx'
+import PlusDetail from './screens/PlusDetail.jsx'
+import Erinnerung from './screens/Erinnerung.jsx'
 
 // Schützt Tab-Bereich, bis Onboarding abgeschlossen ist.
 function Gate({ children }) {
@@ -64,6 +66,8 @@ export default function App() {
         <Route path="/profil/raenge" element={<Gate><RankLadder /></Gate>} />
         <Route path="/feier" element={<Gate><Celebration /></Gate>} />
         <Route path="/rueckkehr" element={<Gate><Rueckkehr /></Gate>} />
+        <Route path="/profil/plus" element={<Gate><PlusDetail /></Gate>} />
+        <Route path="/profil/erinnerung" element={<Gate><Erinnerung /></Gate>} />
       </Route>
 
       {/* Tab-Bereich — mit unterer Navigation */}

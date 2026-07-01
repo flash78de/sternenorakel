@@ -3,12 +3,18 @@ import { useNavigate } from 'react-router-dom'
 import Luna from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
 import { MESSAGES, pickMessage, formatDate } from '../data/library.js'
+import { speak, speechSupported } from '../lib/audio.js'
 
 // Kern-Flow: trigger (Würfel) → listening (Luna erwacht) → revelation → message
 // (auto-gespeichert) → reflection. Fehler = sanfter Zwischenzustand.
 export default function OracleDraw() {
   const nav = useNavigate()
-  const { profile, journal, drawnToday, saveEntry, updateReflection } = useStore()
+  const { profile, journal, drawnToday, saveEntry, updateReflection, settings } = useStore()
+
+  const listen = () => {
+    if (!settings.premium) { nav('/profil/plus'); return }
+    if (message) speak(`${message.title}. ${message.text} Dein Mantra: ${message.mantra}`, settings.tone)
+  }
 
   const todaysEntry = journal.find((e) => e.iso === formatDate().iso)
 
@@ -223,6 +229,14 @@ export default function OracleDraw() {
         )}
 
         <div style={{ flex: 1, minHeight: 10 }} />
+        {speechSupported && (
+          <button
+            onClick={listen}
+            style={{ marginTop: 10, width: '100%', padding: 12, borderRadius: 12, background: 'rgba(166,107,255,.14)', border: '1px solid rgba(167,139,250,.4)', color: 'var(--text)', font: '600 13px var(--font-body)', cursor: 'pointer' }}
+          >
+            🔊 Botschaft anhören {!settings.premium && <span style={{ color: 'var(--gold-1)', fontSize: 11 }}>· Plus</span>}
+          </button>
+        )}
         <button className="btn-gold" style={{ padding: 14, borderRadius: 15, marginTop: 10 }} onClick={() => setPhase('reflection')}>
           Reflektieren ↓
         </button>

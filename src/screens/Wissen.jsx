@@ -45,6 +45,28 @@ export default function Wissen() {
         </div>
       </div>
 
+      <div className="card" style={{ marginTop: 11 }}>
+        <div className="card-title" style={{ marginBottom: 9 }}>Luna begleitet dich – in 6 Zuständen</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
+          {[
+            { s: 'idle', n: 'Ruhe', d: 'Start & Dashboard' },
+            { s: 'lauschen', n: 'Lauschen', d: 'beim Laden' },
+            { s: 'offenbarung', n: 'Offenbarung', d: 'die Botschaft' },
+            { s: 'freude', n: 'Freude', d: 'Belohnung' },
+            { s: 'icon', n: 'Sehnsucht', d: 'Rückkehr' },
+            { s: 'schlaf', n: 'Schlaf', d: 'Abend & Pause' },
+          ].map((x) => (
+            <div key={x.n} style={{ textAlign: 'center' }}>
+              <div style={{ borderRadius: 12, padding: 6, background: 'radial-gradient(circle at 50% 30%,rgba(106,59,232,.28),transparent 65%)' }}>
+                <img src={`/uploads/luna-${x.s}-transparent.png`} alt={x.n} style={{ width: '100%', height: 'auto' }} />
+              </div>
+              <div style={{ fontFamily: 'var(--font-head)', color: 'var(--gold-1)', fontSize: 12, marginTop: 4 }}>{x.n}</div>
+              <div style={{ color: '#7a7494', font: '400 9.5px var(--font-body)' }}>{x.d}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="card" style={{ marginTop: 11, padding: '6px 15px 8px' }}>
         <div className="card-title" style={{ padding: '9px 0 2px' }}>Häufige Fragen</div>
         {FAQ.map((item, i) => (

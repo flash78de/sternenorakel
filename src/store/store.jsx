@@ -28,7 +28,9 @@ const DEFAULT_STATE = {
     aiMode: false,
     reminder: true,
     reminderTime: '21:00',
+    reminderWhen: 'abends', // morgens | mittags | abends | aus
     tone: 'Sanft',
+    premium: false, // Sternenorakel Plus (Demo)
   },
   journal: [], // {id, ts, iso, title, symbol, constellation, theme, mantra, text, reflection}
   seenReward: null, // id der zuletzt gezeigten Belohnung

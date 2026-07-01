@@ -126,18 +126,16 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Tägliche Erinnerung */}
-      <div style={{ marginTop: 12, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 16, padding: '13px 15px', display: 'flex', alignItems: 'center', gap: 11 }}>
+      {/* Tägliche Erinnerung → eigener Screen */}
+      <div onClick={() => nav('/profil/erinnerung')} style={{ marginTop: 12, cursor: 'pointer', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 16, padding: '13px 15px', display: 'flex', alignItems: 'center', gap: 11 }}>
         <img src="/uploads/luna-schlaf-transparent.png" alt="" style={{ width: 40, height: 40, objectFit: 'contain' }} />
         <div style={{ flex: 1 }}>
-          <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>Tägliche Erinnerung</div>
+          <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>Erinnerung</div>
           <div style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)', marginTop: 1 }}>
-            Jeden Abend um <b style={{ color: 'var(--gold-1)' }}>{settings.reminderTime}</b>
+            {settings.reminder ? <>Aktiv um <b style={{ color: 'var(--gold-1)' }}>{settings.reminderTime}</b> · {settings.reminderWhen}</> : 'Aus'}
           </div>
         </div>
-        <span className={'toggle' + (settings.reminder ? ' on' : '')} onClick={() => updateSettings({ reminder: !settings.reminder })}>
-          <span className="knob" />
-        </span>
+        <span className="meta">›</span>
       </div>
 
       {/* Premium */}
@@ -151,10 +149,10 @@ export default function Settings() {
         </div>
         <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ color: 'var(--text-dim)', font: '500 12px var(--font-body)' }}>
-            <b style={{ color: 'var(--text)', fontSize: 16 }}>3,99 €</b> / Monat
+            {settings.premium ? <b style={{ color: 'var(--gold-1)' }}>✦ Plus ist aktiv</b> : <><b style={{ color: 'var(--text)', fontSize: 16 }}>3,99 €</b> / Monat</>}
           </span>
-          <button style={{ background: 'linear-gradient(135deg,#E8C77A,#D9B45A)', color: 'var(--gold-ink)', font: '700 12px var(--font-body)', padding: '9px 18px', borderRadius: 12, border: 'none', boxShadow: '0 6px 16px rgba(232,199,122,.3)', cursor: 'pointer' }}>
-            Plus entdecken
+          <button onClick={() => nav('/profil/plus')} style={{ background: 'linear-gradient(135deg,#E8C77A,#D9B45A)', color: 'var(--gold-ink)', font: '700 12px var(--font-body)', padding: '9px 18px', borderRadius: 12, border: 'none', boxShadow: '0 6px 16px rgba(232,199,122,.3)', cursor: 'pointer' }}>
+            {settings.premium ? 'Verwalten' : 'Plus entdecken'}
           </button>
         </div>
       </div>

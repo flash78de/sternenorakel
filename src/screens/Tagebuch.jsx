@@ -6,12 +6,12 @@ import { formatDate } from '../data/library.js'
 
 export default function Tagebuch() {
   const nav = useNavigate()
-  const { journal } = useStore()
+  const { journal, settings } = useStore()
   const [q, setQ] = useState('')
   const [filter, setFilter] = useState('Alle')
 
-  // Gratis: die letzten 7 Botschaften
-  const pool = useMemo(() => journal.slice(0, 7), [journal])
+  // Gratis: die letzten 7 Botschaften · Plus: der ganze Weg
+  const pool = useMemo(() => (settings.premium ? journal : journal.slice(0, 7)), [journal, settings.premium])
 
   const themes = useMemo(() => {
     const set = [...new Set(pool.map((e) => e.theme).filter(Boolean))]
@@ -57,7 +57,7 @@ export default function Tagebuch() {
         Dein Tagebuch
       </div>
       <div style={{ color: 'var(--text-dim)', font: '400 12px var(--font-body)', textAlign: 'center', fontStyle: 'italic', marginTop: 6 }}>
-        Deine letzten 7 Botschaften. Mit Plus bleibt dein ganzer Weg erhalten.
+        {settings.premium ? 'Dein ganzer Weg – alle festgehaltenen Botschaften.' : 'Deine letzten 7 Botschaften. Mit Plus bleibt dein ganzer Weg erhalten.'}
       </div>
 
       <div className="search" style={{ marginTop: 14 }}>
