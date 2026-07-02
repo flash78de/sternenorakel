@@ -115,6 +115,9 @@ export default function Erinnerung() {
       <div style={{ textAlign: 'center', color: hint ? 'var(--gold-1)' : '#7a7494', font: '400 10.5px/1.45 var(--font-body)', marginTop: 8 }}>
         {hint || 'Du kannst das jederzeit in den Einstellungen ändern.'}
       </div>
+      <div style={{ textAlign: 'center', color: '#7a7494', font: '400 9.5px/1.4 var(--font-body)', marginTop: 6 }}>
+        Hinweis: Browser-Erinnerungen funktionieren nur, wenn die App geöffnet bzw. installiert ist – zuverlässige tägliche Push-Nachrichten folgen später.
+      </div>
     </div>
   )
 }

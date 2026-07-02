@@ -52,6 +52,13 @@ export default function AccountVariant() {
         ✦ Passwortlos: Wir senden dir einen <b style={{ color: 'var(--text)', fontWeight: 600 }}>Magic Link</b> – kein Passwort nötig.
       </div>
 
+      <div style={{ marginTop: 10, display: 'flex', gap: 8, alignItems: 'flex-start', background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 12, padding: '10px 12px' }}>
+        <span style={{ color: '#7a7494', fontSize: 13 }}>ⓘ</span>
+        <div style={{ color: '#7a7494', font: '400 10.5px/1.45 var(--font-body)' }}>
+          <b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Demo:</b> Konto &amp; Sync sind eine Vorschau – es wird noch keine echte E-Mail versendet und nichts in eine Cloud übertragen.
+        </div>
+      </div>
+
       {/* Vorteile */}
       <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
         {VORTEILE.map((v) => (
@@ -104,7 +111,7 @@ export default function AccountVariant() {
 
       <div style={{ flex: 1, minHeight: 14 }} />
       <div style={{ color: '#7a7494', font: '400 11.5px/1.5 var(--font-body)', textAlign: 'center' }}>
-        🔒 Ende-zu-Ende verschlüsselt. Du kannst jederzeit zu local-first zurück.
+        🔒 Später verschlüsselt übertragen und geschützt gespeichert. Du kannst jederzeit bei local-first bleiben.
       </div>
     </div>
   )

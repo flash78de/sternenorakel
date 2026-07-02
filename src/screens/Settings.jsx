@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/store.jsx'
 import { THEMES, MONTHS, zodiacOf } from '../data/library.js'
 import { asset } from '../lib/asset.js'
+import DarkPicker from '../components/DarkPicker.jsx'
 
 const TONES = [
   { key: 'Sanft', desc: 'Warm und einfühlsam' },
@@ -61,27 +62,12 @@ export default function Settings() {
 
         <div style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)', margin: '14px 0 6px' }}>Geburtstag</div>
         <div className="dob">
-          <div className="col">
-            <select value={day} onChange={(e) => { setDay(e.target.value); saveBirth(e.target.value, month, year) }} aria-label="Tag">
-              <option value="">–</option>
-              {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => <option key={d} value={d}>{d}</option>)}
-            </select>
-            <label>TAG</label>
-          </div>
-          <div className="col" style={{ flex: 1.4 }}>
-            <select value={month} onChange={(e) => { setMonth(e.target.value); saveBirth(day, e.target.value, year) }} aria-label="Monat" style={{ fontSize: 16 }}>
-              <option value="">–</option>
-              {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
-            </select>
-            <label style={{ color: month ? 'var(--gold-1)' : undefined }}>MONAT</label>
-          </div>
-          <div className="col" style={{ flex: 1.2 }}>
-            <select value={year} onChange={(e) => { setYear(e.target.value); saveBirth(day, month, e.target.value) }} aria-label="Jahr" style={{ fontSize: 18 }}>
-              <option value="">–</option>
-              {years.map((y) => <option key={y} value={y}>{y}</option>)}
-            </select>
-            <label>JAHR</label>
-          </div>
+          <DarkPicker label="TAG" ariaLabel="Tag" value={day} onChange={(v) => { setDay(v); saveBirth(v, month, year) }}
+            options={Array.from({ length: 31 }, (_, i) => ({ value: i + 1, label: String(i + 1) }))} />
+          <DarkPicker label="MONAT" ariaLabel="Monat" flex={1.6} valueSize={16} value={month} onChange={(v) => { setMonth(v); saveBirth(day, v, year) }}
+            options={MONTHS.map((m, i) => ({ value: i + 1, label: m }))} />
+          <DarkPicker label="JAHR" ariaLabel="Jahr" flex={1.2} value={year} onChange={(v) => { setYear(v); saveBirth(day, month, v) }}
+            options={years.map((y) => ({ value: y, label: String(y) }))} />
         </div>
         {zodiac && day && month && (
           <div className="zodiac-card" style={{ marginTop: 14 }}>
@@ -125,6 +111,17 @@ export default function Settings() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Startanimation „Luna erwacht" */}
+      <div className="glass" style={{ marginTop: 12, padding: '13px 15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>„Luna erwacht"-Start</div>
+          <div style={{ color: 'var(--text-dim)', font: '400 10.5px/1.4 var(--font-body)', marginTop: 2 }}>Kurze Startanimation beim Öffnen der App</div>
+        </div>
+        <span className={'toggle' + (settings.splash !== false ? ' on' : '')} onClick={() => updateSettings({ splash: settings.splash === false })}>
+          <span className="knob" />
+        </span>
       </div>
 
       {/* Tägliche Erinnerung → eigener Screen */}

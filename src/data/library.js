@@ -7,8 +7,13 @@
 export const THEMES = [
   'Liebe & Beziehungen',
   'Beruf & Berufung',
+  'Schule & Lernen',
   'Selbstwert & innere Ruhe',
   'Veränderung & Neuanfang',
+  'Entscheidungen & Klarheit',
+  'Kreativität',
+  'Loslassen',
+  'Dankbarkeit',
 ]
 
 // ---- Rang-Leiter (kanonisch) ----

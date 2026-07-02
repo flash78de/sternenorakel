@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Luna, { LunaAvatar } from '../components/Luna.jsx'
+import DarkPicker from '../components/DarkPicker.jsx'
 import { useStore } from '../store/store.jsx'
 import { THEMES, MONTHS, zodiacOf } from '../data/library.js'
 
@@ -109,7 +110,7 @@ export default function Onboarding() {
             Was beschäftigt<br />dich gerade?
           </div>
           <div style={{ marginTop: 7, color: 'var(--purple-2)', font: '600 12px var(--font-body)', textAlign: 'center' }}>
-            bis zu 3 wählen
+            {themes.length > 0 ? `${themes.length} von 3 gewählt` : 'bis zu 3 wählen'}
           </div>
           <div style={{ marginTop: 20, display: 'flex', flexWrap: 'wrap', gap: 11, justifyContent: 'center' }}>
             {THEMES.map((t) => (
@@ -156,36 +157,15 @@ export default function Onboarding() {
             Wann bist du<br />geboren?
           </div>
           <div style={{ marginTop: 8, color: 'var(--text-dim)', font: '400 13px var(--font-body)', textAlign: 'center' }}>
-            Daraus webt Luna deine persönlichen Impulse. (Später in den Einstellungen änderbar.)
+            Damit Luna dein Sternzeichen als symbolischen Impuls einbeziehen kann. (Später im Profil änderbar.)
           </div>
           <div className="dob" style={{ marginTop: 26 }}>
-            <div className="col">
-              <select value={day} onChange={(e) => setDay(e.target.value)} aria-label="Tag">
-                <option value="">–</option>
-                {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
-              <label>TAG</label>
-            </div>
-            <div className="col" style={{ flex: 1.4 }}>
-              <select value={month} onChange={(e) => setMonth(e.target.value)} aria-label="Monat" style={{ fontSize: 16 }}>
-                <option value="">–</option>
-                {MONTHS.map((m, i) => (
-                  <option key={m} value={i + 1}>{m}</option>
-                ))}
-              </select>
-              <label style={{ color: month ? 'var(--gold-1)' : undefined }}>MONAT</label>
-            </div>
-            <div className="col" style={{ flex: 1.2 }}>
-              <select value={year} onChange={(e) => setYear(e.target.value)} aria-label="Jahr" style={{ fontSize: 18 }}>
-                <option value="">–</option>
-                {years.map((y) => (
-                  <option key={y} value={y}>{y}</option>
-                ))}
-              </select>
-              <label>JAHR</label>
-            </div>
+            <DarkPicker label="TAG" ariaLabel="Tag" value={day} onChange={setDay}
+              options={Array.from({ length: 31 }, (_, i) => ({ value: i + 1, label: String(i + 1) }))} />
+            <DarkPicker label="MONAT" ariaLabel="Monat" flex={1.6} valueSize={16} value={month} onChange={setMonth}
+              options={MONTHS.map((m, i) => ({ value: i + 1, label: m }))} />
+            <DarkPicker label="JAHR" ariaLabel="Jahr" flex={1.2} value={year} onChange={setYear}
+              options={years.map((y) => ({ value: y, label: String(y) }))} />
           </div>
 
           {zodiac && day && month && (

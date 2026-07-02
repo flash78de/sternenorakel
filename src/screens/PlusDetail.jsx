@@ -3,13 +3,13 @@ import Luna from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
 
 const BENEFITS = [
-  { t: 'Unbegrenzt ziehen', d: 'Empfange Botschaften, wann immer du magst – nicht nur einmal am Tag.' },
-  { t: 'Alle Rituale', d: 'Sternenkarten & Runen zusätzlich zum Sternenwürfel.' },
   { t: 'Tiefere Botschaften', d: 'Längere, persönlichere Impulse und vertiefende Deutungen.' },
   { t: 'Monatsrückblick mit Luna', d: 'Erkenne Muster, Themen und Entwicklungen in deinem Monatsbild.' },
-  { t: 'Alle 12 Sternbilder', d: 'Vollende deine komplette Symbol-Sammlung.' },
+  { t: 'Erweiterte Symbolwelt', d: 'Mehr Symboldeutungen und tiefere Musteranalyse deiner Sternbilder.' },
+  { t: 'Zusätzliche freie Impulse', d: 'Neben deiner Tagesbotschaft zusätzliche Impulse, wann du magst.' },
+  { t: 'Cloud-Sync & Backup', d: 'Dein Sternenband sicher auf allen Geräten – mit automatischem Backup.' },
   { t: 'Export & unbegrenztes Tagebuch', d: 'Dein ganzer Weg bleibt erhalten – als PDF/Text exportierbar.' },
-  { t: 'Gesprochene Botschaften', d: 'Lass dir deine Botschaft mit ruhiger Stimme vorlesen.' },
+  { t: 'Exklusive Luna-Momente', d: 'Gesprochene Botschaften und zusätzliche Reaktionen nur für dich.' },
 ]
 
 export default function PlusDetail() {
@@ -30,7 +30,7 @@ export default function PlusDetail() {
           Mehr Tiefe. Mehr Luna.
         </div>
         <div style={{ color: 'var(--text-dim)', font: '400 13px/1.55 var(--font-body)', marginTop: 8 }}>
-          Dein persönlicher Sternenpfad – noch klarer, noch näher.
+          Erkenne über Wochen, welche Themen, Gefühle und Entscheidungen sich in deinem Leben wiederholen.
         </div>
       </div>
 
@@ -64,8 +64,9 @@ export default function PlusDetail() {
           <button className="btn-gold" style={{ marginTop: 14 }} onClick={() => updateSettings({ premium: true })}>
             ✧ Plus 7 Tage kostenlos testen
           </button>
-          <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10.5px/1.45 var(--font-body)', marginTop: 8 }}>
-            Demo-Schalter – es wird nichts berechnet. Danach jederzeit kündbar.
+          <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10.5px/1.5 var(--font-body)', marginTop: 8 }}>
+            7 Tage gratis, danach 3,99 € / Monat · jederzeit kündbar · <span style={{ textDecoration: 'underline' }}>Alle Preise &amp; Bedingungen</span>
+            <br /><b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Demo:</b> Es wird nichts berechnet – der Schalter aktiviert Plus nur zum Ausprobieren.
           </div>
         </>
       )}

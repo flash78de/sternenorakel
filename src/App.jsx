@@ -1,12 +1,15 @@
+import { useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useStore } from './store/store.jsx'
 import { TabLayout, PlainLayout } from './components/Layout.jsx'
 
+import Splash from './screens/Splash.jsx'
 import Welcome from './screens/Welcome.jsx'
 import Onboarding from './screens/Onboarding.jsx'
 import Auth from './screens/Auth.jsx'
 import AccountVariant from './screens/AccountVariant.jsx'
 import Dashboard from './screens/Dashboard.jsx'
+import Befinden from './screens/Befinden.jsx'
 import OracleRitual from './screens/OracleRitual.jsx'
 import OracleDraw from './screens/OracleDraw.jsx'
 import Wissen from './screens/Wissen.jsx'
@@ -30,7 +33,10 @@ function Gate({ children }) {
 }
 
 export default function App() {
-  const { onboarded } = useStore()
+  const { onboarded, settings } = useStore()
+  const [splash, setSplash] = useState(settings.splash !== false)
+
+  if (splash) return <Splash onDone={() => setSplash(false)} />
 
   return (
     <Routes>
@@ -45,6 +51,7 @@ export default function App() {
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/auth/account" element={<AccountVariant />} />
+        <Route path="/oracle/befinden" element={<Gate><Befinden /></Gate>} />
         <Route
           path="/oracle/draw"
           element={

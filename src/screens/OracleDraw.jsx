@@ -7,8 +7,10 @@ import { generateMessage } from '../data/generator.js'
 import { speak, speechSupported } from '../lib/audio.js'
 import { asset } from '../lib/asset.js'
 
-// Kern-Flow: trigger (Würfel) → listening (Luna erwacht) → revelation → message
-// (auto-gespeichert) → reflection. Fehler = sanfter Zwischenzustand.
+// Kern-Flow: trigger (Würfel) → listening (Luna lauscht) → revelation →
+// message + Reflexion auf EINEM Screen (auto-gespeichert). Fehler = sanfter Zwischenzustand.
+const LISTEN_TEXTS = ['Luna lauscht …', 'Ein Gedanke sortiert sich.', 'Die Botschaft nimmt Gestalt an.']
+
 export default function OracleDraw() {
   const nav = useNavigate()
   const loc = useLocation()
@@ -22,12 +24,21 @@ export default function OracleDraw() {
 
   const todaysEntry = journal.find((e) => e.iso === formatDate().iso)
 
-  const [phase, setPhase] = useState('trigger') // trigger|listening|revelation|message|reflection|error
+  const [phase, setPhase] = useState('trigger') // trigger|listening|revelation|message|error
   const [message, setMessage] = useState(null)
   const [note, setNote] = useState('')
   const [saved, setSaved] = useState(null)
-  const [splashFail, setSplashFail] = useState(false)
+  const [micro, setMicro] = useState(0)
   const timers = useRef([])
+  const reflectRef = useRef(null)
+
+  // Wechselnde Mikrotexte im Lade-Zustand (Warten wird inszeniert, nicht technisch).
+  useEffect(() => {
+    if (phase !== 'listening') return
+    setMicro(0)
+    const iv = setInterval(() => setMicro((i) => (i + 1) % LISTEN_TEXTS.length), 850)
+    return () => clearInterval(iv)
+  }, [phase])
 
   useEffect(() => {
     if (drawnToday && todaysEntry) {
@@ -47,7 +58,6 @@ export default function OracleDraw() {
   }, []) // eslint-disable-line
 
   const draw = useCallback(() => {
-    setSplashFail(false)
     setPhase('listening')
     const willFail = Math.random() < 0.03
     timers.current.push(
@@ -119,26 +129,12 @@ export default function OracleDraw() {
 
   if (phase === 'listening')
     return (
-      <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', textAlign: 'center' }}>
-        {!splashFail ? (
-          <img
-            src={asset('uploads/luna-erwacht.png')}
-            alt="Luna erwacht"
-            onError={() => setSplashFail(true)}
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          <div className="center-col" style={{ padding: '30px 30px 40px' }}>
-            <Luna state="lauschen" width={215} glowSize={250} float />
-            <div style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 22, color: 'var(--gold-1)', marginTop: 8, textShadow: '0 0 18px rgba(232,199,122,.4)' }}>
-              Luna erwacht …
-            </div>
-            <div style={{ marginTop: 8, color: 'var(--text-dim)', font: '400 13px/1.5 var(--font-body)', maxWidth: 240 }}>
-              Einen kleinen Sternenmoment …
-            </div>
-          </div>
-        )}
-        <div className="dots" style={{ position: 'absolute', bottom: 34, left: 0, right: 0, justifyContent: 'center' }}>
+      <div className="center-col" style={{ padding: '30px 30px 44px', textAlign: 'center' }}>
+        <Luna state="lauschen" width={250} glowSize={290} float />
+        <div style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 22, color: 'var(--gold-1)', marginTop: 14, textShadow: '0 0 18px rgba(232,199,122,.4)', minHeight: 30 }}>
+          {LISTEN_TEXTS[micro]}
+        </div>
+        <div className="dots" style={{ marginTop: 18, justifyContent: 'center' }}>
           <span style={{ background: '#E8C77A' }} />
           <span style={{ background: '#A66BFF', animationDelay: '.3s' }} />
           <span style={{ background: '#E8C77A', animationDelay: '.6s' }} />
@@ -238,64 +234,58 @@ export default function OracleDraw() {
           </div>
         )}
 
-        <div style={{ flex: 1, minHeight: 10 }} />
         {speechSupported && (
           <button
             onClick={listen}
-            style={{ marginTop: 10, width: '100%', padding: 12, borderRadius: 12, background: 'rgba(166,107,255,.14)', border: '1px solid rgba(167,139,250,.4)', color: 'var(--text)', font: '600 13px var(--font-body)', cursor: 'pointer' }}
+            style={{ marginTop: 12, width: '100%', padding: 12, borderRadius: 12, background: 'rgba(166,107,255,.14)', border: '1px solid rgba(167,139,250,.4)', color: 'var(--text)', font: '600 13px var(--font-body)', cursor: 'pointer' }}
           >
             🔊 Botschaft anhören {!settings.premium && <span style={{ color: 'var(--gold-1)', fontSize: 11 }}>· Plus</span>}
           </button>
         )}
-        <button className="btn-gold" style={{ padding: 14, borderRadius: 15, marginTop: 10 }} onClick={() => setPhase('reflection')}>
+        <button
+          className="btn-gold"
+          style={{ padding: 14, borderRadius: 15, marginTop: 10 }}
+          onClick={() => reflectRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+        >
           Reflektieren ↓
         </button>
-      </div>
-    )
 
-  if (phase === 'reflection' && message)
-    return (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 22px 24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
-          <button className="back" onClick={() => setPhase('message')}>‹</button>
-          <span style={{ background: 'rgba(166,107,255,.18)', border: '1px solid rgba(166,107,255,.3)', borderRadius: 999, padding: '5px 12px', font: '600 11px var(--font-body)', color: 'var(--gold-1)' }}>
-            {message.symbol.glyph} {message.title}
-          </span>
-        </div>
-
-        {!saved?.already && (
-          <div className="banner pop">
-            <Luna state="freude" width={46} glow={false} float={false} />
-            <div style={{ flex: 1 }}>
-              <div style={{ color: 'var(--gold-1)', font: '700 13px var(--font-body)' }}>Im Tagebuch gespeichert ✓</div>
-              <div style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)', marginTop: 1 }}>
-                +{saved?.gainedDust ?? 0} ✦ Sternenstaub · Serie auf {saved?.newStreak ?? 0} {saved?.newStreak === 1 ? 'Tag' : 'Tage'}
+        {/* Reflexion — auf DERSELBEN Seite; die Botschaft bleibt darüber lesbar */}
+        <div ref={reflectRef} style={{ marginTop: 22, paddingTop: 18, borderTop: '1px solid rgba(255,255,255,.08)' }}>
+          {!saved?.already && (
+            <div className="banner pop" style={{ marginBottom: 14 }}>
+              <Luna state="freude" width={46} glow={false} float={false} />
+              <div style={{ flex: 1 }}>
+                <div style={{ color: 'var(--gold-1)', font: '700 13px var(--font-body)' }}>Im Tagebuch gespeichert ✓</div>
+                <div style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)', marginTop: 1 }}>
+                  +{saved?.gainedDust ?? 0} ✦ Sternenstaub · Serie auf {saved?.newStreak ?? 0} {saved?.newStreak === 1 ? 'Tag' : 'Tage'}
+                </div>
               </div>
             </div>
+          )}
+
+          <div style={{ color: '#7a7494', font: '600 10px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Deine Reflexion</div>
+          <div style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 17, color: 'var(--text)', lineHeight: 1.35 }}>
+            {message.reflection}
           </div>
-        )}
 
-        <div style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 18, color: 'var(--text)', lineHeight: 1.35, marginTop: !saved?.already ? 18 : 4 }}>
-          {message.reflection}
+          <textarea
+            className="note"
+            style={{ marginTop: 12, minHeight: 110 }}
+            placeholder="Schreibe, was in dir nachklingt … (optional)"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+            <span style={{ color: '#7a7494', font: '400 11px var(--font-body)' }}>Nur für dich · local-first gespeichert</span>
+            <span style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)' }}>{note.length} Zeichen</span>
+          </div>
+
+          <button className="btn-gold" style={{ marginTop: 12 }} onClick={saveReflection}>
+            {note.trim() ? 'Reflexion speichern' : 'Fertig'}
+          </button>
         </div>
-
-        <textarea
-          className="note"
-          style={{ marginTop: 12, flex: 1 }}
-          placeholder="Schreibe, was in dir nachklingt … (optional)"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          autoFocus
-        />
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
-          <span style={{ color: '#7a7494', font: '400 11px var(--font-body)' }}>Nur für dich · local-first gespeichert</span>
-          <span style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)' }}>{note.length} Zeichen</span>
-        </div>
-
-        <button className="btn-gold" style={{ marginTop: 12 }} onClick={saveReflection}>
-          {note.trim() ? 'Reflexion speichern' : 'Fertig'}
-        </button>
       </div>
     )
 

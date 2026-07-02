@@ -68,6 +68,56 @@ export const themen = {
       'Loslassen ist kein Verlust – manchmal ist es ein Weitergeben.',
     ],
   },
+  schule: {
+    label: 'Schule & Lernen',
+    constellation: 'Das Tor',
+    saetze: [
+      'Du musst heute nicht alles verstehen – es genügt, den nächsten Gedanken wirklich zu durchdringen.',
+      'Lernen ist kein Wettlauf; dein eigenes Tempo trägt dich am weitesten.',
+      'Ein Fehler ist kein Urteil über dich, sondern eine Stelle, an der du gerade wächst.',
+      'Setz dich heute nicht mehr unter Druck, als es dir beim Lernen wirklich hilft.',
+    ],
+  },
+  entscheidungen: {
+    label: 'Entscheidungen & Klarheit',
+    constellation: 'Der Pfad',
+    saetze: [
+      'Klarheit kommt selten durch Grübeln – oft durch einen ruhigen Moment mit dir selbst.',
+      'Du musst nicht alle Wege überblicken, nur den nächsten ehrlichen Schritt.',
+      'Manchmal weiß ein Teil von dir längst, wohin – lausche ihm leise.',
+      'Eine Entscheidung darf sich stimmig anfühlen, nicht nur richtig aussehen.',
+    ],
+  },
+  kreativitaet: {
+    label: 'Kreativität',
+    constellation: 'Der Stern',
+    saetze: [
+      'Deine Ideen brauchen keinen perfekten Anfang – nur einen mutigen ersten Strich.',
+      'Kreativität wächst im Spiel, nicht im Zwang; lass dir Raum zum Ausprobieren.',
+      'Was in dir entstehen will, darf zuerst unfertig und roh sein.',
+      'Nimm einen Funken heute ernst – aus ihm kann etwas Eigenes werden.',
+    ],
+  },
+  loslassen: {
+    label: 'Loslassen',
+    constellation: 'Die Feder',
+    saetze: [
+      'Nicht alles, was du trägst, musst du weitertragen.',
+      'Loslassen heißt nicht aufgeben, sondern die Hände für Neues öffnen.',
+      'Was getan ist, darfst du dankbar ziehen lassen.',
+      'Manchmal ist der leichteste Schritt der, etwas bewusst zurückzulassen.',
+    ],
+  },
+  dankbarkeit: {
+    label: 'Dankbarkeit',
+    constellation: 'Der Anker',
+    saetze: [
+      'Ein kleiner Dank am Tag richtet den Blick sanft auf das, was schon trägt.',
+      'Was du wertschätzt, wächst leiser weiter in dir.',
+      'Auch ein gewöhnlicher Moment kann sich als Geschenk zeigen, wenn du hinschaust.',
+      'Dankbarkeit ist kein Muss – nur eine warme Art, den Tag zu halten.',
+    ],
+  },
 }
 
 // Stimmung 1–5 (mood aus dem Profil)
@@ -162,8 +212,13 @@ export const ritualSymbols = {
 export const THEME_KEY = {
   'Liebe & Beziehungen': 'liebe',
   'Beruf & Berufung': 'beruf',
+  'Schule & Lernen': 'schule',
   'Selbstwert & innere Ruhe': 'selbstwert',
   'Veränderung & Neuanfang': 'veraenderung',
+  'Entscheidungen & Klarheit': 'entscheidungen',
+  'Kreativität': 'kreativitaet',
+  'Loslassen': 'loslassen',
+  'Dankbarkeit': 'dankbarkeit',
 }
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]

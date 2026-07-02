@@ -23,6 +23,7 @@ const DEFAULT_STATE = {
     lastDrawISO: null, // letzter Tag, an dem gezogen wurde
     drawDays: [], // ISO-Tage mit Ziehung (für 7-Tage-Serie)
     constellationsDone: 0,
+    moodTodayISO: null, // Tag, an dem das Befinden zuletzt abgefragt wurde
   },
   settings: {
     aiMode: false,
@@ -31,6 +32,7 @@ const DEFAULT_STATE = {
     reminderWhen: 'abends', // morgens | mittags | abends | aus
     tone: 'Sanft',
     premium: false, // Sternenorakel Plus (Demo)
+    splash: true, // „Luna erwacht"-Startanimation
   },
   journal: [], // {id, ts, iso, mid, title, symbol, constellation, theme, mantra, text, luck, energy, question, reflection}
   seenReward: null, // id der zuletzt gezeigten Belohnung
@@ -89,11 +91,27 @@ export function StoreProvider({ children }) {
     setState((s) => ({ ...s, settings: { ...s.settings, ...p } }))
   }, [])
 
+  // Tägliches Befinden: setzt die Stimmung (fließt in die Botschaft ein) und
+  // merkt sich den Tag, damit die Abfrage nur einmal pro Tag erscheint.
+  const setMoodToday = useCallback((mood) => {
+    const today = formatDate().iso
+    setState((s) => ({
+      ...s,
+      profile: { ...s.profile, mood },
+      stats: { ...s.stats, moodTodayISO: today },
+    }))
+  }, [])
+
   // Hat der/die Nutzer*in heute schon gezogen?
   const drawnToday = useMemo(() => {
     const today = formatDate().iso
     return state.stats.lastDrawISO === today
   }, [state.stats.lastDrawISO])
+
+  // Wurde das Befinden heute schon abgefragt?
+  const moodToday = useMemo(() => {
+    return state.stats.moodTodayISO === formatDate().iso
+  }, [state.stats.moodTodayISO])
 
   // Speichert Botschaft + Reflexion ins Tagebuch, vergibt Sternenstaub & Serie.
   // Liefert ein Ergebnis-Objekt für die Belohnungslogik zurück.
@@ -218,6 +236,7 @@ export function StoreProvider({ children }) {
       completeOnboarding,
       updateProfile,
       updateSettings,
+      setMoodToday,
       saveEntry,
       updateReflection,
       deleteEntry,
@@ -226,6 +245,7 @@ export function StoreProvider({ children }) {
       pausedReturn,
       resetAll,
       drawnToday,
+      moodToday,
       rank: rankInfo(state.stats.stardust),
     }),
     [
@@ -234,6 +254,7 @@ export function StoreProvider({ children }) {
       completeOnboarding,
       updateProfile,
       updateSettings,
+      setMoodToday,
       saveEntry,
       updateReflection,
       deleteEntry,
@@ -242,6 +263,7 @@ export function StoreProvider({ children }) {
       pausedReturn,
       resetAll,
       drawnToday,
+      moodToday,
     ]
   )
 

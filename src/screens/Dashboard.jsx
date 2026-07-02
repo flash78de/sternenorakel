@@ -11,8 +11,12 @@ const WD = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
 export default function Dashboard() {
   const nav = useNavigate()
   const loc = useLocation()
-  const { profile, stats, journal, rank, drawnToday, pausedReturn } = useStore()
+  const { profile, stats, journal, rank, drawnToday, moodToday, pausedReturn } = useStore()
   const [reward, setReward] = useState(loc.state?.reward || null)
+
+  // Tagesziehung: erst Befinden (falls heute noch nicht abgefragt), dann Ritual.
+  // Bereits gezogen → direkt die heutige Botschaft erneut ansehen.
+  const goDraw = () => nav(drawnToday ? '/oracle/draw' : moodToday ? '/oracle' : '/oracle/befinden')
 
   // Rückkehr nach Pause → eigener Screen (23)
   useEffect(() => {
@@ -96,7 +100,7 @@ export default function Dashboard() {
           <button
             className="btn-gold uppercase"
             style={{ padding: 13, borderRadius: 14, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}
-            onClick={() => nav('/oracle')}
+            onClick={goDraw}
           >
             <span style={{ color: '#a07b1e' }}>✦</span>
             {drawnToday ? 'Botschaft erneut lesen' : 'Botschaft empfangen'}
@@ -213,7 +217,7 @@ function EmptyDashboard() {
         </div>
       </div>
 
-      <button className="btn-gold" style={{ padding: 15, marginBottom: 8, boxShadow: '0 12px 30px rgba(232,199,122,.4)' }} onClick={() => nav('/oracle')}>
+      <button className="btn-gold" style={{ padding: 15, marginBottom: 8, boxShadow: '0 12px 30px rgba(232,199,122,.4)' }} onClick={() => nav('/oracle/befinden')}>
         ✦ Erste Botschaft empfangen
       </button>
       <div style={{ textAlign: 'center', color: '#7a7494', font: '400 11.5px var(--font-body)', padding: '0 0 12px' }}>

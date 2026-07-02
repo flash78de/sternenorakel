@@ -444,6 +444,91 @@
   gap: 13px;
 }
 
+/* Dunkler Picker (Ersatz für graue System-Dropdowns) */
+.picker-field {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(232, 199, 122, 0.22);
+  border-radius: 14px;
+  padding: 18px 8px;
+  color: var(--text);
+  cursor: pointer;
+  min-height: 60px;
+}
+.picker-field .picker-val {
+  color: var(--text);
+  font: 600 20px var(--font-body);
+}
+.picker-field .picker-ph {
+  color: #7a7494;
+  font: 600 20px var(--font-body);
+}
+.picker-field .picker-caret {
+  color: var(--gold-1);
+  font-size: 12px;
+}
+.sheet {
+  width: 100%;
+  max-width: 340px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #17141f, #100e18);
+  border: 1px solid rgba(232, 199, 122, 0.2);
+  border-radius: 22px;
+  padding: 16px 14px 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+.sheet-title {
+  text-align: center;
+  color: var(--gold-1);
+  font: 600 13px var(--font-body);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.sheet-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 2px;
+}
+.sheet-list::-webkit-scrollbar {
+  width: 0;
+}
+.sheet-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  padding: 14px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  color: var(--text-dim);
+  font: 600 17px var(--font-body);
+  cursor: pointer;
+}
+.sheet-item.sel {
+  background: rgba(232, 199, 122, 0.14);
+  border-color: var(--gold-1);
+  color: var(--gold-1);
+}
+.sheet-item .sheet-check {
+  position: absolute;
+  right: 14px;
+  color: var(--gold-1);
+}
+.sheet-close {
+  margin-top: 10px;
+}
+
 /* Ritual-Karte */
 .ritual {
   display: flex;
