@@ -35,8 +35,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    # Die Pages-Warteschlange hängt gelegentlich länger als die
-    # Standard-Geduld von 10 Minuten – wir warten bis zu 30 Minuten.
+    # deploy-pages kappt seinen Timeout intern bei 10 Minuten (MAX_TIMEOUT).
+    # Wenn die Pages-Warteschlange bei GitHub hängt, helfen nur Wiederholungen:
+    # bis zu 3 Anläufe à 10 Minuten in einem Lauf.
     timeout-minutes: 35
     environment:
       name: github-pages
@@ -44,6 +45,11 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          timeout: 1800000
-          error_count: 15
+        continue-on-error: true
+      - id: deployment2
+        if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - id: deployment3
+        if: steps.deployment.outcome == 'failure' && steps.deployment2.outcome == 'failure'
+        uses: actions/deploy-pages@v4
