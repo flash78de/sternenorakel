@@ -2,7 +2,9 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/store.jsx'
 import { THEMES, MONTHS, zodiacOf } from '../data/library.js'
+import { COMM_STYLES, COPING } from '../data/generator.js'
 import { asset } from '../lib/asset.js'
+import { aiAvailable } from '../lib/ai.js'
 import DarkPicker from '../components/DarkPicker.jsx'
 
 const TONES = [
@@ -111,6 +113,46 @@ export default function Settings() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Kommunikationsstil & Umgang – editierbar */}
+      <div className="glass" style={{ marginTop: 12, padding: '14px 15px' }}>
+        <div style={{ color: '#7a7494', font: '600 10px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10 }}>Wie Luna mit dir spricht</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {COMM_STYLES.map((s) => {
+            const cur = profile.commStyles || []
+            const on = cur.includes(s.key)
+            return (
+              <span key={s.key} className={'chip' + (on ? ' sel' : '')}
+                onClick={() => {
+                  const next = on ? cur.filter((x) => x !== s.key) : cur.length >= 2 ? cur : [...cur, s.key]
+                  updateProfile({ commStyles: next })
+                }}>{s.label}</span>
+            )
+          })}
+        </div>
+        <div style={{ margin: '12px 0 8px', color: '#7a7494', font: '600 10px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>Was dir bei Schwierigem hilft</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {COPING.map((c) => (
+            <span key={c.key} className={'chip' + (profile.coping === c.key ? ' sel' : '')}
+              onClick={() => updateProfile({ coping: profile.coping === c.key ? null : c.key })}>{c.glyph} {c.label}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* KI-Modus – ehrlich gekennzeichnet */}
+      <div className="glass" style={{ marginTop: 12, padding: '13px 15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ flex: 1, paddingRight: 10 }}>
+          <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>KI-Modus {!aiAvailable && <span style={{ color: '#7a7494', fontWeight: 400, fontSize: 11 }}>· Vorschau</span>}</div>
+          <div style={{ color: 'var(--text-dim)', font: '400 10.5px/1.45 var(--font-body)', marginTop: 2 }}>
+            {aiAvailable
+              ? 'Botschaften werden von einem KI-Dienst erzeugt; ohne Verbindung nutzt Luna die Offline-Sternenbibliothek.'
+              : 'Derzeit ohne Server: Luna nutzt immer die Offline-Sternenbibliothek. Der Schalter wird aktiv, sobald der KI-Dienst verbunden ist.'}
+          </div>
+        </div>
+        <span className={'toggle' + (settings.aiMode ? ' on' : '')} onClick={() => updateSettings({ aiMode: !settings.aiMode })}>
+          <span className="knob" />
+        </span>
       </div>
 
       {/* Startanimation „Luna erwacht" */}

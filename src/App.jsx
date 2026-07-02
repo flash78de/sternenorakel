@@ -24,6 +24,8 @@ import Celebration from './screens/Celebration.jsx'
 import Rueckkehr from './screens/Rueckkehr.jsx'
 import PlusDetail from './screens/PlusDetail.jsx'
 import Erinnerung from './screens/Erinnerung.jsx'
+import Abend from './screens/Abend.jsx'
+import Woche from './screens/Woche.jsx'
 
 // Schützt Tab-Bereich, bis Onboarding abgeschlossen ist.
 function Gate({ children }) {
@@ -75,6 +77,8 @@ export default function App() {
         <Route path="/rueckkehr" element={<Gate><Rueckkehr /></Gate>} />
         <Route path="/profil/plus" element={<Gate><PlusDetail /></Gate>} />
         <Route path="/profil/erinnerung" element={<Gate><Erinnerung /></Gate>} />
+        <Route path="/abend" element={<Gate><Abend /></Gate>} />
+        <Route path="/woche" element={<Gate><Woche /></Gate>} />
       </Route>
 
       {/* Tab-Bereich — mit unterer Navigation */}

@@ -224,15 +224,88 @@ export const THEME_KEY = {
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]
 const clampMood = (m) => Math.min(5, Math.max(1, Math.round(Number(m) || 3)))
 
+// ============================================================
+// Ritual-spezifische Welten (Sprint 2 · jedes Ritual eine eigene Sprache)
+// ============================================================
+
+// Sternenwürfel · 6 Archetypen — Richtung, Entscheidung, Handlung, Tagesfokus
+export const ARCHETYPEN = [
+  { name: 'Mut', glyph: '⚔', kern: 'Heute darfst du einen Schritt wagen, bevor du dich ganz sicher fühlst.', impuls: 'Sprich eine Sache aus, die du bisher nur gedacht hast.' },
+  { name: 'Ruhe', glyph: '☾', kern: 'Deine Kraft liegt heute nicht im Tun, sondern im bewussten Innehalten.', impuls: 'Schenke dir fünf Minuten ohne Bildschirm und ohne Aufgabe.' },
+  { name: 'Klarheit', glyph: '◇', kern: 'Etwas will heute klar werden – wenn du es nicht zerredest.', impuls: 'Schreibe deine Frage in einem einzigen Satz auf.' },
+  { name: 'Vertrauen', glyph: '✦', kern: 'Du musst heute nicht alles kontrollieren, damit es gut wird.', impuls: 'Lass eine kleine Sache heute bewusst ungeplant.' },
+  { name: 'Veränderung', glyph: '✺', kern: 'Ein alter Rahmen ist dir zu klein geworden – spür einmal hin.', impuls: 'Verändere heute eine winzige Gewohnheit, nur für diesen Tag.' },
+  { name: 'Verbindung', glyph: '❤', kern: 'Heute wächst mehr im Miteinander als im Alleinsein.', impuls: 'Melde dich bei einem Menschen, an den du öfter denkst.' },
+]
+
+// Sternenkarten · Deck der inneren Bilder — Emotionen, tiefere Themen
+export const KARTEN = [
+  { title: 'Der stille Kompass', glyph: '🧭', deutung: 'Dieses Bild spricht von einer Richtung, die du längst spürst, aber noch nicht ausgesprochen hast. Der Kompass zeigt nicht nach außen – er zeigt nach innen.', thema: 'innere Ausrichtung' },
+  { title: 'Das offene Tor', glyph: '⛩', deutung: 'Ein Übergang steht bereit. Das Tor zwingt dich nicht hindurch – es zeigt dir nur, dass der Weg nicht verschlossen ist, wie du vielleicht dachtest.', thema: 'Möglichkeit' },
+  { title: 'Die goldene Feder', glyph: '🪶', deutung: 'Die Feder trägt nichts Schweres. Sie erinnert dich daran, dass Loslassen kein Verlust ist, sondern eine Art zu fliegen.', thema: 'Leichtigkeit & Loslassen' },
+  { title: 'Der ruhende See', glyph: '🌊', deutung: 'Erst wenn die Oberfläche still wird, zeigt der See, was in der Tiefe liegt. Deine Ruhe ist kein Rückzug – sie ist ein Blick nach innen.', thema: 'Tiefe & Stille' },
+  { title: 'Der erste Funke', glyph: '🕯', deutung: 'Etwas Neues glimmt in dir – noch klein, noch leise. Der Funke fragt nicht nach Garantien. Er fragt nur, ob du ihn nährst.', thema: 'Anfang & Kreativität' },
+  { title: 'Der verborgene Weg', glyph: '🌿', deutung: 'Es gibt einen Pfad, den du bisher übersehen hast, weil er nicht der offensichtliche ist. Vielleicht liegt er näher, als du denkst.', thema: 'unerwartete Wege' },
+]
+
+// Runen · alte Grundprinzipien — Dreier-Lesung: Nachwirken · Jetzt · Werden
+export const RUNEN = [
+  { name: 'Fehu', glyph: 'ᚠ', bedeutung: 'Fülle & Beginn', heute: 'Etwas in deinem Leben ist reicher, als du es gerade würdigst.' },
+  { name: 'Raidho', glyph: 'ᚱ', bedeutung: 'Der Weg', heute: 'Du bist in Bewegung, auch wenn es sich langsam anfühlt.' },
+  { name: 'Sowilo', glyph: 'ᛊ', bedeutung: 'Lebenskraft', heute: 'Deine Energie will eine Richtung – nicht mehr Aufgaben.' },
+  { name: 'Berkano', glyph: 'ᛒ', bedeutung: 'Wachstum', heute: 'Etwas wächst im Verborgenen und braucht noch Schutz, nicht Urteil.' },
+  { name: 'Wunjo', glyph: 'ᚹ', bedeutung: 'Freude & Harmonie', heute: 'Erlaube dir Freude, ohne sie erst zu verdienen.' },
+  { name: 'Isa', glyph: 'ᛁ', bedeutung: 'Stille & Pause', heute: 'Nicht jede Stille ist Stillstand – manche ist Sammlung.' },
+  { name: 'Ansuz', glyph: 'ᚨ', bedeutung: 'Botschaft & Stimme', heute: 'Ein Wort – gesprochen oder gehört – trägt heute mehr als sonst.' },
+  { name: 'Algiz', glyph: 'ᛉ', bedeutung: 'Schutz & Grenze', heute: 'Eine Grenze, die du ziehst, ist kein Angriff, sondern Selbstachtung.' },
+]
+
+export const RUNEN_POSITIONEN = ['Was wirkt nach?', 'Was ist jetzt wichtig?', 'Was darf entstehen?']
+
+// ---- Kommunikationsstil (Onboarding · „Wie sollen meine Botschaften mit dir sprechen?") ----
+export const COMM_STYLES = [
+  { key: 'klar', label: 'Klar & direkt', desc: 'Sag mir, worum es geht. Ohne viele Umwege.' },
+  { key: 'leicht', label: 'Leicht & inspirierend', desc: 'Gib mir Bilder, Mut und neue Möglichkeiten.' },
+  { key: 'warm', label: 'Warm & behutsam', desc: 'Sprich einfühlsam und gib mir Zeit.' },
+  { key: 'tief', label: 'Tief & strukturiert', desc: 'Erkläre Zusammenhänge und lass mich genau hinschauen.' },
+]
+
+const styleSaetze = {
+  klar: ['Kurz gesagt: Der nächste Schritt ist wichtiger als der perfekte Plan.', 'Ohne Umweg: Du weißt mehr, als du dir gerade zugestehst.'],
+  leicht: ['Stell es dir wie einen Himmel kurz vor Sonnenaufgang vor – noch dunkel, aber schon voller Richtung.', 'Vielleicht ist heute weniger eine Aufgabe als eine Einladung.'],
+  warm: ['Und was auch immer heute wird – du musst es nicht alleine tragen.', 'Sei so freundlich mit dir, wie du es mit einem guten Freund wärst.'],
+  tief: ['Achte auf den Zusammenhang: Was dich beschäftigt, hat oft eine ältere Wurzel als der heutige Anlass.', 'Schau genau hin, wo sich dieses Muster schon einmal gezeigt hat.'],
+}
+
+// ---- Umgang mit Herausforderungen (verändert die Schlussform) ----
+export const COPING = [
+  { key: 'schritt', label: 'Ein konkreter nächster Schritt', glyph: '👣' },
+  { key: 'perspektive', label: 'Eine neue Perspektive', glyph: '🔭' },
+  { key: 'zuspruch', label: 'Zuspruch und Entlastung', glyph: '🕊' },
+  { key: 'nachdenken', label: 'Zeit zum eigenen Nachdenken', glyph: '🌙' },
+]
+
+const copingSaetze = {
+  schritt: ['Dein kleiner Schritt für heute: Schreibe eine Sache auf, die du bereits entschieden hast.', 'Dein kleiner Schritt für heute: Erledige die eine Sache, die nur zwei Minuten braucht.'],
+  perspektive: ['Wie sähe die Situation aus, wenn du sie nicht lösen müsstest, sondern nur beobachten dürftest?', 'Was würde ein Mensch sehen, der dich sehr mag und heute zum ersten Mal zuschaut?'],
+  zuspruch: ['Du musst heute nicht weiter sein, als du gerade bist.', 'Es ist genug, dass du dir diesen Moment genommen hast.'],
+  nachdenken: ['Lass die Frage heute offen. Vielleicht antwortet dein Tag darauf.', 'Du musst nichts festhalten – manche Gedanken sortieren sich über Nacht.'],
+}
+
+const pickN = (arr, n) => {
+  const pool = [...arr]
+  const out = []
+  while (out.length < n && pool.length) out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0])
+  return out
+}
+
 // Erzeugt eine personalisierte Botschaft im MESSAGES-Schema.
-export function generateMessage({ name = '', themes = [], mood = 3, ritual = 'wuerfel' } = {}) {
+// styles: Kommunikationsstil-Keys (max 2) · coping: Schlussform-Key · ritual: eigenes Erlebnis je Weg.
+export function generateMessage({ name = '', themes = [], mood = 3, ritual = 'wuerfel', styles = [], coping = null } = {}) {
   // Thema wählen: bevorzugt aus den gewählten, sonst zufällig
   const keys = (themes || []).map((t) => THEME_KEY[t]).filter(Boolean)
   const themeKey = keys.length ? pick(keys) : pick(Object.keys(themen))
   const thema = themen[themeKey]
-
-  const symbolPool = ritualSymbols[ritual] || ritualSymbols.wuerfel
-  const sym = pick(symbolPool)
 
   const m = clampMood(mood)
   const trimmed = (name || '').trim()
@@ -248,17 +321,74 @@ export function generateMessage({ name = '', themes = [], mood = 3, ritual = 'wu
   const p1 = `${opener} ${kern}`
   // Absatz 2: Themen-Satz + Stimmungs-Satz
   const p2 = `${themenSatz} ${stimmung}`
+  // Absatz 3 (optional): Stil-Färbung + Schlussform nach Umgangs-Präferenz
+  const styleKey = (styles || []).length ? pick(styles) : null
+  const closing = [
+    styleKey && styleSaetze[styleKey] ? pick(styleSaetze[styleKey]) : null,
+    coping && copingSaetze[coping] ? pick(copingSaetze[coping]) : null,
+  ].filter(Boolean).join(' ')
 
-  return {
+  const base = {
     id: `gen-${Date.now()}`,
     title: pick(titelPool),
-    symbol: { glyph: sym.glyph, name: sym.name },
     constellation: thema.constellation,
     theme: thema.label,
-    text: `${p1}\n\n${p2}`,
+    text: [p1, p2, closing].filter(Boolean).join('\n\n'),
     mantra: pick(mantras),
     luck: pick(glueckselemente),
     energy: pick(energien),
     reflection: pick(reflexionsfragen),
+    ritual,
+  }
+
+  // Ritual-spezifisches Ergebnis (eigene Struktur je Weg)
+  if (ritual === 'karten') {
+    const card = pick(KARTEN)
+    return {
+      ...base,
+      symbol: { glyph: card.glyph, name: card.title },
+      title: card.title,
+      card: { title: card.title, glyph: card.glyph, deutung: card.deutung, thema: card.thema },
+    }
+  }
+  if (ritual === 'runen') {
+    const drawn = pickN(RUNEN, 3).map((r, i) => ({ ...r, position: RUNEN_POSITIONEN[i] }))
+    return {
+      ...base,
+      symbol: { glyph: drawn[1].glyph, name: drawn[1].name },
+      runes: drawn,
+    }
+  }
+  // Standard: Sternenwürfel mit Archetyp + kleiner Handlung
+  const arch = pick(ARCHETYPEN)
+  return {
+    ...base,
+    symbol: { glyph: arch.glyph, name: arch.name },
+    archetype: { name: arch.name, glyph: arch.glyph, kern: arch.kern, impuls: arch.impuls },
+  }
+}
+
+// „Dein erster Lichtpunkt" — Mini-Botschaft am Ende des Onboardings (Nutzen beweisen).
+export function generateLichtpunkt({ name = '', mood = 3, themes = [], styles = [], coping = null } = {}) {
+  const m = clampMood(mood)
+  const trimmed = (name || '').trim()
+  const keys = (themes || []).map((t) => THEME_KEY[t]).filter(Boolean)
+  const thema = keys.length ? themen[pick(keys)] : null
+
+  const moodLine = {
+    5: 'Da ist heute viel Bewegung in dir – und sie sucht eine Richtung, keinen Druck.',
+    4: 'Du wirkst wach und aufmerksam – ein guter Moment, um leise Dinge zu bemerken.',
+    3: 'Du wirkst heute ruhig, aber suchend. Du möchtest Klarheit, ohne gedrängt zu werden.',
+    2: 'Du bist heute eher leise unterwegs – das ist kein Mangel, sondern ein Tempo.',
+    1: 'Heute darf es sanft sein. Du musst nichts leisten, um hier richtig zu sein.',
+  }[m]
+
+  const themaLine = thema ? ` ${pick(thema.saetze)}` : ''
+  const closing = coping && copingSaetze[coping] ? ` ${pick(copingSaetze[coping])}` : ''
+  const styleNote = (styles || []).map((s) => COMM_STYLES.find((c) => c.key === s)?.label.split(' ')[0].toLowerCase()).filter(Boolean).join(' und ')
+
+  return {
+    text: `${trimmed ? trimmed + ', d' : 'D'}${'as hier ist dein erster Lichtpunkt: '}${moodLine}${themaLine}${closing}`,
+    styleNote: styleNote ? `So spricht Luna mit dir: ${styleNote} – und immer ohne Vorhersagen.` : 'So spricht Luna mit dir: warm, klar und ohne Vorhersagen.',
   }
 }

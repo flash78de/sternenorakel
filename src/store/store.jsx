@@ -14,6 +14,8 @@ const DEFAULT_STATE = {
     name: '',
     themes: [],
     mood: 3,
+    commStyles: [], // Kommunikationsstil-Keys (max 2): klar|leicht|warm|tief
+    coping: null, // Umgang mit Herausforderungen: schritt|perspektive|zuspruch|nachdenken
     birth: { day: null, month: null, year: null }, // month: 1-12
     zodiac: null, // {name, symbol}
   },
@@ -80,7 +82,14 @@ export function StoreProvider({ children }) {
 
   // ---- Aktionen ----
   const completeOnboarding = useCallback((profile) => {
-    setState((s) => ({ ...s, onboarded: true, profile: { ...s.profile, ...profile } }))
+    // Befinden wurde im Onboarding erfragt → zählt als heutige Abfrage.
+    const today = formatDate().iso
+    setState((s) => ({
+      ...s,
+      onboarded: true,
+      profile: { ...s.profile, ...profile },
+      stats: { ...s.stats, moodTodayISO: today },
+    }))
   }, [])
 
   const updateProfile = useCallback((p) => {
@@ -163,6 +172,11 @@ export function StoreProvider({ children }) {
         luck: message.luck ?? null,
         energy: message.energy ?? null,
         question: message.reflection ?? null, // Reflexionsfrage (NICHT die Nutzer-Notiz)
+        ritual: message.ritual ?? 'wuerfel',
+        archetype: message.archetype ?? null, // Würfel: {name, glyph, kern, impuls}
+        card: message.card ?? null, // Karten: {title, glyph, deutung, thema}
+        runes: message.runes ?? null, // Runen: [{name, glyph, bedeutung, heute, position}]
+        mood: s.profile.mood ?? null, // damalige Stimmung (für Wochen-/Monatsmuster)
         reflection: reflection || '', // Nutzer-Notiz
       }
 

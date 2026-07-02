@@ -109,6 +109,11 @@ export default function Dashboard() {
           <div style={{ textAlign: 'center', color: '#cdbfa0', font: '400 10.5px var(--font-body)', marginTop: 7 }}>
             {drawnToday ? 'Heute schon empfangen · komm morgen wieder.' : 'Dauert ungefähr eine Minute.'}
           </div>
+          {drawnToday && new Date().getHours() >= 19 && (
+            <button className="link-soft" style={{ marginTop: 6 }} onClick={() => nav('/abend')}>
+              ☾ Heute abschließen
+            </button>
+          )}
         </div>
 
         {/* 7-Tage-Serie + FOMO nächstes Sternbild */}
@@ -142,6 +147,23 @@ export default function Dashboard() {
             </span>
             <span style={{ color: 'var(--purple-2)', font: '600 11px var(--font-body)' }}>{cprog.done}/{cprog.total} ›</span>
           </div>
+        </div>
+
+        {/* Wochenrückblick — echter Langzeitnutzen statt reiner Punkte */}
+        <div className="card" style={{ marginTop: 10, borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }} onClick={() => nav('/woche')}>
+          <span style={{ width: 40, height: 40, borderRadius: 12, flexShrink: 0, display: 'grid', placeItems: 'center', fontSize: 18, background: 'radial-gradient(circle,rgba(106,59,232,.45),rgba(40,30,70,.5))', border: '1px solid rgba(232,199,122,.3)' }}>✧</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>Deine Woche mit Luna</div>
+            <div style={{ color: 'var(--text-dim)', font: '400 11px/1.4 var(--font-body)', marginTop: 1 }}>
+              {(() => {
+                const wk = journal.filter((e) => e.ts >= Date.now() - 7 * 86400000).length
+                return wk >= 4
+                  ? 'Dein Wochenmuster ist bereit – sieh, was sich wiederholt.'
+                  : `Noch ${4 - wk} ${4 - wk === 1 ? 'Botschaft' : 'Botschaften'}, dann zeigt Luna dein erstes Wochenmuster.`
+              })()}
+            </div>
+          </div>
+          <span style={{ color: 'var(--purple-2)', fontSize: 16 }}>›</span>
         </div>
 
         {/* Teaser zuletzt empfangen — anklickbar */}
@@ -190,8 +212,10 @@ function Teaser({ nav, to, glyph, title, desc }) {
 // Leerer Zustand · Tag 1 — einladend, mit großer Luna und Ausblick
 function EmptyDashboard() {
   const nav = useNavigate()
-  const { profile, rank } = useStore()
+  const { profile, rank, moodToday } = useStore()
   const date = formatDate()
+  // Befinden wurde ggf. schon im Onboarding erfasst → nicht doppelt fragen
+  const start = () => nav(moodToday ? '/oracle' : '/oracle/befinden')
   return (
     <div style={{ display: 'flex', flexDirection: 'column', padding: '13px 15px 16px' }}>
       {/* App-Bar */}
@@ -227,7 +251,7 @@ function EmptyDashboard() {
         <button
           className="btn-gold uppercase"
           style={{ padding: 13, borderRadius: 14, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}
-          onClick={() => nav('/oracle/befinden')}
+          onClick={start}
         >
           <span style={{ color: '#a07b1e' }}>✦</span>
           Erste Botschaft empfangen

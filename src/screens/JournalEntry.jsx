@@ -107,6 +107,31 @@ export default function JournalEntry() {
         {entry.text}
       </div>
 
+      {/* Ritual-Ergebnis (falls gespeichert) */}
+      {entry.archetype && (
+        <div style={{ marginTop: 12, background: 'rgba(166,107,255,.1)', border: '1px solid rgba(166,107,255,.3)', borderRadius: 14, padding: '11px 13px' }}>
+          <div style={{ color: 'var(--purple-2)', font: '600 9px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>Archetyp · Sternenwürfel</div>
+          <div style={{ color: 'var(--gold-1)', font: '600 14px var(--font-body)', marginTop: 4 }}>{entry.archetype.glyph} {entry.archetype.name}</div>
+          <div style={{ color: 'var(--text-dim)', font: '400 11.5px/1.5 var(--font-body)', marginTop: 4 }}>Kleine Handlung: {entry.archetype.impuls}</div>
+        </div>
+      )}
+      {entry.card && (
+        <div style={{ marginTop: 12, background: 'rgba(166,107,255,.1)', border: '1px solid rgba(166,107,255,.3)', borderRadius: 14, padding: '11px 13px' }}>
+          <div style={{ color: 'var(--purple-2)', font: '600 9px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>Karte · {entry.card.thema}</div>
+          <div style={{ color: 'var(--text-dim)', font: '400 11.5px/1.5 var(--font-body)', marginTop: 5 }}>{entry.card.deutung}</div>
+        </div>
+      )}
+      {entry.runes && (
+        <div style={{ marginTop: 12, background: 'rgba(166,107,255,.1)', border: '1px solid rgba(166,107,255,.3)', borderRadius: 14, padding: '11px 13px' }}>
+          <div style={{ color: 'var(--purple-2)', font: '600 9px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>Runen-Lesung</div>
+          {entry.runes.map((r) => (
+            <div key={r.position} style={{ color: 'var(--text-dim)', font: '400 11.5px/1.5 var(--font-body)', marginTop: 5 }}>
+              <b style={{ color: 'var(--gold-1)', fontWeight: 600 }}>{r.glyph} {r.position}</b> {r.heute}
+            </div>
+          ))}
+        </div>
+      )}
+
       {entry.mantra && (
         <div style={{ marginTop: 14, background: 'linear-gradient(160deg,rgba(232,199,122,.14),rgba(232,199,122,.05))', border: '1px solid rgba(232,199,122,.35)', borderRadius: 16, padding: '12px 14px', textAlign: 'center' }}>
           <div style={{ color: 'var(--purple-2)', font: '600 9px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Dein Mantra</div>

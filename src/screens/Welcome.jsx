@@ -22,12 +22,12 @@ export default function Welcome() {
       >
         <Luna state="idle" width={208} glowSize={230} style={{ marginBottom: 6 }} />
         <div className="title-xl">Sternenorakel</div>
-
-        <div className="bubble" style={{ marginTop: 18 }}>
-          „Hallo, ich bin <b>Luna</b>. Schön, dass du den Weg zu mir gefunden hast."
+        <div style={{ marginTop: 6, color: 'var(--purple-2)', font: '600 12.5px var(--font-body)', letterSpacing: 0.3 }}>
+          Heute ein Lichtpunkt. Mit der Zeit dein Sternbild.
         </div>
-        <div className="subtle" style={{ marginTop: 14 }}>
-          Jeden Tag schenke ich dir eine kleine Botschaft – einen Moment, ganz für dich.
+
+        <div className="bubble" style={{ marginTop: 16 }}>
+          „Hallo, ich bin <b>Luna</b>. Ich sage dir nicht voraus, was passieren wird. Ich helfe dir, einen Gedanken zu hören, der im Alltag vielleicht zu leise ist."
         </div>
 
         <div style={{ flex: 1 }} />

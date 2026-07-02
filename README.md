@@ -1,8 +1,12 @@
 # Sternenorakel
 
+> **Heute ein Lichtpunkt. Mit der Zeit dein Sternbild.**
+
 Eine deutschsprachige, **local-first** Begleiter-App (Web / PWA, mobil-first, Hochformat).
-Das Sternenwesen **Luna** schenkt dir täglich eine persönlich wirkende, reflektierende
-Botschaft – kombiniert mit Journaling, Habit-Tracking und einem Rang-/Belohnungssystem.
+**Luna** begleitet dich durch ein tägliches Ritual aus Symbolen, persönlichen Impulsen
+und kurzen Reflexionen – nicht um deine Zukunft vorherzusagen, sondern damit du klarer
+erkennst, was dich bewegt. Dazu: Tagebuch, Wochenmuster und ein Rang-/Belohnungssystem.
+Siehe auch: `docs/luna-character-bible.md` (Sprachregeln & Story).
 
 Umgesetzt aus dem Claude-Design-Handoff „Sternenorakel UI-Flow" als echte, interaktive
 React-App.
