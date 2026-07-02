@@ -14,12 +14,15 @@ import sharp from 'sharp'
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
-const INPUT = process.argv[2] || 'public/uploads/set-karten-runen.png'
+// Quelle liegt in docs/ (nicht in public/, damit sie nicht mit der App ausgeliefert wird)
+const INPUT = process.argv[2] || 'docs/set-karten-runen.png'
 const OUT = 'public/uploads/opt'
 const PREVIEW = 'scripts/.slice-preview'
 
-// Reihenfolge im Set (links → rechts) — nach Sichtprüfung ggf. anpassen.
-const RUNEN_ORDER = ['fehu', 'raidho', 'sowilo', 'wunjo', 'berkano', 'isa', 'algiz']
+// Reihenfolge im Set (links → rechts), per Sichtprüfung verifiziert.
+// Stein 5 ist ein Berkano-Duplikat ('_'-Prefix = wird nicht exportiert);
+// Wunjo und Ansuz sind im gemalten Set nicht enthalten.
+const RUNEN_ORDER = ['fehu', 'raidho', 'sowilo', 'berkano', '_berkano-doppel', 'isa', 'algiz']
 const PORTRAIT_ORDER = ['kompass', 'tor', 'feder', 'see', 'funke']
 const QUER_ORDER = ['kompass', 'tor', 'funke', 'weg']
 
@@ -106,17 +109,35 @@ rows.sort((a, b) => a.cy - b.cy)
 rows.forEach((r) => r.items.sort((a, b) => a.x - b.x))
 
 if (rows.length !== 3) console.warn(`⚠ Erwartet 3 Reihen, gefunden: ${rows.length} — bitte Vorschau prüfen!`)
-const [steine, portraits, quer] = rows.map((r) => r.items)
+const [steineRoh, portraits, quer] = rows.map((r) => r.items)
+
+// Verschmolzene Nachbar-Steine trennen: deutlich überbreite Boxen werden
+// an der foreground-ärmsten Spalte im mittleren Drittel geteilt.
+const medW = [...steineRoh].map((b) => b.w).sort((a, b) => a - b)[Math.floor(steineRoh.length / 2)]
+const steine = []
+for (const b of steineRoh) {
+  if (b.w <= medW * 1.4) { steine.push(b); continue }
+  let bestX = Math.round(b.x + b.w / 2), bestCount = Infinity
+  for (let X = Math.round(b.x + b.w * 0.33); X <= Math.round(b.x + b.w * 0.67); X++) {
+    const sx = Math.floor(X / SCALE)
+    let count = 0
+    for (let sy = Math.floor(b.y / SCALE); sy < Math.floor((b.y + b.h) / SCALE); sy++) count += fg[sy * w + sx] || 0
+    if (count < bestCount) { bestCount = count; bestX = X }
+  }
+  steine.push({ x: b.x, y: b.y, w: bestX - b.x, h: b.h }, { x: bestX, y: b.y, w: b.x + b.w - bestX, h: b.h })
+  console.log(`↔ Doppelstein geteilt bei x=${bestX}`)
+}
+steine.sort((a, b) => a.x - b.x)
 
 console.log(`Gefunden: ${steine?.length ?? 0} Steine · ${portraits?.length ?? 0} Karten hochkant · ${quer?.length ?? 0} Karten quer`)
 
 // ---------- 3) Plaketten-Fix: Farbe sampeln, überdecken, Titel neu setzen ----------
 async function fixCaption(buf, cw, ch, title, landscape) {
   // Plaketten-Bereich (relativ, aus dem Set-Layout ermittelt)
-  const px = Math.round(cw * (landscape ? 0.14 : 0.13))
-  const pw = Math.round(cw * (landscape ? 0.72 : 0.74))
-  const py = Math.round(ch * (landscape ? 0.72 : 0.845))
-  const ph = Math.round(ch * (landscape ? 0.17 : 0.095))
+  const px = Math.round(cw * (landscape ? 0.14 : 0.12))
+  const pw = Math.round(cw * (landscape ? 0.72 : 0.76))
+  const py = Math.round(ch * (landscape ? 0.72 : 0.788))
+  const ph = Math.round(ch * (landscape ? 0.17 : 0.152))
 
   // Innenfarbe der Plakette sampeln (Mitte oben & unten → Verlauf)
   const rawCard = await sharp(buf).ensureAlpha().raw().toBuffer()
@@ -152,6 +173,7 @@ const outWebp = async (buf, name, width) =>
 
 for (let i = 0; i < (steine?.length ?? 0); i++) {
   const name = RUNEN_ORDER[i] || `stein-${i}`
+  if (name.startsWith('_')) continue // Duplikat, wird nicht gebraucht
   const buf = await crop(steine[i])
   await outWebp(buf, `rune-${name}-md.webp`, 320)
   await outWebp(buf, `rune-${name}-sm.webp`, 96)

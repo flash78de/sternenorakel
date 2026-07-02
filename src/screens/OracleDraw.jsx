@@ -18,7 +18,6 @@ export default function OracleDraw() {
   const nav = useNavigate()
   const loc = useLocation()
   const ritual = loc.state?.ritual || 'wuerfel' // von OracleRitual durchgereicht
-  const t = ritualTheme(ritual) // eigene Farbwelt je Ritual (Gold/Rosé/Jade)
   const { profile, journal, drawnToday, saveEntry, updateReflection, settings } = useStore()
 
   const listen = () => {
@@ -35,6 +34,8 @@ export default function OracleDraw() {
 
   const [phase, setPhase] = useState('trigger') // trigger|listening|revelation|message|error
   const [message, setMessage] = useState(null)
+  // Farbwelt (Gold/Rosé/Jade): bei Wiederansicht dem gespeicherten Ritual folgen
+  const t = ritualTheme(message?.ritual || ritual)
   const [note, setNote] = useState('')
   const [saved, setSaved] = useState(null)
   const [micro, setMicro] = useState(0)

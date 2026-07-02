@@ -7,10 +7,9 @@
 // ============================================================
 import { asset } from './asset.js'
 
-// Wird auf true gestellt, sobald scripts/slice-set.mjs die Einzelbilder
-// erzeugt hat (uploads/opt/karte-*.webp, rune-*.webp). Solange false,
-// zeigt die App die bisherigen gezeichneten Platzhalter.
-const SET_VERFUEGBAR = false
+// Einzelbilder wurden mit scripts/slice-set.mjs erzeugt
+// (uploads/opt/karte-*.webp, rune-*.webp).
+const SET_VERFUEGBAR = true
 
 // Kartentitel → Datei-Schlüssel
 const KARTEN_KEY = {
@@ -25,9 +24,10 @@ const KARTEN_KEY = {
 const HAT_HOCHKANT = new Set(['kompass', 'tor', 'feder', 'see', 'funke'])
 const HAT_QUER = new Set(['kompass', 'tor', 'funke', 'weg'])
 
-// Runenname → Datei-Schlüssel (Ansuz ist im gemalten Set nicht enthalten)
+// Runenname → Datei-Schlüssel. Wunjo & Ansuz sind im gemalten Set nicht
+// enthalten (→ null, App zeigt den gezeichneten Platzhalter-Stein).
 const RUNEN_KEY = {
-  Fehu: 'fehu', Raidho: 'raidho', Sowilo: 'sowilo', Wunjo: 'wunjo',
+  Fehu: 'fehu', Raidho: 'raidho', Sowilo: 'sowilo',
   Berkano: 'berkano', Isa: 'isa', Algiz: 'algiz',
 }
 
