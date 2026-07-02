@@ -15,8 +15,8 @@ export default function Rueckkehr() {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '24px 26px 26px', textAlign: 'center' }}>
       <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', marginTop: 10 }}>
-        <Luna state="idle" width="min(225px, 58vw)" glowSize={255} float />
-        <span style={{ position: 'absolute', top: 24, right: 54, fontSize: 22 }}>💜</span>
+        {/* Sehnsucht-Zustand: „Sie hat gewartet – ohne Vorwurf" (Herzfunkeln ist im Bild) */}
+        <Luna state="sehnsucht" width="min(225px, 58vw)" glowSize={255} float />
       </div>
 
       <div className="h-serif" style={{ fontWeight: 600, fontSize: 24, color: 'var(--gold-1)', marginTop: 6, lineHeight: 1.3 }}>

@@ -20,15 +20,19 @@ const KARTEN_KEY = {
   'Der erste Funke': 'funke',
   'Der verborgene Weg': 'weg',
 }
-// Welche Varianten das Set hergibt
-const HAT_HOCHKANT = new Set(['kompass', 'tor', 'feder', 'see', 'funke'])
+// Wird auf true gestellt, sobald das Nachschub-Blatt (docs/set-nachschub.png)
+// mit scripts/slice-nachschub.mjs zerlegt wurde (Wunjo, Ansuz, weg-hochkant).
+const NACHSCHUB_VERFUEGBAR = false
+
+// Welche Varianten das Set hergibt (weg-hochkant kommt aus dem Nachschub-Blatt)
+const HAT_HOCHKANT = new Set(['kompass', 'tor', 'feder', 'see', 'funke', ...(NACHSCHUB_VERFUEGBAR ? ['weg'] : [])])
 const HAT_QUER = new Set(['kompass', 'tor', 'funke', 'weg'])
 
-// Runenname → Datei-Schlüssel. Wunjo & Ansuz sind im gemalten Set nicht
-// enthalten (→ null, App zeigt den gezeichneten Platzhalter-Stein).
+// Runenname → Datei-Schlüssel (Wunjo & Ansuz kommen aus dem Nachschub-Blatt)
 const RUNEN_KEY = {
   Fehu: 'fehu', Raidho: 'raidho', Sowilo: 'sowilo',
   Berkano: 'berkano', Isa: 'isa', Algiz: 'algiz',
+  ...(NACHSCHUB_VERFUEGBAR ? { Wunjo: 'wunjo', Ansuz: 'ansuz' } : {}),
 }
 
 // Hochkant-Kartenbild (md|sm) oder null

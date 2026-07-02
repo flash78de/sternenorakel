@@ -9,6 +9,7 @@ const FILE = {
   offenbarung: 'luna-offenbarung-transparent',
   freude: 'luna-freude-transparent',
   schlaf: 'luna-schlaf-transparent',
+  sehnsucht: 'luna-sehnsucht-transparent', // „Sie hat gewartet – ohne Vorwurf"
   icon: 'luna-icon-transparent',
 }
 
@@ -20,6 +21,7 @@ const GLOW = {
   offenbarung: 'rgba(255,247,225,.7)',
   freude: 'rgba(232,199,122,.5)',
   schlaf: 'rgba(106,59,232,.3)',
+  sehnsucht: 'rgba(166,107,255,.36)', // gedämpfter, lila-dominant (lt. Briefing)
   icon: 'rgba(166,107,255,.32)',
 }
 
@@ -29,6 +31,7 @@ const SHADOW = {
   offenbarung: 'drop-shadow(0 0 30px rgba(232,199,122,.7))',
   freude: 'drop-shadow(0 12px 22px rgba(232,199,122,.5))',
   schlaf: 'drop-shadow(0 12px 22px rgba(106,59,232,.4))',
+  sehnsucht: 'drop-shadow(0 12px 24px rgba(106,59,232,.45))',
   icon: 'drop-shadow(0 8px 22px rgba(106,59,232,.45))',
 }
 
@@ -39,6 +42,7 @@ const TEMPO = {
   offenbarung: 4.2,
   freude: 3.6,
   schlaf: 8.5,
+  sehnsucht: 7, // ruhig, geduldig wartend
   icon: 6,
 }
 
@@ -48,6 +52,10 @@ const SPARKS = [
   { top: '20%', right: '6%', size: 10, delay: 1.1, dur: 2.6 },
   { bottom: '14%', left: '4%', size: 9, delay: 1.9, dur: 3.5 },
 ]
+
+// Wird auf true gestellt, sobald luna-sehnsucht-transparent.png hochgeladen
+// und optimiert wurde (scripts/optimize-images.mjs). Bis dahin → idle.
+const SEHNSUCHT_VERFUEGBAR = false
 
 // width: Zahl (px) oder CSS-String wie 'min(330px, 82vw)' für responsive Größen.
 export default function Luna({
@@ -61,6 +69,7 @@ export default function Luna({
   alt = 'Luna',
   style = {},
 }) {
+  if (state === 'sehnsucht' && !SEHNSUCHT_VERFUEGBAR) state = 'idle'
   const numeric = typeof width === 'number'
   const small = numeric && width <= 120
   const gSize = glowSize || (numeric ? width * 1.25 : 220)
