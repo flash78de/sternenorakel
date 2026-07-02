@@ -5,6 +5,7 @@ import { useStore } from '../store/store.jsx'
 import { formatDate } from '../data/library.js'
 import { generateMessage } from '../data/generator.js'
 import { speak, speechSupported } from '../lib/audio.js'
+import { asset } from '../lib/asset.js'
 
 // Kern-Flow: trigger (Würfel) → listening (Luna erwacht) → revelation → message
 // (auto-gespeichert) → reflection. Fehler = sanfter Zwischenzustand.
@@ -104,7 +105,7 @@ export default function OracleDraw() {
         </div>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <button className="dice-orb anim-orb" onClick={draw} aria-label="Sternenwürfel werfen">
-            <img src="/uploads/wuerfel.png" alt="Sternenwürfel" width={124} style={{ filter: 'drop-shadow(0 10px 22px rgba(232,199,122,.55))' }} />
+            <img src={asset('uploads/wuerfel.png')} alt="Sternenwürfel" width={124} style={{ filter: 'drop-shadow(0 10px 22px rgba(232,199,122,.55))' }} />
           </button>
         </div>
         <div style={{ textAlign: 'center', color: 'var(--gold-1)', font: '600 13px var(--font-body)', letterSpacing: 0.5, marginBottom: 6 }}>
@@ -121,7 +122,7 @@ export default function OracleDraw() {
       <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', textAlign: 'center' }}>
         {!splashFail ? (
           <img
-            src="/uploads/luna-erwacht.png"
+            src={asset('uploads/luna-erwacht.png')}
             alt="Luna erwacht"
             onError={() => setSplashFail(true)}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}

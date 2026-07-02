@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/store.jsx'
+import { asset } from '../lib/asset.js'
 
 export default function OracleRitual() {
   const nav = useNavigate()
@@ -29,7 +30,7 @@ export default function OracleRitual() {
         {/* Sternenwürfel — frei */}
         <button className="ritual" onClick={() => nav('/oracle/draw', { state: { ritual: 'wuerfel' } })}>
           <span className="ico">
-            <img src="/uploads/wuerfel.png" alt="Würfel" style={{ width: 50, height: 50, objectFit: 'contain', filter: 'drop-shadow(0 4px 10px rgba(232,199,122,.45))' }} />
+            <img src={asset('uploads/wuerfel.png')} alt="Würfel" style={{ width: 50, height: 50, objectFit: 'contain', filter: 'drop-shadow(0 4px 10px rgba(232,199,122,.45))' }} />
           </span>
           <span style={{ flex: 1, minWidth: 0 }}>
             <span style={{ display: 'block', fontFamily: 'var(--font-head)', color: 'var(--gold-1)', fontSize: 16, fontWeight: 600 }}>Sternenwürfel</span>

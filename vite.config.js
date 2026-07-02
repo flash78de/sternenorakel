@@ -3,7 +3,13 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // Sternenorakel — mobil-first, installierbare PWA (local-first)
-export default defineConfig({
+// Basis-Pfad: Dev unter '/', Produktions-Build (GitHub Pages) unter '/sternenorakel/'.
+const REPO_BASE = '/sternenorakel/'
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? REPO_BASE : '/',
+  define: {
+    __ASSET_BASE__: JSON.stringify(command === 'build' ? REPO_BASE : '/'),
+  },
   plugins: [
     react(),
     VitePWA({
@@ -28,4 +34,4 @@ export default defineConfig({
       }
     })
   ]
-})
+}))

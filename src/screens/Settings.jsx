@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/store.jsx'
 import { THEMES, MONTHS, zodiacOf } from '../data/library.js'
+import { asset } from '../lib/asset.js'
 
 const TONES = [
   { key: 'Sanft', desc: 'Warm und einfühlsam' },
@@ -128,7 +129,7 @@ export default function Settings() {
 
       {/* Tägliche Erinnerung → eigener Screen */}
       <div onClick={() => nav('/profil/erinnerung')} style={{ marginTop: 12, cursor: 'pointer', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 16, padding: '13px 15px', display: 'flex', alignItems: 'center', gap: 11 }}>
-        <img src="/uploads/luna-schlaf-transparent.png" alt="" style={{ width: 40, height: 40, objectFit: 'contain' }} />
+        <img src={asset('uploads/luna-schlaf-transparent.png')} alt="" style={{ width: 40, height: 40, objectFit: 'contain' }} />
         <div style={{ flex: 1 }}>
           <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>Erinnerung</div>
           <div style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)', marginTop: 1 }}>

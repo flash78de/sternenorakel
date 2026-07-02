@@ -7,6 +7,8 @@ import { viteSingleFile } from 'vite-plugin-singlefile'
 // sodass die fertige standalone.html per Doppelklick (file://) lauffähig ist.
 export default defineConfig({
   base: './',
+  // Leerer Asset-Basispfad: die Bilder werden anschließend als Data-URI eingebettet.
+  define: { __ASSET_BASE__: JSON.stringify('') },
   plugins: [react(), viteSingleFile()],
   build: {
     outDir: 'standalone-dist',

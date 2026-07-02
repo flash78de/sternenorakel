@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { asset } from '../lib/asset.js'
 
 const FAQ = [
   {
@@ -58,7 +59,7 @@ export default function Wissen() {
           ].map((x) => (
             <div key={x.n} style={{ textAlign: 'center' }}>
               <div style={{ borderRadius: 12, padding: 6, background: 'radial-gradient(circle at 50% 30%,rgba(106,59,232,.28),transparent 65%)' }}>
-                <img src={`/uploads/luna-${x.s}-transparent.png`} alt={x.n} style={{ width: '100%', height: 'auto' }} />
+                <img src={asset(`uploads/luna-${x.s}-transparent.png`)} alt={x.n} style={{ width: '100%', height: 'auto' }} />
               </div>
               <div style={{ fontFamily: 'var(--font-head)', color: 'var(--gold-1)', fontSize: 12, marginTop: 4 }}>{x.n}</div>
               <div style={{ color: '#7a7494', font: '400 9.5px var(--font-body)' }}>{x.d}</div>

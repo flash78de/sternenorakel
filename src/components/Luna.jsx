@@ -1,13 +1,14 @@
 // Luna — das Sternenwesen in 6 Zuständen.
 // Jeder Zustand verweist auf die echte transparente Art (Dark-First).
+import { asset } from '../lib/asset.js'
 
 const SRC = {
-  idle: '/uploads/luna-idle-transparent.png',
-  lauschen: '/uploads/luna-lauschen-transparent.png',
-  offenbarung: '/uploads/luna-offenbarung-transparent.png',
-  freude: '/uploads/luna-freude-transparent.png',
-  schlaf: '/uploads/luna-schlaf-transparent.png',
-  icon: '/uploads/luna-icon-transparent.png',
+  idle: asset('uploads/luna-idle-transparent.png'),
+  lauschen: asset('uploads/luna-lauschen-transparent.png'),
+  offenbarung: asset('uploads/luna-offenbarung-transparent.png'),
+  freude: asset('uploads/luna-freude-transparent.png'),
+  schlaf: asset('uploads/luna-schlaf-transparent.png'),
+  icon: asset('uploads/luna-icon-transparent.png'),
 }
 
 const GLOW = {

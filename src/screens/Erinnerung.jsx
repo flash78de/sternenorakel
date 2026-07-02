@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/store.jsx'
+import { asset } from '../lib/asset.js'
 
 const WHEN = [
   { key: 'morgens', icon: '☀', label: 'Morgens', desc: 'Sanfter Start in den Tag', time: '08:00' },
@@ -100,7 +101,7 @@ export default function Erinnerung() {
                 background: settings.tone === t.key ? 'rgba(166,107,255,.16)' : 'rgba(10,10,31,.5)',
                 border: '1px solid ' + (settings.tone === t.key ? 'var(--gold-1)' : 'rgba(167,139,250,.28)'),
               }}>
-              <img src={`/uploads/luna-${t.state}-transparent.png`} alt="" style={{ width: 34, height: 34, objectFit: 'contain' }} />
+              <img src={asset(`uploads/luna-${t.state}-transparent.png`)} alt="" style={{ width: 34, height: 34, objectFit: 'contain' }} />
               <div style={{ color: settings.tone === t.key ? 'var(--gold-1)' : 'var(--text)', font: '600 11.5px var(--font-body)', marginTop: 4 }}>{t.key}</div>
               <div style={{ color: 'var(--text-dim)', font: '400 9px/1.3 var(--font-body)', marginTop: 2 }}>{t.desc}</div>
             </button>
