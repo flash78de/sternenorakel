@@ -20,9 +20,9 @@ const KARTEN_KEY = {
   'Der erste Funke': 'funke',
   'Der verborgene Weg': 'weg',
 }
-// Wird auf true gestellt, sobald das Nachschub-Blatt (docs/set-nachschub.png)
-// mit scripts/slice-nachschub.mjs zerlegt wurde (Wunjo, Ansuz, weg-hochkant).
-const NACHSCHUB_VERFUEGBAR = false
+// Nachschub-Blatt (docs/set-nachschub.png) wurde zerlegt:
+// Wunjo, Ansuz und „Der verborgene Weg" hochkant sind vorhanden.
+const NACHSCHUB_VERFUEGBAR = true
 
 // Welche Varianten das Set hergibt (weg-hochkant kommt aus dem Nachschub-Blatt)
 const HAT_HOCHKANT = new Set(['kompass', 'tor', 'feder', 'see', 'funke', ...(NACHSCHUB_VERFUEGBAR ? ['weg'] : [])])

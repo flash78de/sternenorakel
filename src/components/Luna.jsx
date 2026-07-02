@@ -53,9 +53,8 @@ const SPARKS = [
   { bottom: '14%', left: '4%', size: 9, delay: 1.9, dur: 3.5 },
 ]
 
-// Wird auf true gestellt, sobald luna-sehnsucht-transparent.png hochgeladen
-// und optimiert wurde (scripts/optimize-images.mjs). Bis dahin → idle.
-const SEHNSUCHT_VERFUEGBAR = false
+// luna-sehnsucht-transparent.png ist hochgeladen und optimiert.
+const SEHNSUCHT_VERFUEGBAR = true
 
 // width: Zahl (px) oder CSS-String wie 'min(330px, 82vw)' für responsive Größen.
 export default function Luna({
