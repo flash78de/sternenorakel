@@ -99,9 +99,13 @@ export default function OracleDraw() {
     )
   }, [profile.name, profile.themes, profile.mood, profile.commStyles, profile.coping, ritual, settings.aiMode, settings.aiEndpoint, saveEntry])
 
-  // Belohnung → eigener Feier-Screen (22); sonst Dashboard
+  // Jede NEUE Tagesbotschaft endet im Feier-Moment (Dopamin-Schleife schließen):
+  // Sternbild > Rangaufstieg > tägliche Vollendung (+Sternenstaub, Serie).
+  // Nur Wiederansichten und freie Impulse (kein Staub) gehen still zurück.
+  const earned = saved && !saved.already && (saved.gainedDust > 0 || saved.rankUp || saved.constellation)
+
   const finish = () => {
-    if (saved && !saved.already && (saved.constellation || saved.rankUp)) {
+    if (earned) {
       nav('/feier', { replace: true, state: { reward: { ...saved } } })
     } else {
       nav('/dashboard', { replace: true })
@@ -109,9 +113,9 @@ export default function OracleDraw() {
   }
 
   const saveReflection = () => {
-    // Reflexion speichern kann ein Sternbild vollenden → eigener Feier-Moment
+    // Reflexion speichern kann ein Sternbild vollenden → gefeiert wird immer das Größte
     const unlocked = saved?.id ? updateReflection(saved.id, note) : null
-    if (unlocked || (saved && !saved.already && saved.rankUp)) {
+    if (unlocked || earned) {
       nav('/feier', { replace: true, state: { reward: { ...saved, constellationName: unlocked } } })
     } else {
       nav('/dashboard', { replace: true })

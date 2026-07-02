@@ -410,6 +410,12 @@ img {
   40% { opacity: 0.95; transform: scale(1.1) rotate(16deg); }
   62% { opacity: 0.55; transform: scale(0.85) rotate(24deg); }
 }
+/* Feier-Konfetti: Sternchen steigen auf und verglühen */
+@keyframes feierFly {
+  0% { opacity: 0; transform: translateY(42vh) scale(0.4) rotate(0deg); }
+  12% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-30vh) scale(1.15) rotate(200deg); }
+}
 @keyframes orbpulse {
   0%, 100% {
     transform: scale(1);
@@ -452,6 +458,13 @@ img {
   text-shadow: 0 0 8px rgba(232, 199, 122, 0.8);
   animation: sparkTwinkle 3s ease-in-out infinite;
   z-index: 2;
+}
+.feier-part {
+  position: absolute;
+  bottom: 12%;
+  pointer-events: none;
+  text-shadow: 0 0 10px currentColor;
+  animation: feierFly 2.8s ease-out infinite;
 }
 .anim-orb { animation: orbpulse 3.4s ease-in-out infinite; }
 .anim-burst { animation: burst 3s ease-in-out infinite; }

@@ -8,12 +8,22 @@ export default function OracleRitual() {
   const { drawnToday, settings } = useStore()
   const premium = settings.premium
 
+  // Echte gemalte Motive als Ritual-Icons: aufgefächerte Karten & Runenstein
   const cardsIcon = (
-    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={ritualTheme('karten').accent} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="7.5" y="4" width="11" height="15" rx="2" transform="rotate(8 13 11)" />
-      <rect x="4" y="6" width="11" height="15" rx="2" fill="rgba(40,30,70,.7)" />
-      <path d="M7 11h5M7 14h4" />
-    </svg>
+    <span style={{ position: 'relative', width: 58, height: 62, display: 'block' }}>
+      <img src={asset('uploads/opt/karte-see-sm.webp')} alt=""
+        style={{ position: 'absolute', left: 0, top: 4, width: 36, transform: 'rotate(-10deg)', borderRadius: 4, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,.5))' }} />
+      <img src={asset('uploads/opt/karte-kompass-sm.webp')} alt="Sternenkarten"
+        style={{ position: 'absolute', left: 18, top: 0, width: 38, transform: 'rotate(9deg)', borderRadius: 4, filter: 'drop-shadow(0 5px 10px rgba(0,0,0,.55))' }} />
+    </span>
+  )
+  const runesIcon = (
+    <span style={{ position: 'relative', width: 60, height: 62, display: 'block' }}>
+      <img src={asset('uploads/opt/rune-berkano-sm.webp')} alt=""
+        style={{ position: 'absolute', left: 0, top: 8, width: 34, transform: 'rotate(-9deg)', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,.5))' }} />
+      <img src={asset('uploads/opt/rune-raidho-sm.webp')} alt="Runen"
+        style={{ position: 'absolute', left: 22, top: 2, width: 36, transform: 'rotate(8deg)', filter: 'drop-shadow(0 5px 10px rgba(0,0,0,.55))' }} />
+    </span>
   )
 
   return (
@@ -30,7 +40,7 @@ export default function OracleRitual() {
           icon={<img src={asset('uploads/opt/wuerfel-sm.webp')} alt="Würfel" style={{ width: 72, height: 72, objectFit: 'contain', filter: 'drop-shadow(0 4px 10px rgba(232,199,122,.45))' }} />} />
         <Ritual premium={premium} nav={nav} ritual="karten" title="Sternenkarten" desc="Du ziehst selbst: ein inneres Bild für tiefere Gefühle & Themen." icon={cardsIcon} />
         <Ritual premium={premium} nav={nav} ritual="runen" title="Runen" desc="Drei Zeichen: was nachwirkt, was jetzt zählt, was entstehen darf."
-          icon={<span style={{ fontFamily: 'var(--font-head)', color: ritualTheme('runen').accent, fontSize: 36 }}>ᚱ</span>} />
+          icon={runesIcon} />
       </div>
       <div style={{ textAlign: 'center', color: '#7a7494', font: '400 11.5px/1.5 var(--font-body)', padding: '14px 0' }}>
         {premium
