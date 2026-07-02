@@ -11,11 +11,7 @@ export default function Auth() {
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 26px 30px' }}>
-      <div className="statusbar" style={{ padding: 0, height: 30 }}>
-        <span>9:41</span>
-      </div>
-
-      <div style={{ textAlign: 'center', marginTop: 6 }}>
+      <div style={{ textAlign: 'center', marginTop: 16 }}>
         <Luna state="idle" width={140} glowSize={175} float />
       </div>
 

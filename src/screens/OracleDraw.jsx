@@ -6,6 +6,8 @@ import { formatDate } from '../data/library.js'
 import { fetchMessage } from '../lib/ai.js'
 import { speak, speechSupported } from '../lib/audio.js'
 import { asset } from '../lib/asset.js'
+import { ritualTheme } from '../lib/ritualTheme.js'
+import { buzz } from '../lib/haptics.js'
 
 // Kern-Flow: trigger (Würfel) → listening (Luna lauscht) → revelation →
 // message + Reflexion auf EINEM Screen (auto-gespeichert). Fehler = sanfter Zwischenzustand.
@@ -15,6 +17,7 @@ export default function OracleDraw() {
   const nav = useNavigate()
   const loc = useLocation()
   const ritual = loc.state?.ritual || 'wuerfel' // von OracleRitual durchgereicht
+  const t = ritualTheme(ritual) // eigene Farbwelt je Ritual (Gold/Rosé/Jade)
   const { profile, journal, drawnToday, saveEntry, updateReflection, settings } = useStore()
 
   const listen = () => {
@@ -87,6 +90,7 @@ export default function OracleDraw() {
             setMessage(msg)
             setSaved(res)
             setPhase('message')
+            buzz(24) // spürbarer Moment: die Botschaft ist da
           }, 1700)
         )
       }, 2300)
@@ -120,9 +124,12 @@ export default function OracleDraw() {
     }[ritual]
     const hint = { wuerfel: 'Berühren zum Würfeln', karten: 'Eine Karte berühren', runen: 'Die Runen berühren' }[ritual]
     return (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 28px 34px' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 28px 34px', background: t.wash }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text)', font: '600 16px var(--font-body)' }}>
           <button className="back" onClick={() => nav('/oracle')}>‹</button>
+          <span style={{ color: t.accent, font: '600 10.5px var(--font-body)', letterSpacing: 1.4, textTransform: 'uppercase', opacity: 0.9 }}>
+            {t.glyph} {t.name}
+          </span>
           <button className="back" onClick={() => nav('/dashboard')} style={{ opacity: 0.6 }}>×</button>
         </div>
         <div style={{ textAlign: 'center', marginTop: 8 }}>
@@ -149,10 +156,10 @@ export default function OracleDraw() {
                     width: 62, height: 96, marginLeft: i ? -22 : 0, cursor: 'pointer',
                     transform: `rotate(${deg}deg) translateY(${Math.abs(deg) * 0.8}px)`,
                     animationDelay: `${i * 0.35}s`,
-                    borderRadius: 10, border: '1px solid rgba(232,199,122,.5)',
-                    background: 'linear-gradient(150deg,#2a2140,#171226) center/cover',
-                    boxShadow: '0 10px 26px rgba(0,0,0,.5), inset 0 0 18px rgba(106,59,232,.35)',
-                    display: 'grid', placeItems: 'center', color: 'var(--gold-1)', fontSize: 20,
+                    borderRadius: 10, border: `1px solid ${t.border}`,
+                    background: 'linear-gradient(150deg,#2f1e30,#191021) center/cover',
+                    boxShadow: `0 10px 26px rgba(0,0,0,.5), inset 0 0 18px ${t.soft}`,
+                    display: 'grid', placeItems: 'center', color: t.accent, fontSize: 20,
                   }}>✦</button>
               ))}
             </div>
@@ -163,16 +170,16 @@ export default function OracleDraw() {
               {['ᚠ', 'ᚱ', 'ᛒ'].map((g, i) => (
                 <span key={i} className="anim-float" style={{
                   width: 66, height: 80, borderRadius: '46% 46% 40% 40%', animationDelay: `${i * 0.45}s`,
-                  background: 'linear-gradient(160deg,#332a4a,#1a1428)', border: '1px solid rgba(232,199,122,.4)',
-                  boxShadow: '0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1)',
-                  display: 'grid', placeItems: 'center', color: 'rgba(232,199,122,.35)', fontSize: 26, fontFamily: 'var(--font-head)',
+                  background: 'linear-gradient(160deg,#26382f,#131f19)', border: `1px solid ${t.border}`,
+                  boxShadow: `0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1), inset 0 0 16px ${t.softer}`,
+                  display: 'grid', placeItems: 'center', color: t.accent, fontSize: 26, fontFamily: 'var(--font-head)', opacity: 0.92,
                 }}>{g}</span>
               ))}
             </button>
           )}
         </div>
 
-        <div style={{ textAlign: 'center', color: 'var(--gold-1)', font: '600 13px var(--font-body)', letterSpacing: 0.5, marginBottom: 6 }}>
+        <div style={{ textAlign: 'center', color: t.accent, font: '600 13px var(--font-body)', letterSpacing: 0.5, marginBottom: 6, textShadow: `0 0 14px ${t.glow}` }}>
           {hint}
         </div>
         <div style={{ textAlign: 'center', color: '#7a7494', font: '400 11px var(--font-body)' }}>
@@ -186,7 +193,7 @@ export default function OracleDraw() {
 
   if (phase === 'listening')
     return (
-      <div className="center-col" style={{ padding: '30px 30px 44px', textAlign: 'center' }}>
+      <div className="center-col" style={{ padding: '30px 30px 44px', textAlign: 'center', background: t.wash }}>
         <Luna state="lauschen" width="min(280px, 70vw)" glowSize={310} float />
         <div style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 22, color: 'var(--gold-1)', marginTop: 14, textShadow: '0 0 18px rgba(232,199,122,.4)', minHeight: 30 }}>
           {LISTEN_TEXTS[micro]}
@@ -201,7 +208,7 @@ export default function OracleDraw() {
 
   if (phase === 'revelation')
     return (
-      <div className="center-col" style={{ padding: 30, position: 'relative', background: 'radial-gradient(420px 420px at 50% 40%,rgba(255,247,225,.5),rgba(232,199,122,.28) 35%,transparent 62%)' }}>
+      <div className="center-col" style={{ padding: 30, position: 'relative', background: `radial-gradient(420px 420px at 50% 40%,rgba(255,247,225,.5),${t.glow} 35%,transparent 62%)` }}>
         <div
           style={{
             position: 'absolute',
@@ -259,8 +266,8 @@ export default function OracleDraw() {
 
         {/* Ritual-spezifisches Ergebnis */}
         {message.archetype && (
-          <div style={{ marginTop: 14, background: 'rgba(166,107,255,.1)', border: '1px solid rgba(166,107,255,.35)', borderRadius: 16, padding: '13px 15px' }}>
-            <div style={{ color: 'var(--purple-2)', font: '600 9px var(--font-body)', letterSpacing: 1.2, textTransform: 'uppercase' }}>Dein Archetyp · Sternenwürfel</div>
+          <div style={{ marginTop: 14, background: t.soft, border: `1px solid ${t.border}`, borderRadius: 16, padding: '13px 15px' }}>
+            <div style={{ color: t.accent, font: '600 9px var(--font-body)', letterSpacing: 1.2, textTransform: 'uppercase' }}>Dein Archetyp · Sternenwürfel</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 6 }}>
               <span style={{ fontSize: 22, color: 'var(--gold-1)' }}>{message.archetype.glyph}</span>
               <span style={{ fontFamily: 'var(--font-head)', color: 'var(--gold-1)', fontSize: 18, fontWeight: 600 }}>{message.archetype.name}</span>
@@ -272,19 +279,19 @@ export default function OracleDraw() {
           </div>
         )}
         {message.card && (
-          <div style={{ marginTop: 14, background: 'rgba(166,107,255,.1)', border: '1px solid rgba(166,107,255,.35)', borderRadius: 16, padding: '13px 15px' }}>
-            <div style={{ color: 'var(--purple-2)', font: '600 9px var(--font-body)', letterSpacing: 1.2, textTransform: 'uppercase' }}>Deine Karte · {message.card.thema}</div>
+          <div style={{ marginTop: 14, background: t.soft, border: `1px solid ${t.border}`, borderRadius: 16, padding: '13px 15px' }}>
+            <div style={{ color: t.accent, font: '600 9px var(--font-body)', letterSpacing: 1.2, textTransform: 'uppercase' }}>Deine Karte · {message.card.thema}</div>
             <div style={{ color: 'var(--text)', font: '400 12.5px/1.6 var(--font-body)', marginTop: 7 }}>{message.card.deutung}</div>
           </div>
         )}
         {message.runes && (
-          <div style={{ marginTop: 14, background: 'rgba(166,107,255,.1)', border: '1px solid rgba(166,107,255,.35)', borderRadius: 16, padding: '13px 15px' }}>
-            <div style={{ color: 'var(--purple-2)', font: '600 9px var(--font-body)', letterSpacing: 1.2, textTransform: 'uppercase' }}>Deine Runen-Lesung</div>
+          <div style={{ marginTop: 14, background: t.soft, border: `1px solid ${t.border}`, borderRadius: 16, padding: '13px 15px' }}>
+            <div style={{ color: t.accent, font: '600 9px var(--font-body)', letterSpacing: 1.2, textTransform: 'uppercase' }}>Deine Runen-Lesung</div>
             {message.runes.map((r) => (
               <div key={r.position} style={{ display: 'flex', gap: 11, alignItems: 'flex-start', marginTop: 9 }}>
-                <span style={{ width: 34, height: 40, flexShrink: 0, borderRadius: '44% 44% 38% 38%', background: 'linear-gradient(160deg,#332a4a,#1a1428)', border: '1px solid rgba(232,199,122,.4)', display: 'grid', placeItems: 'center', color: 'var(--gold-1)', fontSize: 17, fontFamily: 'var(--font-head)' }}>{r.glyph}</span>
+                <span style={{ width: 34, height: 40, flexShrink: 0, borderRadius: '44% 44% 38% 38%', background: 'linear-gradient(160deg,#26382f,#131f19)', border: `1px solid ${t.border}`, display: 'grid', placeItems: 'center', color: t.accent, fontSize: 17, fontFamily: 'var(--font-head)' }}>{r.glyph}</span>
                 <span style={{ flex: 1 }}>
-                  <span style={{ display: 'block', color: 'var(--gold-1)', font: '600 11.5px var(--font-body)' }}>{r.position} · {r.name} ({r.bedeutung})</span>
+                  <span style={{ display: 'block', color: t.accent, font: '600 11.5px var(--font-body)' }}>{r.position} · {r.name} ({r.bedeutung})</span>
                   <span style={{ display: 'block', color: 'var(--text)', font: '400 12px/1.5 var(--font-body)', marginTop: 2 }}>{r.heute}</span>
                 </span>
               </div>

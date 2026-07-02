@@ -1,7 +1,9 @@
+import { useEffect } from 'react'
 import { useLocation, useNavigate, Navigate } from 'react-router-dom'
 import Luna from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
 import { CONSTELLATIONS } from '../data/library.js'
+import { buzz } from '../lib/haptics.js'
 
 // 22 · Rangaufstieg / Sternbild vollendet — eigener Belohnungs-Screen mit Visualisierung
 export default function Celebration() {
@@ -9,6 +11,11 @@ export default function Celebration() {
   const loc = useLocation()
   const { rank } = useStore()
   const reward = loc.state?.reward
+
+  // Feier spürbar machen (Android; iOS ignoriert vibrate still)
+  useEffect(() => {
+    if (reward) buzz([30, 45, 30])
+  }, [reward])
 
   if (!reward) return <Navigate to="/dashboard" replace />
 

@@ -16,13 +16,17 @@ export function TabLayout() {
   )
 }
 
-// Telefon-Hülle ohne Navigation (Onboarding, Auth, Orakel-Ritual)
+// Telefon-Hülle ohne Navigation (Onboarding, Auth, Orakel-Ritual).
+// Innerer screen-scroll: Bei fester App-Höhe scrollen zu lange Screens
+// intern statt abgeschnitten zu werden; Overlays ankern weiter am .screen.
 export function PlainLayout() {
   const loc = useLocation()
   return (
     <div className="phone">
       <div key={loc.pathname} className="screen route-fade">
-        <Outlet />
+        <div className="screen-scroll screen--plain">
+          <Outlet />
+        </div>
       </div>
     </div>
   )

@@ -32,6 +32,23 @@ const SHADOW = {
   icon: 'drop-shadow(0 8px 22px rgba(106,59,232,.45))',
 }
 
+// Tempo je Zustand: schlafend atmet langsam, Freude ist lebhafter.
+const TEMPO = {
+  idle: 6,
+  lauschen: 5.2,
+  offenbarung: 4.2,
+  freude: 3.6,
+  schlaf: 8.5,
+  icon: 6,
+}
+
+// Funkelnde Sternchen um Luna (nur bei größeren Darstellungen)
+const SPARKS = [
+  { top: '6%', left: '10%', size: 13, delay: 0, dur: 3.1 },
+  { top: '20%', right: '6%', size: 10, delay: 1.1, dur: 2.6 },
+  { bottom: '14%', left: '4%', size: 9, delay: 1.9, dur: 3.5 },
+]
+
 // width: Zahl (px) oder CSS-String wie 'min(330px, 82vw)' für responsive Größen.
 export default function Luna({
   state = 'idle',
@@ -40,31 +57,50 @@ export default function Luna({
   glowSize,
   float = true,
   burst = false,
+  sparkle = true,
   alt = 'Luna',
   style = {},
 }) {
   const numeric = typeof width === 'number'
   const small = numeric && width <= 120
   const gSize = glowSize || (numeric ? width * 1.25 : 220)
+  const tempo = TEMPO[state] || 6
+  const animate = !burst // burst hat eine eigene Animation (Feier)
   return (
     <div className="luna" style={{ display: 'flex', justifyContent: 'center', ...style }}>
       {glow && (
         <span
-          className="luna-glow"
+          className={'luna-glow' + (animate ? ' luna-glow--pulse' : '')}
           style={{
             width: gSize,
             height: gSize,
             top: -gSize * 0.06,
             background: `radial-gradient(circle, ${GLOW[state]}, transparent 65%)`,
+            animationDuration: `${tempo}s`,
           }}
         />
       )}
-      <img
-        src={srcFor(state, small)}
-        alt={alt}
-        className={burst ? 'anim-burst' : float ? 'anim-float' : ''}
-        style={{ width, height: 'auto', position: 'relative', filter: SHADOW[state] }}
-      />
+      {sparkle && !small && animate && SPARKS.map((sp, i) => (
+        <span key={i} className="luna-spark" aria-hidden="true"
+          style={{
+            top: sp.top, left: sp.left, right: sp.right, bottom: sp.bottom,
+            fontSize: sp.size,
+            animationDuration: `${sp.dur}s`,
+            animationDelay: `${sp.delay}s`,
+            color: i === 1 ? 'var(--purple-2)' : 'var(--gold-1)',
+          }}>✦</span>
+      ))}
+      <span
+        className={animate && float ? 'luna-sway' : undefined}
+        style={{ position: 'relative', animationDuration: `${tempo * 1.3}s` }}
+      >
+        <img
+          src={srcFor(state, small)}
+          alt={alt}
+          className={burst ? 'anim-burst' : animate ? 'luna-breath' : ''}
+          style={{ width, height: 'auto', display: 'block', filter: SHADOW[state], animationDuration: burst ? undefined : `${tempo}s` }}
+        />
+      </span>
     </div>
   )
 }

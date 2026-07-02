@@ -75,11 +75,16 @@ img {
   position: relative;
   width: 100%;
   max-width: var(--maxw);
+  /* App-Gefühl: feste Höhe, KEIN Seiten-Scroll – Inhalte scrollen intern,
+     die untere Navigation bleibt dadurch immer am Bildschirmrand. */
+  height: 100dvh;
   min-height: 100dvh;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  /* echte Geräte-Statusleiste (Notch) freihalten statt Fake-Uhrzeit */
+  padding-top: env(safe-area-inset-top, 0px);
   /* Sternenfeld + Lila-Orbs + Anthrazit-Aubergine-Verlauf */
   background:
     radial-gradient(1px 1px at 18% 10%, rgba(245, 244, 250, 0.7), transparent),
@@ -141,21 +146,9 @@ img {
   padding-right: 20px;
 }
 
-/* Statusleiste (Mock) */
-.statusbar {
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 22px;
-  color: var(--text);
-  font: 600 13px var(--font-body);
-  flex-shrink: 0;
-}
-.statusbar .glyphs {
-  opacity: 0.8;
-  font-size: 11px;
-  letter-spacing: 2px;
+/* Plain-Screens (ohne Tab-Bar): unten die Home-Indicator-Zone freihalten */
+.screen--plain {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* ---------- Typografie ---------- */
@@ -398,6 +391,25 @@ img {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-9px); }
 }
+/* Luna lebt: Schweben + sanftes Wiegen (äußere Hülle) … */
+@keyframes lunaSway {
+  0%, 100% { transform: translateY(0) rotate(-1.3deg); }
+  50% { transform: translateY(-8px) rotate(1.3deg); }
+}
+/* … und Atmen (Bild selbst) – zwei Ebenen wirken organisch statt mechanisch */
+@keyframes lunaBreath {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.022); }
+}
+@keyframes lunaGlowPulse {
+  0%, 100% { opacity: 0.72; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.08); }
+}
+@keyframes sparkTwinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4) rotate(0deg); }
+  40% { opacity: 0.95; transform: scale(1.1) rotate(16deg); }
+  62% { opacity: 0.55; transform: scale(0.85) rotate(24deg); }
+}
 @keyframes orbpulse {
   0%, 100% {
     transform: scale(1);
@@ -430,6 +442,17 @@ img {
 }
 
 .anim-float { animation: floaty 6s ease-in-out infinite; }
+.luna-sway { animation: lunaSway 6s ease-in-out infinite; display: block; }
+.luna-breath { animation: lunaBreath 4.6s ease-in-out infinite; }
+.luna-glow--pulse { animation: lunaGlowPulse 4.6s ease-in-out infinite; }
+.luna-spark {
+  position: absolute;
+  pointer-events: none;
+  color: var(--gold-1);
+  text-shadow: 0 0 8px rgba(232, 199, 122, 0.8);
+  animation: sparkTwinkle 3s ease-in-out infinite;
+  z-index: 2;
+}
 .anim-orb { animation: orbpulse 3.4s ease-in-out infinite; }
 .anim-burst { animation: burst 3s ease-in-out infinite; }
 .fade-up { animation: fadeUp 0.5s ease both; }

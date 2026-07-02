@@ -5,10 +5,6 @@ export default function Welcome() {
   const nav = useNavigate()
   return (
     <>
-      <div className="statusbar">
-        <span>9:41</span>
-        <span className="glyphs">☾ ✦</span>
-      </div>
       <div
         style={{
           flex: 1,

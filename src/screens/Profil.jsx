@@ -12,13 +12,8 @@ export default function Profil() {
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 20px 16px' }}>
-      <div className="statusbar" style={{ padding: 0, height: 24 }}>
-        <span>9:41</span>
-        <span className="glyphs" style={{ fontSize: 10 }}>☾ ✦</span>
-      </div>
-
       {/* Kopf */}
-      <div style={{ textAlign: 'center', marginTop: 10 }}>
+      <div style={{ textAlign: 'center', marginTop: 6 }}>
         <LunaAvatar size={78} />
         <div style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 21, color: 'var(--text)', marginTop: 8 }}>
           {profile.name || 'Sternenkind'}
