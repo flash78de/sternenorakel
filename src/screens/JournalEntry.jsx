@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useStore } from '../store/store.jsx'
 import { MESSAGES, formatDate } from '../data/library.js'
 import { speak, speechSupported } from '../lib/audio.js'
+import { karteBild, runeBild } from '../lib/ritualAssets.js'
 
 const softBtn = {
   flex: 1,
@@ -123,15 +124,26 @@ export default function JournalEntry() {
       {entry.card && (
         <div style={{ marginTop: 12, background: 'rgba(166,107,255,.1)', border: '1px solid rgba(166,107,255,.3)', borderRadius: 14, padding: '11px 13px' }}>
           <div style={{ color: 'var(--purple-2)', font: '600 9px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>Karte · {entry.card.thema}</div>
-          <div style={{ color: 'var(--text-dim)', font: '400 11.5px/1.5 var(--font-body)', marginTop: 5 }}>{entry.card.deutung}</div>
+          {karteBild(entry.card.title) && (
+            <div style={{ textAlign: 'center', marginTop: 8 }}>
+              <img src={karteBild(entry.card.title)} alt={entry.card.title}
+                style={{ width: 'min(150px, 46%)', height: 'auto', borderRadius: 9, filter: 'drop-shadow(0 8px 20px rgba(0,0,0,.5))' }} />
+            </div>
+          )}
+          <div style={{ color: 'var(--text-dim)', font: '400 11.5px/1.5 var(--font-body)', marginTop: 6 }}>{entry.card.deutung}</div>
         </div>
       )}
       {entry.runes && (
         <div style={{ marginTop: 12, background: 'rgba(166,107,255,.1)', border: '1px solid rgba(166,107,255,.3)', borderRadius: 14, padding: '11px 13px' }}>
           <div style={{ color: 'var(--purple-2)', font: '600 9px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>Runen-Lesung</div>
           {entry.runes.map((r) => (
-            <div key={r.position} style={{ color: 'var(--text-dim)', font: '400 11.5px/1.5 var(--font-body)', marginTop: 5 }}>
-              <b style={{ color: 'var(--gold-1)', fontWeight: 600 }}>{r.glyph} {r.position}</b> {r.heute}
+            <div key={r.position} style={{ display: 'flex', gap: 9, alignItems: 'flex-start', marginTop: 7 }}>
+              {runeBild(r.name) && (
+                <img src={runeBild(r.name)} alt={`Rune ${r.name}`} style={{ width: 30, height: 'auto', flexShrink: 0, filter: 'drop-shadow(0 3px 8px rgba(0,0,0,.5))' }} />
+              )}
+              <div style={{ color: 'var(--text-dim)', font: '400 11.5px/1.5 var(--font-body)' }}>
+                <b style={{ color: 'var(--gold-1)', fontWeight: 600 }}>{runeBild(r.name) ? '' : `${r.glyph} `}{r.position}</b> {r.heute}
+              </div>
             </div>
           ))}
         </div>

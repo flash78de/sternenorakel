@@ -8,6 +8,7 @@ import { speak, speechSupported } from '../lib/audio.js'
 import { asset } from '../lib/asset.js'
 import { ritualTheme } from '../lib/ritualTheme.js'
 import { buzz } from '../lib/haptics.js'
+import { karteBild, karteBanner, runeBild } from '../lib/ritualAssets.js'
 
 // Kern-Flow: trigger (Würfel) → listening (Luna lauscht) → revelation →
 // message + Reflexion auf EINEM Screen (auto-gespeichert). Fehler = sanfter Zwischenzustand.
@@ -166,15 +167,21 @@ export default function OracleDraw() {
           )}
 
           {ritual === 'runen' && (
-            <button onClick={draw} aria-label="Runen legen" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', gap: 16 }}>
-              {['ᚠ', 'ᚱ', 'ᛒ'].map((g, i) => (
-                <span key={i} className="anim-float" style={{
-                  width: 66, height: 80, borderRadius: '46% 46% 40% 40%', animationDelay: `${i * 0.45}s`,
-                  background: 'linear-gradient(160deg,#26382f,#131f19)', border: `1px solid ${t.border}`,
-                  boxShadow: `0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1), inset 0 0 16px ${t.softer}`,
-                  display: 'grid', placeItems: 'center', color: t.accent, fontSize: 26, fontFamily: 'var(--font-head)', opacity: 0.92,
-                }}>{g}</span>
-              ))}
+            <button onClick={draw} aria-label="Runen legen" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', gap: 16, alignItems: 'center' }}>
+              {[['Fehu', 'ᚠ'], ['Raidho', 'ᚱ'], ['Berkano', 'ᛒ']].map(([name, g], i) => {
+                const img = runeBild(name, 'md')
+                return img ? (
+                  <img key={name} src={img} alt={`Rune ${name}`} className="anim-float"
+                    style={{ width: 78, height: 'auto', animationDelay: `${i * 0.45}s`, filter: `drop-shadow(0 10px 20px rgba(0,0,0,.55)) drop-shadow(0 0 14px ${t.glow})` }} />
+                ) : (
+                  <span key={name} className="anim-float" style={{
+                    width: 66, height: 80, borderRadius: '46% 46% 40% 40%', animationDelay: `${i * 0.45}s`,
+                    background: 'linear-gradient(160deg,#26382f,#131f19)', border: `1px solid ${t.border}`,
+                    boxShadow: `0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1), inset 0 0 16px ${t.softer}`,
+                    display: 'grid', placeItems: 'center', color: t.accent, fontSize: 26, fontFamily: 'var(--font-head)', opacity: 0.92,
+                  }}>{g}</span>
+                )
+              })}
             </button>
           )}
         </div>
@@ -281,7 +288,16 @@ export default function OracleDraw() {
         {message.card && (
           <div style={{ marginTop: 14, background: t.soft, border: `1px solid ${t.border}`, borderRadius: 16, padding: '13px 15px' }}>
             <div style={{ color: t.accent, font: '600 9px var(--font-body)', letterSpacing: 1.2, textTransform: 'uppercase' }}>Deine Karte · {message.card.thema}</div>
-            <div style={{ color: 'var(--text)', font: '400 12.5px/1.6 var(--font-body)', marginTop: 7 }}>{message.card.deutung}</div>
+            {karteBild(message.card.title) ? (
+              <div style={{ textAlign: 'center', marginTop: 10 }}>
+                <img src={karteBild(message.card.title)} alt={message.card.title} className="pop"
+                  style={{ width: 'min(180px, 52%)', height: 'auto', borderRadius: 10, filter: `drop-shadow(0 12px 26px rgba(0,0,0,.55)) drop-shadow(0 0 18px ${t.glow})` }} />
+              </div>
+            ) : karteBanner(message.card.title) ? (
+              <img src={karteBanner(message.card.title)} alt={message.card.title} className="pop"
+                style={{ width: '100%', height: 'auto', borderRadius: 10, marginTop: 10, filter: 'drop-shadow(0 10px 22px rgba(0,0,0,.5))' }} />
+            ) : null}
+            <div style={{ color: 'var(--text)', font: '400 12.5px/1.6 var(--font-body)', marginTop: 9 }}>{message.card.deutung}</div>
           </div>
         )}
         {message.runes && (
@@ -289,7 +305,12 @@ export default function OracleDraw() {
             <div style={{ color: t.accent, font: '600 9px var(--font-body)', letterSpacing: 1.2, textTransform: 'uppercase' }}>Deine Runen-Lesung</div>
             {message.runes.map((r) => (
               <div key={r.position} style={{ display: 'flex', gap: 11, alignItems: 'flex-start', marginTop: 9 }}>
-                <span style={{ width: 34, height: 40, flexShrink: 0, borderRadius: '44% 44% 38% 38%', background: 'linear-gradient(160deg,#26382f,#131f19)', border: `1px solid ${t.border}`, display: 'grid', placeItems: 'center', color: t.accent, fontSize: 17, fontFamily: 'var(--font-head)' }}>{r.glyph}</span>
+                {runeBild(r.name) ? (
+                  <img src={runeBild(r.name)} alt={`Rune ${r.name}`}
+                    style={{ width: 40, height: 'auto', flexShrink: 0, filter: 'drop-shadow(0 4px 10px rgba(0,0,0,.5))' }} />
+                ) : (
+                  <span style={{ width: 34, height: 40, flexShrink: 0, borderRadius: '44% 44% 38% 38%', background: 'linear-gradient(160deg,#26382f,#131f19)', border: `1px solid ${t.border}`, display: 'grid', placeItems: 'center', color: t.accent, fontSize: 17, fontFamily: 'var(--font-head)' }}>{r.glyph}</span>
+                )}
                 <span style={{ flex: 1 }}>
                   <span style={{ display: 'block', color: t.accent, font: '600 11.5px var(--font-body)' }}>{r.position} · {r.name} ({r.bedeutung})</span>
                   <span style={{ display: 'block', color: 'var(--text)', font: '400 12px/1.5 var(--font-body)', marginTop: 2 }}>{r.heute}</span>

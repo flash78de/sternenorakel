@@ -5,6 +5,7 @@ import RewardModal from '../components/RewardModal.jsx'
 import { IcBell, IcCalendar, IcCompass, IcBook } from '../components/icons.jsx'
 import { useStore } from '../store/store.jsx'
 import { formatDate, greeting, lunaSays, constellationStatus } from '../data/library.js'
+import { karteBild, runeBild } from '../lib/ritualAssets.js'
 
 const WD = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
 
@@ -175,9 +176,18 @@ export default function Dashboard() {
               Zuletzt empfangen
             </div>
             <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 11 }}>
-              <span style={{ width: 42, height: 42, borderRadius: 12, flexShrink: 0, background: 'radial-gradient(circle,rgba(106,59,232,.5),rgba(40,30,70,.5))', border: '1px solid rgba(232,199,122,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IcCompass />
-              </span>
+              {/* Gezogenes Motiv als kleines Bild – macht den Tag „greifbar" */}
+              {last.card && karteBild(last.card.title, 'sm') ? (
+                <img src={karteBild(last.card.title, 'sm')} alt={last.card.title}
+                  style={{ width: 42, height: 'auto', flexShrink: 0, borderRadius: 6, filter: 'drop-shadow(0 4px 10px rgba(0,0,0,.5))' }} />
+              ) : last.runes?.length && runeBild(last.runes[1]?.name || last.runes[0]?.name) ? (
+                <img src={runeBild(last.runes[1]?.name || last.runes[0]?.name)} alt="Rune"
+                  style={{ width: 42, height: 'auto', flexShrink: 0, filter: 'drop-shadow(0 4px 10px rgba(0,0,0,.5))' }} />
+              ) : (
+                <span style={{ width: 42, height: 42, borderRadius: 12, flexShrink: 0, background: 'radial-gradient(circle,rgba(106,59,232,.5),rgba(40,30,70,.5))', border: '1px solid rgba(232,199,122,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <IcCompass />
+                </span>
+              )}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontFamily: 'var(--font-head)', color: 'var(--text)', fontSize: 14, fontWeight: 600 }}>{last.title}</div>
                 <div style={{ color: 'var(--text-dim)', font: '400 11px/1.35 var(--font-body)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
