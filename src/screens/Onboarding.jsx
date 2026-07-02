@@ -153,13 +153,16 @@ export default function Onboarding() {
 
       {step === 3 && (
         <StepWrap key="s3">
-          <div className="title-lg" style={{ textAlign: 'center', marginTop: 26 }}>
+          <div style={{ textAlign: 'center', marginTop: 10 }}>
+            <Luna state="idle" width={128} glowSize={165} float />
+          </div>
+          <div className="title-lg" style={{ textAlign: 'center', marginTop: 4 }}>
             Wann bist du<br />geboren?
           </div>
-          <div style={{ marginTop: 8, color: 'var(--text-dim)', font: '400 13px var(--font-body)', textAlign: 'center' }}>
+          <div style={{ marginTop: 8, color: 'var(--text-dim)', font: '400 13px/1.5 var(--font-body)', textAlign: 'center' }}>
             Damit Luna dein Sternzeichen als symbolischen Impuls einbeziehen kann. (Später im Profil änderbar.)
           </div>
-          <div className="dob" style={{ marginTop: 26 }}>
+          <div className="dob" style={{ marginTop: 22 }}>
             <DarkPicker label="TAG" ariaLabel="Tag" value={day} onChange={setDay}
               options={Array.from({ length: 31 }, (_, i) => ({ value: i + 1, label: String(i + 1) }))} />
             <DarkPicker label="MONAT" ariaLabel="Monat" flex={1.6} valueSize={16} value={month} onChange={setMonth}
@@ -181,6 +184,9 @@ export default function Onboarding() {
               </div>
             </div>
           )}
+          <div style={{ marginTop: 16, textAlign: 'center', color: '#7a7494', font: '400 11.5px/1.6 var(--font-body)', padding: '0 10px' }}>
+            Luna nutzt dein Zeichen als <b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Symbol</b> – nicht als Vorhersage. Deine Themen und dein Befinden geben den Ton an.
+          </div>
         </StepWrap>
       )}
 

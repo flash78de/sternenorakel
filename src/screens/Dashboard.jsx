@@ -173,55 +173,77 @@ export default function Dashboard() {
   )
 }
 
-// Leerer Zustand · Tag 1
+// Kleiner Ausblick-Teaser (Erst-Dashboard)
+function Teaser({ nav, to, glyph, title, desc }) {
+  return (
+    <div className="card" style={{ borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }} onClick={() => nav(to)}>
+      <span style={{ width: 40, height: 40, borderRadius: 12, flexShrink: 0, display: 'grid', placeItems: 'center', fontSize: 18, background: 'radial-gradient(circle,rgba(106,59,232,.45),rgba(40,30,70,.5))', border: '1px solid rgba(232,199,122,.3)', color: 'var(--gold-1)' }}>{glyph}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>{title}</div>
+        <div style={{ color: 'var(--text-dim)', font: '400 11px/1.4 var(--font-body)', marginTop: 1 }}>{desc}</div>
+      </div>
+      <span style={{ color: 'var(--purple-2)', fontSize: 16 }}>›</span>
+    </div>
+  )
+}
+
+// Leerer Zustand · Tag 1 — einladend, mit großer Luna und Ausblick
 function EmptyDashboard() {
   const nav = useNavigate()
   const { profile, rank } = useStore()
   const date = formatDate()
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 20px 0' }}>
-      <div className="statusbar" style={{ padding: 0, height: 24 }}>
-        <span>9:41</span>
-        <span className="glyphs" style={{ fontSize: 10 }}>☾ ✦</span>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
-        <div>
-          <div style={{ color: 'var(--text-dim)', font: '500 12px var(--font-body)' }}>{date.weekday}</div>
-          <div style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 22, color: 'var(--gold-1)' }}>{date.short}</div>
+    <div style={{ display: 'flex', flexDirection: 'column', padding: '13px 15px 16px' }}>
+      {/* App-Bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          <span style={{ color: 'var(--gold-1)', fontSize: 16 }}>☾</span>
+          <span style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 13, color: 'var(--gold-1)', letterSpacing: 1.5 }}>STERNENORAKEL</span>
         </div>
-        <LunaAvatar size={42} />
+        <LunaAvatar size={34} />
       </div>
 
-      <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
-        <div style={{ flex: 1.5, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 14, padding: '9px 11px' }}>
-          <div style={{ color: '#7a7494', font: '600 8.5px var(--font-body)', letterSpacing: 0.8, textTransform: 'uppercase' }}>Rang</div>
-          <div style={{ color: 'var(--text)', font: '600 12px var(--font-body)', margin: '2px 0 5px' }}>{rank.rank}</div>
-          <div style={{ height: 4, borderRadius: 2, background: 'rgba(255,255,255,.1)' }}>
-            <div style={{ width: '3%', height: '100%', borderRadius: 2, background: 'linear-gradient(90deg,#6A3BE8,#A66BFF)' }} />
-          </div>
+      {/* Begrüßung */}
+      <div style={{ marginTop: 10 }}>
+        <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 21, color: 'var(--gold-1)', lineHeight: 1.05, textShadow: '0 2px 14px rgba(232,199,122,.3)' }}>
+          Willkommen, {profile.name || 'Sternenkind'}
         </div>
-        <div style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 14, padding: '9px 10px', textAlign: 'center' }}>
-          <div style={{ color: '#7a7494', font: '700 16px var(--font-body)' }}>✦ 0</div>
-          <div style={{ color: '#7a7494', font: '600 8.5px var(--font-body)', letterSpacing: 0.5, textTransform: 'uppercase', marginTop: 2 }}>Sternenstaub</div>
+        <div style={{ color: 'var(--text-dim)', font: '500 12.5px var(--font-body)', marginTop: 4 }}>{date.weekday}, {date.short}</div>
+      </div>
+
+      {/* Startwert-Chips */}
+      <div className="chips-row" style={{ marginTop: 11 }}>
+        <div className="stat-chip" style={{ flex: 1.7 }}><span className="gd">✦</span><span>{rank.rank} · Lvl {rank.level}</span></div>
+        <div className="stat-chip"><span className="gd">✦</span><span>0</span></div>
+        <div className="stat-chip"><IcCalendar /><span>0 Tage</span></div>
+      </div>
+
+      {/* Luna-Hero groß */}
+      <div className="hero hero--bleed" style={{ marginTop: 10, minHeight: 320 }}>
+        <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', minHeight: 0 }}>
+          <div className="hero-bubble">„Unser erster gemeinsamer Tag – schön, dass du da bist. Lass uns deine erste Botschaft empfangen."</div>
+          <Luna state="idle" width={320} glow={false} float style={{ alignSelf: 'flex-end' }} />
         </div>
-        <div style={{ flex: 0.9, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 14, padding: '9px 8px', textAlign: 'center' }}>
-          <div style={{ color: '#7a7494', font: '700 16px var(--font-body)' }}>0</div>
-          <div style={{ color: '#7a7494', font: '600 8.5px var(--font-body)', letterSpacing: 0.5, textTransform: 'uppercase', marginTop: 2 }}>Tage Serie</div>
+        <button
+          className="btn-gold uppercase"
+          style={{ padding: 13, borderRadius: 14, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}
+          onClick={() => nav('/oracle/befinden')}
+        >
+          <span style={{ color: '#a07b1e' }}>✦</span>
+          Erste Botschaft empfangen
+          <span style={{ color: '#a07b1e' }}>✦</span>
+        </button>
+        <div style={{ textAlign: 'center', color: '#cdbfa0', font: '400 10.5px var(--font-body)', marginTop: 7 }}>
+          Dauert ungefähr eine Minute.
         </div>
       </div>
 
-      <div className="center-col" style={{ padding: '10px 14px' }}>
-        <Luna state="idle" width={170} glowSize={210} float />
-        <div className="bubble" style={{ marginTop: 4 }}>
-          „Unser erster gemeinsamer Tag – wie aufregend! Lass uns deine erste Botschaft empfangen."
-        </div>
-      </div>
-
-      <button className="btn-gold" style={{ padding: 15, marginBottom: 8, boxShadow: '0 12px 30px rgba(232,199,122,.4)' }} onClick={() => nav('/oracle/befinden')}>
-        ✦ Erste Botschaft empfangen
-      </button>
-      <div style={{ textAlign: 'center', color: '#7a7494', font: '400 11.5px var(--font-body)', padding: '0 0 12px' }}>
-        Hier wächst dein Sternenband mit jedem Tag.
+      {/* Ausblick: was hier entsteht */}
+      <div style={{ marginTop: 12, color: '#7a7494', font: '600 10px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>Was hier entsteht</div>
+      <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 9 }}>
+        <Teaser nav={nav} to="/profil/raenge" glyph="✦" title="Dein Sternenband wächst" desc="Mit jeder Botschaft sammelst du Sternenstaub und steigst im Rang auf." />
+        <Teaser nav={nav} to="/tagebuch" glyph="📖" title="Dein Tagebuch entsteht hier" desc="Jede Botschaft und Reflexion wird zu deinem persönlichen Spiegel." />
+        <Teaser nav={nav} to="/profil/sternbilder" glyph="✧" title="Sammle 12 Sternbilder" desc="Vervollständige nach und nach dein eigenes Sternenbild." />
       </div>
     </div>
   )
