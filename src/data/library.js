@@ -224,7 +224,56 @@ export const CONSTELLATIONS = [
   { name: 'Die Krone', glyph: '♛', motto: 'Vollendung' },
 ]
 
-// Fortschritt zur Sammlung: wie viele frei, wie viele Tage bis zum nächsten.
+// ---- Sternbilder als Reflexions-Meilensteine ----
+// Kein Zufall, keine Serie: Ein Sternbild entsteht durch echte Entwicklung.
+// Themen-Sternbilder: 3 festgehaltene Reflexionen zum jeweiligen Themenfeld.
+const CONST_RULES = {
+  'Der Mond': { type: 'any', need: 1, desc: 'Halte deine erste Reflexion fest' },
+  'Das Herz': { type: 'theme', theme: 'Liebe & Beziehungen', need: 3 },
+  'Die Quelle': { type: 'theme', theme: 'Beruf & Berufung', need: 3 },
+  'Das Tor': { type: 'theme', theme: 'Schule & Lernen', need: 3 },
+  'Die Weite': { type: 'theme', theme: 'Selbstwert & innere Ruhe', need: 3 },
+  'Der Wandel': { type: 'theme', theme: 'Veränderung & Neuanfang', need: 3 },
+  'Der Pfad': { type: 'theme', theme: 'Entscheidungen & Klarheit', need: 3 },
+  'Der Stern': { type: 'theme', theme: 'Kreativität', need: 3 },
+  'Die Feder': { type: 'theme', theme: 'Loslassen', need: 3 },
+  'Der Anker': { type: 'theme', theme: 'Dankbarkeit', need: 3 },
+  'Die Brücke': { type: 'any', need: 7, desc: 'Sieben festgehaltene Sterne insgesamt' },
+  'Die Krone': { type: 'all', desc: 'Vollende alle anderen Sternbilder' },
+}
+
+// Liefert Status aller Sternbilder, abgeleitet aus dem Tagebuch (Reflexionen).
+export function constellationStatus(journal = []) {
+  const reflected = journal.filter((e) => (e.reflection || '').trim())
+  const byTheme = {}
+  for (const e of reflected) if (e.theme) byTheme[e.theme] = (byTheme[e.theme] || 0) + 1
+
+  const base = CONSTELLATIONS.filter((c) => CONST_RULES[c.name]?.type !== 'all').map((c) => {
+    const r = CONST_RULES[c.name]
+    const have = r.type === 'any' ? reflected.length : byTheme[r.theme] || 0
+    const need = r.need
+    return {
+      ...c,
+      need,
+      have: Math.min(have, need),
+      unlocked: have >= need,
+      desc: r.desc || `${need} Reflexionen zu „${r.theme}"`,
+    }
+  })
+  const othersDone = base.filter((c) => c.unlocked).length
+  const krone = CONSTELLATIONS.find((c) => c.name === 'Die Krone')
+  const list = [
+    ...base,
+    { ...krone, need: base.length, have: othersDone, unlocked: othersDone >= base.length, desc: CONST_RULES['Die Krone'].desc },
+  ]
+  const done = list.filter((c) => c.unlocked).length
+  // Nächstes Ziel: begonnen > unbegonnen, jeweils kleinste Rest-Distanz
+  const open = list.filter((c) => !c.unlocked)
+  const next = open.sort((a, b) => (b.have > 0) - (a.have > 0) || (a.need - a.have) - (b.need - b.have))[0] || null
+  return { list, done, total: list.length, next, missing: next ? next.need - next.have : 0 }
+}
+
+// Kompatibilität: alter Serien-Fortschritt (wird nicht mehr für Sternbilder genutzt)
 export function constellationProgress(constellationsDone = 0, streak = 0) {
   const total = CONSTELLATIONS.length
   const done = Math.min(constellationsDone, total)

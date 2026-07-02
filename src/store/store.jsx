@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react'
-import { formatDate, rankInfo } from '../data/library.js'
+import { createContext, useContext, useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import { formatDate, rankInfo, constellationStatus } from '../data/library.js'
 
 // ============================================================
 // Sternenorakel — local-first Zustand (localStorage)
@@ -29,6 +29,7 @@ const DEFAULT_STATE = {
   },
   settings: {
     aiMode: false,
+    aiEndpoint: '', // eigene KI-Server-Adresse (server/README.md) – leer = Offline-Bibliothek
     reminder: true,
     reminderTime: '21:00',
     reminderWhen: 'abends', // morgens | mittags | abends | aus
@@ -64,6 +65,9 @@ const StoreCtx = createContext(null)
 
 export function StoreProvider({ children }) {
   const [state, setState] = useState(load)
+  // Spiegel des aktuellen Zustands für synchrone Berechnungen (z. B. Sternbild-Unlock).
+  const stateRef = useRef(state)
+  stateRef.current = state
 
   useEffect(() => {
     try {
@@ -145,11 +149,10 @@ export function StoreProvider({ children }) {
       const afterRank = rankInfo(stardust).rank
       const rankUp = afterRank !== beforeRank ? afterRank : null
 
-      // 7-Tage-Sternbild vollendet?
-      const constellation = !already && streak > 0 && streak % 7 === 0
-      const constellationsDone = constellation
-        ? s.stats.constellationsDone + 1
-        : s.stats.constellationsDone
+      // Sternbilder entstehen jetzt durch Reflexionen (constellationStatus),
+      // nicht mehr durch die Serie — hier keine Freischaltung mehr.
+      const constellation = false
+      const constellationsDone = s.stats.constellationsDone
 
       const drawDays = already
         ? s.stats.drawDays
@@ -221,12 +224,26 @@ export function StoreProvider({ children }) {
     setState((s) => ({ ...s, seenReturnISO: formatDate().iso }))
   }, [])
 
-  // Reflexion eines vorhandenen Eintrags nachträglich setzen (kein Duplikat)
+  // Reflexion eines vorhandenen Eintrags nachträglich setzen (kein Duplikat).
+  // Liefert den Namen eines dadurch NEU vollendeten Sternbilds zurück (oder null).
+  // Wichtig: synchron aus stateRef berechnet – der setState-Updater läuft
+  // in React 18 nicht garantiert vor dem return.
   const updateReflection = useCallback((id, reflection) => {
-    setState((s) => ({
-      ...s,
-      journal: s.journal.map((e) => (e.id === id ? { ...e, reflection: (reflection || '').trim() } : e)),
+    const s = stateRef.current
+    const trimmed = (reflection || '').trim()
+    const nextJournal = s.journal.map((e) => (e.id === id ? { ...e, reflection: trimmed } : e))
+    const before = constellationStatus(s.journal)
+    const after = constellationStatus(nextJournal)
+    let unlockedName = null
+    if (after.done > before.done) {
+      const beforeNames = new Set(before.list.filter((c) => c.unlocked).map((c) => c.name))
+      unlockedName = after.list.find((c) => c.unlocked && !beforeNames.has(c.name))?.name || null
+    }
+    setState((cur) => ({
+      ...cur,
+      journal: cur.journal.map((e) => (e.id === id ? { ...e, reflection: trimmed } : e)),
     }))
+    return unlockedName
   }, [])
 
   // Einzelnen Tagebuch-Eintrag löschen

@@ -1,0 +1,145 @@
+// ============================================================
+// Sternenorakel · KI-Backend (Cloudflare Worker)
+// ------------------------------------------------------------
+// Nimmt die datensparsame Anfrage der App entgegen (kein Name,
+// keine Tagebuch-Notizen) und lässt Claude eine Luna-Botschaft
+// im MESSAGES-Schema formulieren. Die App fällt bei jedem
+// Fehler automatisch auf die Offline-Sternenbibliothek zurück.
+//
+// Deployment: siehe server/README.md
+// Benötigte Secrets/Variablen:
+//   ANTHROPIC_API_KEY  (Secret, Pflicht)
+//   ALLOWED_ORIGIN     (optional, z. B. https://flash78de.github.io — sonst *)
+//   MODEL              (optional, Standard: claude-opus-4-8)
+// ============================================================
+
+const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages'
+const DEFAULT_MODEL = 'claude-opus-4-8'
+
+// Antwortformat, das Claude einhalten MUSS (Structured Output).
+// Entspricht dem Teil des MESSAGES-Schemas, den die KI ersetzt —
+// Symbole/Archetypen/Karten/Runen bleiben die der App.
+const OUTPUT_SCHEMA = {
+  type: 'object',
+  properties: {
+    title: { type: 'string', description: 'Kurzer poetischer Titel der Botschaft, 2–4 Worte, Deutsch, ohne Anführungszeichen.' },
+    text: { type: 'string', description: 'Die Botschaft: 2–3 kurze Absätze, getrennt durch Leerzeilen (\\n\\n). Deutsch, du-Form.' },
+    mantra: { type: 'string', description: 'Ein Satz zum Mitnehmen, max. 12 Worte, ohne Anführungszeichen.' },
+    question: { type: 'string', description: 'Eine offene, sanfte Reflexionsfrage für das Tagebuch.' },
+  },
+  required: ['title', 'text', 'mantra', 'question'],
+  additionalProperties: false,
+}
+
+// Luna-Charakter (Kurzfassung der Character Bible in docs/luna-character-bible.md).
+const SYSTEM = `Du schreibst als Luna, die Sternweberin der App „Sternenorakel" — eine ruhige, warme, leicht verspielte Begleiterin, die Menschen hilft, den eigenen Tag zu reflektieren.
+
+Grundregeln (nicht verhandelbar):
+- Deutsch, du-Form, warm und klar. Kein Esoterik-Kitsch, keine Engel, keine Energien-Beschwörung.
+- KEINE Zukunftsvorhersagen, KEINE Heilsversprechen, KEINE medizinischen oder therapeutischen Ratschläge.
+- Luna deutet nicht das Schicksal, sondern gibt Sprache für das, was die Person vermutlich ohnehin fühlt (reflektierend, Barnum-artig, aber ehrlich und nie manipulativ).
+- Ton: wie eine weise Freundin bei einer Tasse Tee unterm Sternenhimmel. Konkret statt schwülstig. Kurze Sätze sind erlaubt.
+- Immer mindestens ein kleiner, machbarer Impuls für HEUTE (keine Lebensumbau-Aufgaben).
+- Bei niedriger Stimmung (1–2): besonders sanft, nichts fordern, Entlastung anbieten. Nie „Kopf hoch"-Floskeln.
+- Wenn hasName=true ist: beginne den Text mit dem Platzhalter „{{name}}, …" — die App ersetzt ihn lokal durch den echten Namen. Erfinde NIE einen Namen.
+- Beziehe das mitgelieferte Ritual-Ergebnis (Archetyp, Karte oder Runen) inhaltlich ein — es ist das, was die Person gerade gezogen hat.`
+
+const cors = (env) => ({
+  'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Max-Age': '86400',
+})
+
+const json = (body, status, env) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json; charset=utf-8', ...cors(env) },
+  })
+
+const MOOD_LABEL = { 1: 'erschöpft', 2: 'müde', 3: 'ausgeglichen', 4: 'wach', 5: 'voller Energie' }
+const STYLE_LABEL = { klar: 'klar & direkt', leicht: 'leicht & humorvoll', warm: 'warm & bestärkend', tief: 'tief & nachdenklich' }
+const COPING_LABEL = {
+  schritt: 'ein kleiner konkreter Schritt',
+  perspektive: 'ein Perspektivwechsel',
+  zuspruch: 'ehrlicher Zuspruch',
+  nachdenken: 'Raum zum Nachdenken',
+}
+
+// Baut aus der datensparsamen Anfrage den Prompt für Claude.
+function buildPrompt(b) {
+  const lines = ['Schreibe die heutige Botschaft für diese Person:', '']
+  lines.push(`- Stimmung heute: ${MOOD_LABEL[b.mood] || 'unbekannt'} (${b.mood ?? '?'} von 5)`)
+  if (Array.isArray(b.themes) && b.themes.length) lines.push(`- Gewählte Lebensthemen: ${b.themes.join(', ')}`)
+  if (b.theme) lines.push(`- Thema dieser Botschaft: ${b.theme}`)
+  const styles = (b.styles || []).map((s) => STYLE_LABEL[s]).filter(Boolean)
+  if (styles.length) lines.push(`- Gewünschter Ton: ${styles.join(' und ')}`)
+  if (b.coping && COPING_LABEL[b.coping]) lines.push(`- Was bei Schwierigem hilft: ${COPING_LABEL[b.coping]}`)
+  lines.push(`- hasName: ${b.hasName === true}`)
+  lines.push('')
+
+  if (b.ritual === 'karten' && b.card) {
+    lines.push(`Ritual: Sternenkarten. Gezogene Karte: „${b.card.title}" (Thema: ${b.card.thema || '—'}).`)
+    lines.push('Der Titel deiner Botschaft ist der Kartentitel; deute die Karte im Text.')
+  } else if (b.ritual === 'runen' && Array.isArray(b.runes) && b.runes.length) {
+    lines.push('Ritual: Sternenrunen. Gelegte Runen:')
+    for (const r of b.runes) lines.push(`  · ${r.name} — Position: ${r.position}`)
+    lines.push('Verwebe die drei Positionen (Nachwirken / Jetzt / Entstehen) im Text.')
+  } else if (b.archetype) {
+    lines.push(`Ritual: Sternenwürfel. Gewürfelter Archetyp: „${b.archetype.name}" — Kern: ${b.archetype.kern}`)
+    if (b.archetype.impuls) lines.push(`  Kleine Handlung dazu: ${b.archetype.impuls}`)
+    lines.push('Greife den Archetyp im Text auf.')
+  }
+  return lines.join('\n')
+}
+
+export default {
+  async fetch(request, env) {
+    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(env) })
+    if (request.method !== 'POST') return json({ error: 'Nur POST.' }, 405, env)
+    if (!env.ANTHROPIC_API_KEY) return json({ error: 'ANTHROPIC_API_KEY fehlt.' }, 500, env)
+
+    let body
+    try {
+      body = await request.json()
+    } catch {
+      return json({ error: 'Ungültiges JSON.' }, 400, env)
+    }
+
+    try {
+      const res = await fetch(ANTHROPIC_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: env.MODEL || DEFAULT_MODEL,
+          max_tokens: 1500,
+          thinking: { type: 'adaptive' },
+          system: SYSTEM,
+          output_config: { format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
+          messages: [{ role: 'user', content: buildPrompt(body) }],
+        }),
+      })
+
+      if (!res.ok) {
+        const detail = await res.text().catch(() => '')
+        return json({ error: 'KI-Dienst nicht erreichbar.', status: res.status, detail: detail.slice(0, 300) }, 502, env)
+      }
+
+      const data = await res.json()
+      if (data.stop_reason === 'refusal') return json({ error: 'Anfrage wurde abgelehnt.' }, 502, env)
+
+      // Bei aktiviertem Thinking kommen thinking- UND text-Blöcke; wir brauchen den Text.
+      const textBlock = (data.content || []).find((c) => c.type === 'text')
+      if (!textBlock) return json({ error: 'Leere Antwort.' }, 502, env)
+
+      const msg = JSON.parse(textBlock.text) // dank json_schema garantiert valide
+      return json(msg, 200, env)
+    } catch (e) {
+      return json({ error: 'Interner Fehler.', detail: String(e).slice(0, 200) }, 500, env)
+    }
+  },
+}

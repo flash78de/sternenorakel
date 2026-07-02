@@ -4,15 +4,25 @@ import { useStore } from '../store/store.jsx'
 
 export default function Privacy() {
   const nav = useNavigate()
-  const { settings, updateSettings, resetAll, journal } = useStore()
+  const { settings, updateSettings, resetAll, journal, profile, stats } = useStore()
   const [confirm, setConfirm] = useState(false)
 
+  // Vollständiges Backup: Tagebuch + Profil + Fortschritt + Einstellungen.
   const exportData = () => {
-    const blob = new Blob([JSON.stringify({ journal }, null, 2)], { type: 'application/json' })
+    const backup = {
+      app: 'sternenorakel',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      profile,
+      stats,
+      settings,
+      journal,
+    }
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'sternenorakel-tagebuch.json'
+    a.download = 'sternenorakel-backup.json'
     a.click()
     URL.revokeObjectURL(url)
   }

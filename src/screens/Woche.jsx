@@ -98,14 +98,12 @@ export default function Woche() {
             </div>
           </div>
 
-          {!settings.premium && (
-            <div style={{ marginTop: 12, cursor: 'pointer', background: 'linear-gradient(150deg,rgba(232,199,122,.14),rgba(232,199,122,.04))', border: '1px solid rgba(232,199,122,.35)', borderRadius: 14, padding: '12px 14px' }} onClick={() => nav('/profil/plus')}>
-              <div style={{ color: 'var(--gold-1)', font: '600 12px var(--font-body)' }}>✦ Mit Plus: dein Monatsbild</div>
-              <div style={{ color: 'var(--text-dim)', font: '400 11px/1.45 var(--font-body)', marginTop: 3 }}>
-                Luna führt deine Einträge über Wochen zusammen – Stimmungsverlauf, wiederkehrende Symbole und ein persönlicher Rückblick.
-              </div>
+          <div style={{ marginTop: 12, cursor: 'pointer', background: 'linear-gradient(150deg,rgba(232,199,122,.14),rgba(232,199,122,.04))', border: '1px solid rgba(232,199,122,.35)', borderRadius: 14, padding: '12px 14px' }} onClick={() => nav('/monat')}>
+            <div style={{ color: 'var(--gold-1)', font: '600 12px var(--font-body)' }}>✦ {settings.premium ? 'Dein Monatsbild ansehen ›' : 'Mit Plus: dein Monatsbild'}</div>
+            <div style={{ color: 'var(--text-dim)', font: '400 11px/1.45 var(--font-body)', marginTop: 3 }}>
+              Luna führt deine Einträge über Wochen zusammen – Stimmungsverlauf, wiederkehrende Symbole und ein persönlicher Rückblick.
             </div>
-          )}
+          </div>
         </>
       )}
     </div>

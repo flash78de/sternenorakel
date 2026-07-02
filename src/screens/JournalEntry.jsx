@@ -47,7 +47,12 @@ export default function JournalEntry() {
   const question = entry.question ?? full?.reflection
 
   const saveNote = () => {
-    updateReflection(entry.id, note)
+    const unlocked = updateReflection(entry.id, note)
+    // Vollendet diese Reflexion ein Sternbild? Dann gebührend feiern.
+    if (unlocked) {
+      nav('/feier', { state: { reward: { constellationName: unlocked } } })
+      return
+    }
     setSavedHint(true)
     setTimeout(() => setSavedHint(false), 1600)
   }
@@ -141,8 +146,8 @@ export default function JournalEntry() {
 
       {(luck || energy) && (
         <div style={{ marginTop: 10, display: 'flex', gap: 9 }}>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 13, padding: '9px 11px' }}>
-            <div style={{ color: '#7a7494', font: '600 8.5px var(--font-body)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Glückselement</div>
+          <div onClick={() => nav('/profil/glueck')} style={{ flex: 1, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 13, padding: '9px 11px', cursor: 'pointer' }}>
+            <div style={{ color: '#7a7494', font: '600 8.5px var(--font-body)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Glückselement ›</div>
             <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)', marginTop: 2 }}>✦ {luck || '—'}</div>
           </div>
           <div style={{ flex: 1, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 13, padding: '9px 11px' }}>

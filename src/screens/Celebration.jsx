@@ -1,6 +1,7 @@
 import { useLocation, useNavigate, Navigate } from 'react-router-dom'
 import Luna from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
+import { CONSTELLATIONS } from '../data/library.js'
 
 // 22 · Rangaufstieg / Sternbild vollendet — eigener Belohnungs-Screen mit Visualisierung
 export default function Celebration() {
@@ -11,7 +12,10 @@ export default function Celebration() {
 
   if (!reward) return <Navigate to="/dashboard" replace />
 
-  const isRankUp = Boolean(reward.rankUp)
+  const isRankUp = Boolean(reward.rankUp) && !reward.constellationName
+  const constObj = reward.constellationName
+    ? CONSTELLATIONS.find((c) => c.name === reward.constellationName)
+    : null
 
   return (
     <div className="center-col" style={{ padding: '30px 26px', position: 'relative', overflow: 'hidden' }}>
@@ -34,11 +38,11 @@ export default function Celebration() {
           </>
         ) : (
           <>
-            <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 26, color: 'var(--gold-1)', marginTop: 8 }}>
-              Tag {reward.newStreak}!
+            <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 27, color: 'var(--gold-1)', marginTop: 8, textShadow: '0 2px 18px rgba(232,199,122,.45)' }}>
+              {constObj ? <>{constObj.glyph} {constObj.name}</> : 'Sternbild vollendet!'}
             </div>
-            <div style={{ color: 'var(--text)', font: '400 14px/1.5 var(--font-body)', marginTop: 8, maxWidth: 260 }}>
-              Du hast ein Sternbild vollendet – ich bin so stolz auf dich. ✦
+            <div style={{ color: 'var(--text)', font: '400 14px/1.55 var(--font-body)', marginTop: 8, maxWidth: 270 }}>
+              {constObj?.motto ? <>Sternbild „{constObj.motto}" – entstanden aus deinen festgehaltenen Reflexionen. ✦</> : 'Du hast ein Sternbild vollendet – ich bin so stolz auf dich. ✦'}
             </div>
           </>
         )}
@@ -61,10 +65,12 @@ export default function Celebration() {
               <div style={{ color: 'var(--text-dim)', font: '500 10px var(--font-body)', marginTop: 2 }}>Sternenstaub</div>
             </div>
           )}
-          <div style={{ background: 'rgba(166,107,255,.14)', border: '1px solid rgba(166,107,255,.3)', borderRadius: 14, padding: '10px 14px' }}>
-            <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>{reward.newStreak} Tage</div>
-            <div style={{ color: 'var(--text-dim)', font: '500 10px var(--font-body)', marginTop: 2 }}>Serie</div>
-          </div>
+          {reward.newStreak > 0 && (
+            <div style={{ background: 'rgba(166,107,255,.14)', border: '1px solid rgba(166,107,255,.3)', borderRadius: 14, padding: '10px 14px' }}>
+              <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>{reward.newStreak} Tage</div>
+              <div style={{ color: 'var(--text-dim)', font: '500 10px var(--font-body)', marginTop: 2 }}>Serie</div>
+            </div>
+          )}
         </div>
 
         <button className="btn-gold" style={{ marginTop: 22, width: 'auto', padding: '14px 30px' }} onClick={() => nav('/dashboard', { replace: true })}>

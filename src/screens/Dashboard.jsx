@@ -4,7 +4,7 @@ import Luna, { LunaAvatar } from '../components/Luna.jsx'
 import RewardModal from '../components/RewardModal.jsx'
 import { IcBell, IcCalendar, IcCompass, IcBook } from '../components/icons.jsx'
 import { useStore } from '../store/store.jsx'
-import { formatDate, greeting, lunaSays, constellationProgress } from '../data/library.js'
+import { formatDate, greeting, lunaSays, constellationStatus } from '../data/library.js'
 
 const WD = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
 
@@ -29,7 +29,7 @@ export default function Dashboard() {
 
   const todayIdx = (new Date().getDay() + 6) % 7 // Mo=0
   const filled = Math.min(stats.streak, 7)
-  const cprog = constellationProgress(stats.constellationsDone, stats.streak)
+  const cstat = constellationStatus(journal)
 
   if (firstDay) return <EmptyDashboard />
 
@@ -143,9 +143,11 @@ export default function Dashboard() {
           </div>
           <div onClick={() => nav('/profil/sternbilder')} style={{ marginTop: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,.07)', paddingTop: 9 }}>
             <span style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)' }}>
-              Noch <b style={{ color: 'var(--gold-1)' }}>{cprog.daysToNext}</b> {cprog.daysToNext === 1 ? 'Tag' : 'Tage'} bis <b style={{ color: 'var(--gold-1)' }}>{cprog.next?.name || 'zum nächsten Sternbild'}</b>
+              {cstat.next
+                ? <>Noch <b style={{ color: 'var(--gold-1)' }}>{cstat.missing}</b> {cstat.missing === 1 ? 'Reflexion' : 'Reflexionen'} bis <b style={{ color: 'var(--gold-1)' }}>{cstat.next.name}</b></>
+                : <>Alle Sternbilder vollendet ✦</>}
             </span>
-            <span style={{ color: 'var(--purple-2)', font: '600 11px var(--font-body)' }}>{cprog.done}/{cprog.total} ›</span>
+            <span style={{ color: 'var(--purple-2)', font: '600 11px var(--font-body)' }}>{cstat.done}/{cstat.total} ›</span>
           </div>
         </div>
 

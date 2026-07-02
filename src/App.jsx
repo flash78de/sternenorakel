@@ -25,6 +25,8 @@ import Rueckkehr from './screens/Rueckkehr.jsx'
 import PlusDetail from './screens/PlusDetail.jsx'
 import Erinnerung from './screens/Erinnerung.jsx'
 import Abend from './screens/Abend.jsx'
+import Glueck from './screens/Glueck.jsx'
+import Monat from './screens/Monat.jsx'
 import Woche from './screens/Woche.jsx'
 
 // Schützt Tab-Bereich, bis Onboarding abgeschlossen ist.
@@ -79,6 +81,8 @@ export default function App() {
         <Route path="/profil/erinnerung" element={<Gate><Erinnerung /></Gate>} />
         <Route path="/abend" element={<Gate><Abend /></Gate>} />
         <Route path="/woche" element={<Gate><Woche /></Gate>} />
+        <Route path="/monat" element={<Gate><Monat /></Gate>} />
+        <Route path="/profil/glueck" element={<Gate><Glueck /></Gate>} />
       </Route>
 
       {/* Tab-Bereich — mit unterer Navigation */}

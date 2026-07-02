@@ -81,7 +81,7 @@ export default function OracleDraw() {
                 styles: profile.commStyles,
                 coping: profile.coping,
               },
-              { aiMode: settings.aiMode }
+              { aiMode: settings.aiMode, endpoint: settings.aiEndpoint }
             )
             const res = saveEntry(msg, '')
             setMessage(msg)
@@ -91,7 +91,7 @@ export default function OracleDraw() {
         )
       }, 2300)
     )
-  }, [profile.name, profile.themes, profile.mood, profile.commStyles, profile.coping, ritual, settings.aiMode, saveEntry])
+  }, [profile.name, profile.themes, profile.mood, profile.commStyles, profile.coping, ritual, settings.aiMode, settings.aiEndpoint, saveEntry])
 
   // Belohnung → eigener Feier-Screen (22); sonst Dashboard
   const finish = () => {
@@ -103,8 +103,13 @@ export default function OracleDraw() {
   }
 
   const saveReflection = () => {
-    if (saved?.id) updateReflection(saved.id, note)
-    finish()
+    // Reflexion speichern kann ein Sternbild vollenden → eigener Feier-Moment
+    const unlocked = saved?.id ? updateReflection(saved.id, note) : null
+    if (unlocked || (saved && !saved.already && saved.rankUp)) {
+      nav('/feier', { replace: true, state: { reward: { ...saved, constellationName: unlocked } } })
+    } else {
+      nav('/dashboard', { replace: true })
+    }
   }
 
   if (phase === 'trigger') {
@@ -295,8 +300,8 @@ export default function OracleDraw() {
         </div>
 
         <div style={{ marginTop: 12, display: 'flex', gap: 9 }}>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 13, padding: '9px 11px' }}>
-            <div style={{ color: '#7a7494', font: '600 8.5px var(--font-body)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Glückselement</div>
+          <div onClick={() => nav('/profil/glueck')} style={{ flex: 1, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 13, padding: '9px 11px', cursor: 'pointer' }}>
+            <div style={{ color: '#7a7494', font: '600 8.5px var(--font-body)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Glückselement · Sammlung ›</div>
             <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)', marginTop: 2 }}>✦ {message.luck}</div>
           </div>
           <div style={{ flex: 1, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 13, padding: '9px 11px' }}>

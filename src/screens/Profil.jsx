@@ -1,12 +1,14 @@
 import { useNavigate } from 'react-router-dom'
 import { LunaAvatar } from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
-import { RANKS, constellationProgress } from '../data/library.js'
+import { RANKS, constellationStatus } from '../data/library.js'
+import { GLUECKSELEMENTE } from '../data/generator.js'
 
 export default function Profil() {
   const nav = useNavigate()
-  const { profile, stats, rank } = useStore()
-  const cprog = constellationProgress(stats.constellationsDone, stats.streak)
+  const { profile, stats, rank, journal } = useStore()
+  const cstat = constellationStatus(journal)
+  const luckFound = GLUECKSELEMENTE.filter((g) => journal.some((e) => e.luck === g.name)).length
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 20px 16px' }}>
@@ -68,7 +70,11 @@ export default function Profil() {
         </button>
         <button className="list-row" onClick={() => nav('/profil/sternbilder')}>
           <span>☾ Meine Sternbilder</span>
-          <span className="chev">{cprog.done} / {cprog.total} ›</span>
+          <span className="chev">{cstat.done} / {cstat.total} ›</span>
+        </button>
+        <button className="list-row" onClick={() => nav('/profil/glueck')}>
+          <span>🌟 Glückselemente</span>
+          <span className="chev">{luckFound} / {GLUECKSELEMENTE.length} ›</span>
         </button>
       </div>
 

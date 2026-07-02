@@ -149,15 +149,24 @@ export const mantras = [
   'Ich bin genug, auch heute.',
 ]
 
-export const glueckselemente = [
-  'Goldenes Licht',
-  'Warmes Bernsteinlicht',
-  'Stilles Mondlicht',
-  'Erste Morgenröte',
-  'Klarer Bergquell',
-  'Abendgold',
-  'Sanfter Sternenstaub',
+// Glückselemente-Sammlung: jede Botschaft bringt eines mit; gesammelt wird
+// über das Tagebuch (entry.luck). 12 Stück – wie Abzeichen in einer Fitness-App.
+export const GLUECKSELEMENTE = [
+  { name: 'Goldenes Licht', glyph: '🌟', bedeutung: 'Ein Moment, der dich ohne Grund wärmt – nimm ihn an, statt ihn zu erklären.' },
+  { name: 'Warmes Bernsteinlicht', glyph: '🕯', bedeutung: 'Geborgenheit im Kleinen: ein Ort, ein Mensch, eine Tasse, ein Atemzug.' },
+  { name: 'Stilles Mondlicht', glyph: '🌙', bedeutung: 'Ruhe, die nicht leer ist – sie hält, was tagsüber keinen Platz hatte.' },
+  { name: 'Erste Morgenröte', glyph: '🌄', bedeutung: 'Der Anfang vor dem Anfang: noch nichts ist entschieden, alles ist möglich.' },
+  { name: 'Klarer Bergquell', glyph: '💧', bedeutung: 'Klarheit, die von selbst kommt, wenn du aufhörst, das Wasser aufzuwühlen.' },
+  { name: 'Abendgold', glyph: '🌇', bedeutung: 'Der milde Blick zurück: Auch ein unfertiger Tag darf schön gewesen sein.' },
+  { name: 'Sanfter Sternenstaub', glyph: '✨', bedeutung: 'Die kleinen Spuren, die du hinterlässt, ohne es zu merken.' },
+  { name: 'Silberner Nebel', glyph: '🌫', bedeutung: 'Nicht alles muss heute klar sein – manches darf weich bleiben.' },
+  { name: 'Blaue Stunde', glyph: '🌌', bedeutung: 'Der Übergang gehört dir: zwischen Tun und Ruhen liegt ein eigener Raum.' },
+  { name: 'Federleichter Wind', glyph: '🍃', bedeutung: 'Loslassen fühlt sich zuerst wie Verlieren an – und dann wie Fliegen.' },
+  { name: 'Verborgene Perle', glyph: '🫧', bedeutung: 'In etwas Gewöhnlichem wartet heute etwas Kostbares auf deinen Blick.' },
+  { name: 'Sternschnuppen-Funke', glyph: '🌠', bedeutung: 'Ein flüchtiger Impuls, der ernst genommen werden will, bevor er verglüht.' },
 ]
+
+export const glueckselemente = GLUECKSELEMENTE.map((g) => g.name)
 
 export const energien = [
   { label: 'Sanfte Ausrichtung', value: 0.45 },
