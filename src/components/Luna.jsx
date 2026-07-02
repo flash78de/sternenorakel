@@ -1,15 +1,18 @@
 // Luna — das Sternenwesen in 6 Zuständen.
-// Jeder Zustand verweist auf die echte transparente Art (Dark-First).
+// Lädt automatisch die passende optimierte Variante (opt/*-md|sm.webp):
+// kleine Darstellungen (Avatare, Icons) → sm, große (Hero, Rituale) → md.
 import { asset } from '../lib/asset.js'
 
-const SRC = {
-  idle: asset('uploads/luna-idle-transparent.png'),
-  lauschen: asset('uploads/luna-lauschen-transparent.png'),
-  offenbarung: asset('uploads/luna-offenbarung-transparent.png'),
-  freude: asset('uploads/luna-freude-transparent.png'),
-  schlaf: asset('uploads/luna-schlaf-transparent.png'),
-  icon: asset('uploads/luna-icon-transparent.png'),
+const FILE = {
+  idle: 'luna-idle-transparent',
+  lauschen: 'luna-lauschen-transparent',
+  offenbarung: 'luna-offenbarung-transparent',
+  freude: 'luna-freude-transparent',
+  schlaf: 'luna-schlaf-transparent',
+  icon: 'luna-icon-transparent',
 }
+
+const srcFor = (state, small) => asset(`uploads/opt/${FILE[state] || FILE.idle}-${small ? 'sm' : 'md'}.webp`)
 
 const GLOW = {
   idle: 'rgba(166,107,255,.42)',
@@ -29,6 +32,7 @@ const SHADOW = {
   icon: 'drop-shadow(0 8px 22px rgba(106,59,232,.45))',
 }
 
+// width: Zahl (px) oder CSS-String wie 'min(330px, 82vw)' für responsive Größen.
 export default function Luna({
   state = 'idle',
   width = 180,
@@ -39,7 +43,9 @@ export default function Luna({
   alt = 'Luna',
   style = {},
 }) {
-  const gSize = glowSize || width * 1.25
+  const numeric = typeof width === 'number'
+  const small = numeric && width <= 120
+  const gSize = glowSize || (numeric ? width * 1.25 : 220)
   return (
     <div className="luna" style={{ display: 'flex', justifyContent: 'center', ...style }}>
       {glow && (
@@ -54,7 +60,7 @@ export default function Luna({
         />
       )}
       <img
-        src={SRC[state]}
+        src={srcFor(state, small)}
         alt={alt}
         className={burst ? 'anim-burst' : float ? 'anim-float' : ''}
         style={{ width, height: 'auto', position: 'relative', filter: SHADOW[state] }}
@@ -63,11 +69,11 @@ export default function Luna({
   )
 }
 
-// Runder Avatar (Profil, Sprechblasen-Kopf)
+// Runder Avatar (Profil, Sprechblasen-Kopf) — immer kleine Variante
 export function LunaAvatar({ size = 78, ring = true }) {
   return (
     <img
-      src={SRC.icon}
+      src={srcFor('icon', true)}
       alt="Luna"
       style={{
         width: size,

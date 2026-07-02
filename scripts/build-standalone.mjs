@@ -32,6 +32,10 @@ try { sharp = (await import('sharp')).default } catch { /* Fallback unten */ }
 async function toDataUri(file) {
   const abs = join(UPLOADS, file)
   const raw = readFileSync(abs)
+  // Bereits optimierte WebP (uploads/opt/*) roh einbetten – nicht doppelt komprimieren
+  if (extname(file).toLowerCase() === '.webp') {
+    return `data:image/webp;base64,${raw.toString('base64')}`
+  }
   if (sharp) {
     try {
       const out = await sharp(raw)
@@ -49,24 +53,40 @@ async function toDataUri(file) {
 
 let html = readFileSync(IN_HTML, 'utf8')
 
-// Nach Namenslänge absteigend (verhindert Teil-Treffer wie luna-icon vs luna-icon-transparent)
-const files = readdirSync(UPLOADS)
-  .filter((f) => MIME[extname(f).toLowerCase()])
-  .sort((a, b) => b.length - a.length)
+// Uploads inkl. opt/-Unterordner (relative Pfade), nach Länge absteigend
+// (verhindert Teil-Treffer wie luna-icon vs luna-icon-transparent)
+const collect = (dir, prefix = '') =>
+  readdirSync(dir, { withFileTypes: true }).flatMap((d) =>
+    d.isDirectory()
+      ? collect(join(dir, d.name), prefix + d.name + '/')
+      : MIME[extname(d.name).toLowerCase()] ? [prefix + d.name] : []
+  )
+const files = collect(UPLOADS).sort((a, b) => b.length - a.length)
 
-let embedded = 0
+// Manifest-Daten vorbereiten (alle optimierten Varianten uploads/opt/*)
+const manifest = {}
+for (const file of files.filter((f) => f.startsWith('opt/'))) {
+  manifest['uploads/' + file] = await toDataUri(file)
+}
+
+// 1) ZUERST wörtliche uploads/-Referenzen im Bundle ersetzen (Alt-/Sonderfälle) —
+//    muss vor der Manifest-Injektion passieren, sonst würden die Manifest-Keys
+//    selbst mit ersetzt und zerstört.
+let replaced = 0
 for (const file of files) {
-  const dataUri = await toDataUri(file)
+  const dataUri = manifest['uploads/' + file] || (await toDataUri(file))
   const re = new RegExp('(?:\\.?/)?uploads/' + escapeRe(file), 'g')
   const before = html.length
   html = html.replace(re, dataUri)
-  if (html.length !== before) embedded++
+  if (html.length !== before) replaced++
 }
+
+// 2) DANACH Asset-Manifest injizieren: deckt dynamisch gebaute Pfade ab
+//    (z. B. `uploads/opt/luna-${state}-sm.webp` in der Luna-Komponente).
+const manifestTag = `<script>window.__ASSETS__=${JSON.stringify(manifest)}</script>`
+html = html.replace('<head>', '<head>' + manifestTag)
 
 writeFileSync(OUT_HTML, html, 'utf8')
 
 const mb = (Buffer.byteLength(html, 'utf8') / 1048576).toFixed(1)
-console.log(`✓ standalone.html erstellt — ${embedded} Bilder eingebettet (${sharp ? 'WebP' : 'PNG-Fallback'}), ${mb} MB`)
-
-const leftover = html.match(/["'(](?:\.?\/)?uploads\/[^"')]+/g)
-if (leftover) console.warn('⚠ Nicht eingebettete Verweise:', [...new Set(leftover)].slice(0, 10))
+console.log(`✓ standalone.html erstellt — Manifest: ${Object.keys(manifest).length} Assets, ${replaced} direkte Ersetzungen, ${mb} MB`)

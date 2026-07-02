@@ -168,7 +168,7 @@ export default function Settings() {
 
       {/* Tägliche Erinnerung → eigener Screen */}
       <div onClick={() => nav('/profil/erinnerung')} style={{ marginTop: 12, cursor: 'pointer', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 16, padding: '13px 15px', display: 'flex', alignItems: 'center', gap: 11 }}>
-        <img src={asset('uploads/luna-schlaf-transparent.png')} alt="" style={{ width: 40, height: 40, objectFit: 'contain' }} />
+        <img src={asset('uploads/opt/luna-schlaf-transparent-sm.webp')} alt="" style={{ width: 40, height: 40, objectFit: 'contain' }} />
         <div style={{ flex: 1 }}>
           <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>Erinnerung</div>
           <div style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)', marginTop: 1 }}>

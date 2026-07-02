@@ -95,7 +95,7 @@ export default function Dashboard() {
         <div className="hero hero--bleed" style={{ marginTop: 10, minHeight: 300 }}>
           <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', minHeight: 0 }}>
             <div className="hero-bubble">„{lunaSays()}"</div>
-            <Luna state="idle" width={330} glow={false} float style={{ alignSelf: 'flex-end' }} />
+            <Luna state="idle" width="min(345px, 88vw)" glow={false} float style={{ alignSelf: 'flex-end' }} />
           </div>
           <button
             className="btn-gold uppercase"
@@ -107,7 +107,7 @@ export default function Dashboard() {
             <span style={{ color: '#a07b1e' }}>✦</span>
           </button>
           <div style={{ textAlign: 'center', color: '#cdbfa0', font: '400 10.5px var(--font-body)', marginTop: 7 }}>
-            {drawnToday ? 'Heute schon empfangen · komm morgen wieder.' : 'Dauert ungefähr eine Minute.'}
+            {drawnToday ? 'Heute schon empfangen · komm morgen wieder.' : 'Dein heutiger Lichtpunkt ist noch unentdeckt. ✦'}
           </div>
           {drawnToday && new Date().getHours() >= 19 && (
             <button className="link-soft" style={{ marginTop: 6 }} onClick={() => nav('/abend')}>
@@ -246,7 +246,7 @@ function EmptyDashboard() {
       <div className="hero hero--bleed" style={{ marginTop: 10, minHeight: 320 }}>
         <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', minHeight: 0 }}>
           <div className="hero-bubble">„Unser erster gemeinsamer Tag – schön, dass du da bist. Lass uns deine erste Botschaft empfangen."</div>
-          <Luna state="idle" width={320} glow={false} float style={{ alignSelf: 'flex-end' }} />
+          <Luna state="idle" width="min(345px, 88vw)" glow={false} float style={{ alignSelf: 'flex-end' }} />
         </div>
         <button
           className="btn-gold uppercase"

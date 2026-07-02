@@ -30,24 +30,26 @@ export default function OracleRitual() {
         {/* Sternenwürfel — frei */}
         <button className="ritual" onClick={() => nav('/oracle/draw', { state: { ritual: 'wuerfel' } })}>
           <span className="ico">
-            <img src={asset('uploads/wuerfel.png')} alt="Würfel" style={{ width: 72, height: 72, objectFit: 'contain', filter: 'drop-shadow(0 4px 10px rgba(232,199,122,.45))' }} />
+            <img src={asset('uploads/opt/wuerfel-sm.webp')} alt="Würfel" style={{ width: 72, height: 72, objectFit: 'contain', filter: 'drop-shadow(0 4px 10px rgba(232,199,122,.45))' }} />
           </span>
           <span style={{ flex: 1, minWidth: 0 }}>
             <span style={{ display: 'block', fontFamily: 'var(--font-head)', color: 'var(--gold-1)', fontSize: 18, fontWeight: 600 }}>Sternenwürfel</span>
             <span style={{ display: 'block', color: 'var(--text-dim)', font: '400 12.5px/1.45 var(--font-body)', marginTop: 3 }}>
-              Sechs Archetypen – einer fällt heute für dich.
+              Richtung für heute: ein Archetyp und ein kleiner Schritt.
             </span>
           </span>
           <span style={{ color: 'var(--purple-2)', fontSize: 22 }}>›</span>
         </button>
 
-        <Ritual premium={premium} nav={nav} ritual="karten" title="Sternenkarten" desc="Ein Bild aus dem Deck der inneren Bilder." icon={cards.icon} />
-        <Ritual premium={premium} nav={nav} ritual="runen" title="Runen" desc="Alte Zeichen, die in die Gegenwart sprechen."
+        <Ritual premium={premium} nav={nav} ritual="karten" title="Sternenkarten" desc="Du ziehst selbst: ein inneres Bild für tiefere Gefühle & Themen." icon={cards.icon} />
+        <Ritual premium={premium} nav={nav} ritual="runen" title="Runen" desc="Drei Zeichen: was nachwirkt, was jetzt zählt, was entstehen darf."
           icon={<span style={{ fontFamily: 'var(--font-head)', color: 'var(--gold-1)', fontSize: 36 }}>ᚱ</span>} />
       </div>
       <div style={{ textAlign: 'center', color: '#7a7494', font: '400 11.5px/1.5 var(--font-body)', padding: '14px 0' }}>
         {premium
-          ? 'Mit Plus stehen dir alle Rituale offen. ✦'
+          ? drawnToday
+            ? <>Tagesbotschaft empfangen ✓ – weitere Züge sind <b style={{ color: 'var(--gold-1)', fontWeight: 600 }}>freie Impulse</b>, nur für dich.</>
+            : 'Mit Plus stehen dir alle Rituale offen. ✦'
           : drawnToday
             ? 'Du hast heute schon gezogen – morgen wartet das nächste Ritual.'
             : <>Weitere Rituale gibt es in <span style={{ color: 'var(--gold-1)', cursor: 'pointer' }} onClick={() => nav('/profil/plus')}>Sternenorakel Plus</span>.</>}

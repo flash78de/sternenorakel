@@ -9,7 +9,7 @@ export default function Abend() {
 
   return (
     <div className="center-col" style={{ padding: '34px 30px', background: 'radial-gradient(320px 320px at 50% 30%, rgba(106,59,232,.18), transparent 70%)' }}>
-      <Luna state="schlaf" width={210} glowSize={240} float />
+      <Luna state="schlaf" width="min(240px, 62vw)" glowSize={270} float />
       <div className="h-serif" style={{ fontWeight: 600, fontSize: 24, marginTop: 10, textAlign: 'center', color: 'var(--text)' }}>
         Dein heutiger Stern ruht.
       </div>

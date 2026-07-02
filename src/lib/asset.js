@@ -6,4 +6,13 @@
 // So funktionieren dieselben Pfade in allen drei Umgebungen.
 const BASE = typeof __ASSET_BASE__ !== 'undefined' ? __ASSET_BASE__ : '/'
 
-export const asset = (path = '') => BASE + String(path).replace(/^\/+/, '')
+// Standalone-Build: scripts/build-standalone.mjs injiziert window.__ASSETS__
+// (Pfad → Data-URI). Damit funktionieren auch dynamisch zusammengesetzte
+// Bildpfade (Template-Strings) unter file:// ohne Server.
+export const asset = (path = '') => {
+  const p = String(path).replace(/^\/+/, '')
+  if (typeof window !== 'undefined' && window.__ASSETS__ && window.__ASSETS__[p]) {
+    return window.__ASSETS__[p]
+  }
+  return BASE + p
+}

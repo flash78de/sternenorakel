@@ -20,7 +20,7 @@ export default function Welcome() {
           padding: '8px 30px 34px',
         }}
       >
-        <Luna state="idle" width={208} glowSize={230} style={{ marginBottom: 6 }} />
+        <Luna state="idle" width="min(230px, 60vw)" glowSize={260} style={{ marginBottom: 6 }} />
         <div className="title-xl">Sternenorakel</div>
         <div style={{ marginTop: 6, color: 'var(--purple-2)', font: '600 12.5px var(--font-body)', letterSpacing: 0.3 }}>
           Heute ein Lichtpunkt. Mit der Zeit dein Sternbild.

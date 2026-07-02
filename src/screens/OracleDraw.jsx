@@ -24,6 +24,11 @@ export default function OracleDraw() {
 
   const todaysEntry = journal.find((e) => e.iso === formatDate().iso)
 
+  // Freier Impuls (Entscheidung 2a): Die Tagesbotschaft bleibt 1×/Tag.
+  // Wer mit Plus BEWUSST ein Ritual wählt (Route-State), darf zusätzlich ziehen –
+  // ohne Serie/Sternenstaub. Ohne Plus (oder via „erneut lesen") erscheint der Tageseintrag.
+  const freeImpulse = drawnToday && settings.premium && Boolean(loc.state?.ritual)
+
   const [phase, setPhase] = useState('trigger') // trigger|listening|revelation|message|error
   const [message, setMessage] = useState(null)
   const [note, setNote] = useState('')
@@ -41,7 +46,7 @@ export default function OracleDraw() {
   }, [phase])
 
   useEffect(() => {
-    if (drawnToday && todaysEntry) {
+    if (drawnToday && todaysEntry && !freeImpulse) {
       // Wiederansicht direkt aus dem Eintrag (generierte Botschaften stehen nicht in MESSAGES).
       const full = {
         ...todaysEntry,
@@ -57,15 +62,12 @@ export default function OracleDraw() {
     return () => timers.current.forEach(clearTimeout)
   }, []) // eslint-disable-line
 
+  // Hinweis: Der 'error'-Zustand bleibt für den späteren KI-Modus erhalten;
+  // die Offline-Generierung selbst kann nicht fehlschlagen (kein Fake-Fehler mehr).
   const draw = useCallback(() => {
     setPhase('listening')
-    const willFail = Math.random() < 0.03
     timers.current.push(
       setTimeout(() => {
-        if (willFail) {
-          setPhase('error')
-          return
-        }
         setPhase('revelation')
         timers.current.push(
           setTimeout(async () => {
@@ -119,7 +121,7 @@ export default function OracleDraw() {
           <button className="back" onClick={() => nav('/dashboard')} style={{ opacity: 0.6 }}>×</button>
         </div>
         <div style={{ textAlign: 'center', marginTop: 8 }}>
-          <Luna state="lauschen" width={96} glowSize={130} float />
+          <Luna state="lauschen" width={128} glowSize={165} float />
         </div>
         <div className="h-serif" style={{ fontWeight: 600, fontSize: 24, textAlign: 'center', marginTop: 4 }}>Bist du bereit?</div>
         <div style={{ marginTop: 10, color: 'var(--text-dim)', font: '400 13.5px/1.55 var(--font-body)', textAlign: 'center' }}>
@@ -129,7 +131,7 @@ export default function OracleDraw() {
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {ritual === 'wuerfel' && (
             <button className="dice-orb anim-orb" onClick={draw} aria-label="Sternenwürfel werfen">
-              <img src={asset('uploads/wuerfel.png')} alt="Sternenwürfel" width={124} style={{ filter: 'drop-shadow(0 10px 22px rgba(232,199,122,.55))' }} />
+              <img src={asset('uploads/opt/wuerfel-sm.webp')} alt="Sternenwürfel" width={124} style={{ filter: 'drop-shadow(0 10px 22px rgba(232,199,122,.55))' }} />
             </button>
           )}
 
@@ -169,7 +171,9 @@ export default function OracleDraw() {
           {hint}
         </div>
         <div style={{ textAlign: 'center', color: '#7a7494', font: '400 11px var(--font-body)' }}>
-          Eine Botschaft pro Tag · heute noch nicht gezogen
+          {freeImpulse
+            ? 'Freier Impuls ✦ Plus · deine Tagesbotschaft bleibt unberührt'
+            : 'Eine Botschaft pro Tag · heute noch nicht gezogen'}
         </div>
       </div>
     )
@@ -178,7 +182,7 @@ export default function OracleDraw() {
   if (phase === 'listening')
     return (
       <div className="center-col" style={{ padding: '30px 30px 44px', textAlign: 'center' }}>
-        <Luna state="lauschen" width={250} glowSize={290} float />
+        <Luna state="lauschen" width="min(280px, 70vw)" glowSize={310} float />
         <div style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 22, color: 'var(--gold-1)', marginTop: 14, textShadow: '0 0 18px rgba(232,199,122,.4)', minHeight: 30 }}>
           {LISTEN_TEXTS[micro]}
         </div>
@@ -202,7 +206,7 @@ export default function OracleDraw() {
           }}
           className="anim-burst"
         />
-        <Luna state="offenbarung" width={230} glowSize={280} float={false} burst />
+        <Luna state="offenbarung" width="min(255px, 65vw)" glowSize={300} float={false} burst />
         <div style={{ position: 'relative', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 22, color: '#fff', marginTop: 6, textAlign: 'center', textShadow: '0 0 24px rgba(232,199,122,.8)' }}>
           {ritual === 'karten' ? <>Deine Karte<br />dreht sich um …</> : ritual === 'runen' ? <>Die Runen<br />ordnen sich …</> : <>Der Würfel fällt –<br />ein Zeichen leuchtet auf …</>}
         </div>
@@ -341,7 +345,9 @@ export default function OracleDraw() {
               <div style={{ flex: 1 }}>
                 <div style={{ color: 'var(--gold-1)', font: '700 13px var(--font-body)' }}>Im Tagebuch gespeichert ✓</div>
                 <div style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)', marginTop: 1 }}>
-                  +{saved?.gainedDust ?? 0} ✦ Sternenstaub · Serie auf {saved?.newStreak ?? 0} {saved?.newStreak === 1 ? 'Tag' : 'Tage'}
+                  {freeImpulse
+                    ? 'Freier Impuls ✦ nur für dich – Serie & Sternenstaub bleiben bei deiner Tagesbotschaft'
+                    : <>+{saved?.gainedDust ?? 0} ✦ Sternenstaub · Serie auf {saved?.newStreak ?? 0} {saved?.newStreak === 1 ? 'Tag' : 'Tage'}</>}
                 </div>
               </div>
             </div>

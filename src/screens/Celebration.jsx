@@ -23,7 +23,7 @@ export default function Celebration() {
           {isRankUp ? 'Herzlichen Glückwunsch!' : 'Sternbild vollendet!'}
         </div>
 
-        <Luna state="freude" width={180} glowSize={210} burst style={{ marginTop: 10 }} />
+        <Luna state="freude" width="min(215px, 56vw)" glowSize={245} burst style={{ marginTop: 10 }} />
 
         {isRankUp ? (
           <>

@@ -14,7 +14,7 @@ export default function Splash({ onDone }) {
     <div className="phone">
       <div className="screen" style={{ position: 'relative', overflow: 'hidden' }}>
         <img
-          src={asset('uploads/luna-erwacht.png')}
+          src={asset('uploads/opt/luna-erwacht-md.webp')}
           alt="Luna erwacht … Sternenorakel"
           className="fade-up"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
