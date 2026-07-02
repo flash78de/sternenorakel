@@ -35,9 +35,15 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    # Die Pages-Warteschlange hängt gelegentlich länger als die
+    # Standard-Geduld von 10 Minuten – wir warten bis zu 30 Minuten.
+    timeout-minutes: 35
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          timeout: 1800000
+          error_count: 15
