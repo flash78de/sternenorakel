@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/store.jsx'
-import { THEMES, MONTHS, zodiacOf } from '../data/library.js'
-import { COMM_STYLES, COPING } from '../data/generator.js'
+import { THEMES, MONTHS, zodiacOf, formatDate } from '../data/library.js'
+import { COMM_STYLES, COPING, generateMessage } from '../data/generator.js'
 import { asset } from '../lib/asset.js'
 import { isAiConfigured } from '../lib/ai.js'
 import DarkPicker from '../components/DarkPicker.jsx'
@@ -15,7 +15,61 @@ const TONES = [
 
 export default function Settings() {
   const nav = useNavigate()
-  const { settings, updateSettings, profile, updateProfile } = useStore()
+  const { settings, updateSettings, profile, updateProfile, patch, journal } = useStore()
+  const [devTaps, setDevTaps] = useState(0)
+  const devMode = devTaps >= 5
+
+  // ---- Test-Werkzeuge (nur für die Erprobung, erreichbar über 5× Tippen auf die Version) ----
+  const seedDemo = () => {
+    // 14 Tage Demo-Tagebuch: gemischte Rituale, Stimmungen & Reflexionen,
+    // damit Woche/Monat/Sternbilder/Glückselemente sofort etwas zeigen.
+    const plan = [
+      ['Liebe & Beziehungen', 'wuerfel', 'Ich habe heute an unser Gespräch gedacht.'],
+      ['Liebe & Beziehungen', 'karten', 'Nähe fällt mir leichter, wenn ich ehrlich bin.'],
+      ['Liebe & Beziehungen', 'runen', 'Ich möchte öfter zuhören statt zu antworten.'],
+      ['Beruf & Berufung', 'wuerfel', 'Der Druck kommt mehr von mir als von außen.'],
+      ['Beruf & Berufung', 'karten', 'Kleine Schritte reichen heute.'],
+      ['Beruf & Berufung', 'runen', 'Ich darf Aufgaben auch abgeben.'],
+      ['Selbstwert & innere Ruhe', 'wuerfel', 'Ich war heute freundlicher zu mir.'],
+      ['Selbstwert & innere Ruhe', 'karten', ''],
+      ['Veränderung & Neuanfang', 'runen', 'Etwas Altes darf enden.'],
+      ['Dankbarkeit', 'wuerfel', 'Der Morgenkaffee auf dem Balkon.'],
+      ['Kreativität', 'karten', ''],
+      ['Loslassen', 'runen', 'Ich muss nicht alles festhalten.'],
+      ['Entscheidungen & Klarheit', 'wuerfel', ''],
+      ['Schule & Lernen', 'karten', 'Lernen fällt mir abends leichter.'],
+    ]
+    const entries = plan.map(([theme, ritual, reflection], i) => {
+      const ts = Date.now() - (i + 1) * 86400000
+      const msg = generateMessage({ name: profile.name, themes: [theme], mood: 1 + ((i * 2) % 5), ritual })
+      return {
+        id: `demo-${i}`, ts, iso: new Date(ts).toISOString().slice(0, 10),
+        title: msg.title, symbol: msg.symbol, constellation: msg.constellation ?? null,
+        theme, mantra: msg.mantra, text: msg.text, luck: msg.luck, energy: msg.energy,
+        question: msg.reflection, ritual, archetype: msg.archetype ?? null,
+        card: msg.card ?? null, runes: msg.runes ?? null,
+        mood: 1 + ((i * 2) % 5), reflection,
+      }
+    })
+    patch((s) => ({
+      journal: [...entries, ...s.journal.filter((e) => !String(e.id).startsWith('demo-'))],
+      stats: { ...s.stats, stardust: Math.max(s.stats.stardust, 140), streak: Math.max(s.stats.streak, 3) },
+    }))
+  }
+  const simulateReturn = () => {
+    const past = new Date(Date.now() - 4 * 86400000).toISOString().slice(0, 10)
+    patch((s) => ({ stats: { ...s.stats, lastDrawISO: past }, seenReturnISO: null }))
+    nav('/dashboard')
+  }
+  const timeShift = () => {
+    // Alles einen Tag älter machen → „morgen" lässt sich sofort testen
+    const shift = (iso) => (iso ? new Date(new Date(iso + 'T12:00').getTime() - 86400000).toISOString().slice(0, 10) : iso)
+    patch((s) => ({
+      journal: s.journal.map((e) => ({ ...e, ts: e.ts - 86400000, iso: shift(e.iso) })),
+      stats: { ...s.stats, lastDrawISO: shift(s.stats.lastDrawISO), moodTodayISO: shift(s.stats.moodTodayISO) },
+      seenReturnISO: formatDate().iso, // kein ungewollter Rückkehr-Screen
+    }))
+  }
 
   const [name, setName] = useState(profile.name || '')
   const [aiUrl, setAiUrl] = useState(settings.aiEndpoint || '')
@@ -228,8 +282,27 @@ export default function Settings() {
         </div>
       </div>
 
-      <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10px var(--font-body)', paddingTop: 12 }}>
-        Sternenorakel · v1.0 · local-first
+      {/* Test-Werkzeuge — erscheinen nach 5× Tippen auf die Versionszeile */}
+      {devMode && (
+        <div className="glass" style={{ marginTop: 12, padding: '13px 15px', border: '1px dashed rgba(255,122,154,.5)' }}>
+          <div style={{ color: 'var(--danger)', font: '600 11px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>🧪 Test-Werkzeuge · nur Demo</div>
+          <div style={{ color: 'var(--text-dim)', font: '400 11px/1.5 var(--font-body)', marginTop: 4 }}>
+            Zum Ausprobieren aller Funktionen ohne 14 Tage Wartezeit. Verändert nur lokale Daten.
+          </div>
+          <button className="list-row" style={{ marginTop: 8, borderRadius: 12, background: 'rgba(255,255,255,.05)' }} onClick={seedDemo}>
+            <span>📖 Demo-Tagebuch laden (14 Tage)</span><span className="meta">Woche · Monat · Sternbilder ›</span>
+          </button>
+          <button className="list-row" style={{ marginTop: 6, borderRadius: 12, background: 'rgba(255,255,255,.05)' }} onClick={timeShift}>
+            <span>⏪ Alles 1 Tag zurückdatieren</span><span className="meta">„Morgen" sofort testen ›</span>
+          </button>
+          <button className="list-row" style={{ marginTop: 6, borderRadius: 12, background: 'rgba(255,255,255,.05)' }} disabled={journal.length === 0} onClick={simulateReturn}>
+            <span>💜 Rückkehr nach Pause simulieren</span><span className="meta">{journal.length === 0 ? 'braucht Einträge' : 'zum Dashboard ›'}</span>
+          </button>
+        </div>
+      )}
+
+      <div onClick={() => setDevTaps((n) => n + 1)} style={{ textAlign: 'center', color: '#7a7494', font: '400 10px var(--font-body)', paddingTop: 12, cursor: 'default', userSelect: 'none' }}>
+        Sternenorakel · v1.0 · local-first{devMode ? ' · 🧪' : ''}
       </div>
     </div>
   )
