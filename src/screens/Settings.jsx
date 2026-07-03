@@ -250,11 +250,17 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Privatsphäre */}
-      <button className="list-row" style={{ marginTop: 12, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 16 }} onClick={() => nav('/profil/privacy')}>
-        <span>🔒 Daten &amp; Privatsphäre</span>
-        <span className="meta">Export · Löschen ›</span>
-      </button>
+      {/* Privatsphäre & Rechtliches */}
+      <div className="list" style={{ marginTop: 12 }}>
+        <button className="list-row" onClick={() => nav('/profil/privacy')}>
+          <span>🔒 Daten &amp; Privatsphäre</span>
+          <span className="meta">Export · Löschen ›</span>
+        </button>
+        <button className="list-row" onClick={() => nav('/rechtliches')}>
+          <span>§ Rechtliches</span>
+          <span className="meta">Impressum · Datenschutz · Haftung ›</span>
+        </button>
+      </div>
 
       {/* Therapie-Hinweis */}
       <div className="glass-purple" style={{ marginTop: 12, padding: '11px 13px' }}>

@@ -28,6 +28,7 @@ import Abend from './screens/Abend.jsx'
 import Glueck from './screens/Glueck.jsx'
 import Monat from './screens/Monat.jsx'
 import Woche from './screens/Woche.jsx'
+import Rechtliches from './screens/Rechtliches.jsx'
 
 // Schützt Tab-Bereich, bis Onboarding abgeschlossen ist.
 function Gate({ children }) {
@@ -83,6 +84,8 @@ export default function App() {
         <Route path="/woche" element={<Gate><Woche /></Gate>} />
         <Route path="/monat" element={<Gate><Monat /></Gate>} />
         <Route path="/profil/glueck" element={<Gate><Glueck /></Gate>} />
+        {/* Rechtliches bewusst OHNE Gate: Impressum muss immer erreichbar sein */}
+        <Route path="/rechtliches" element={<Rechtliches />} />
       </Route>
 
       {/* Tab-Bereich — mit unterer Navigation */}

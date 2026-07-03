@@ -117,7 +117,7 @@ export default function PlusDetail() {
         </button>
       ) : (
         <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10.5px/1.5 var(--font-body)', marginTop: 10 }}>
-          7 Tage gratis, danach 3,99 € / Monat · jederzeit kündbar · <span style={{ textDecoration: 'underline' }}>Alle Preise &amp; Bedingungen</span>
+          7 Tage gratis, danach 3,99 € / Monat · jederzeit kündbar · <span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={() => nav('/rechtliches')}>Rechtliches &amp; Datenschutz</span>
           <br /><b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Demo:</b> Es wird nichts berechnet – der Schalter aktiviert Plus nur zum Ausprobieren.
         </div>
       )}

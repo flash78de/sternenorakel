@@ -34,6 +34,9 @@ export default function Welcome() {
         <button className="link-soft" style={{ marginTop: 14 }} onClick={() => nav('/auth')}>
           Ich habe schon ein <b>Sternenband</b>
         </button>
+        <button className="link-soft" style={{ marginTop: 10, fontSize: 11, color: '#7a7494' }} onClick={() => nav('/rechtliches')}>
+          Impressum &amp; Datenschutz
+        </button>
       </div>
     </>
   )
