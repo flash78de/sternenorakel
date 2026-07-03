@@ -4,7 +4,6 @@ import { useStore } from '../store/store.jsx'
 import { THEMES, MONTHS, zodiacOf, formatDate } from '../data/library.js'
 import { COMM_STYLES, COPING, generateMessage } from '../data/generator.js'
 import { asset } from '../lib/asset.js'
-import { isAiConfigured } from '../lib/ai.js'
 import DarkPicker from '../components/DarkPicker.jsx'
 
 const TONES = [
@@ -72,7 +71,6 @@ export default function Settings() {
   }
 
   const [name, setName] = useState(profile.name || '')
-  const [aiUrl, setAiUrl] = useState(settings.aiEndpoint || '')
   const [day, setDay] = useState(profile.birth?.day || '')
   const [month, setMonth] = useState(profile.birth?.month || '')
   const [year, setYear] = useState(profile.birth?.year || '')
@@ -195,34 +193,19 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* KI-Modus – ehrlich gekennzeichnet, Server-Adresse konfigurierbar */}
-      <div className="glass" style={{ marginTop: 12, padding: '13px 15px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ flex: 1, paddingRight: 10 }}>
-            <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>KI-Modus {!isAiConfigured(settings.aiEndpoint) && <span style={{ color: '#7a7494', fontWeight: 400, fontSize: 11 }}>· kein Server verbunden</span>}</div>
-            <div style={{ color: 'var(--text-dim)', font: '400 10.5px/1.45 var(--font-body)', marginTop: 2 }}>
-              {isAiConfigured(settings.aiEndpoint)
-                ? 'Botschaften formuliert ein KI-Dienst live; ohne Verbindung nutzt Luna automatisch die Offline-Sternenbibliothek.'
-                : 'Ohne Server-Adresse nutzt Luna immer die Offline-Sternenbibliothek. Ein eigener KI-Server lässt sich in wenigen Minuten einrichten (Anleitung: server/README.md im Projekt).'}
-            </div>
+      {/* KI-Modus – der Schalter genügt, der KI-Server ist fest eingebaut */}
+      <div className="glass" style={{ marginTop: 12, padding: '13px 15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ flex: 1, paddingRight: 10 }}>
+          <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>KI-Modus</div>
+          <div style={{ color: 'var(--text-dim)', font: '400 10.5px/1.45 var(--font-body)', marginTop: 2 }}>
+            Luna formuliert deine Botschaft live mit KI – passend zu deinem gezogenen Ergebnis.
+            Ohne Verbindung nutzt sie automatisch die Offline-Sternenbibliothek.
+            Übertragen werden nur Stimmung, Themen und das Ritual-Ergebnis – nie dein Name oder deine Notizen.
           </div>
-          <span className={'toggle' + (settings.aiMode ? ' on' : '')} onClick={() => updateSettings({ aiMode: !settings.aiMode })}>
-            <span className="knob" />
-          </span>
         </div>
-        {settings.aiMode && (
-          <div style={{ marginTop: 12, borderTop: '1px solid rgba(255,255,255,.07)', paddingTop: 11 }}>
-            <div style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)', marginBottom: 6 }}>KI-Server-Adresse</div>
-            <input className="field" type="url" inputMode="url" autoCapitalize="off" autoCorrect="off" spellCheck={false}
-              placeholder="https://…workers.dev"
-              value={aiUrl}
-              onChange={(e) => setAiUrl(e.target.value)}
-              onBlur={() => updateSettings({ aiEndpoint: aiUrl.trim() })} />
-            <div style={{ marginTop: 6, color: '#7a7494', font: '400 10px/1.45 var(--font-body)' }}>
-              Es werden nur Stimmung, Themen und das gezogene Ritual-Ergebnis übertragen – nie dein Name oder deine Notizen.
-            </div>
-          </div>
-        )}
+        <span className={'toggle' + (settings.aiMode ? ' on' : '')} onClick={() => updateSettings({ aiMode: !settings.aiMode })}>
+          <span className="knob" />
+        </span>
       </div>
 
       {/* Startanimation „Luna erwacht" */}

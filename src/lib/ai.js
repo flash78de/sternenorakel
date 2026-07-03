@@ -6,10 +6,10 @@
 // ============================================================
 import { generateMessage } from '../data/generator.js'
 
-// Fest eingebauter Endpunkt (per Build setzbar). Zusätzlich kann die
-// Nutzerin in den Einstellungen eine eigene Server-Adresse hinterlegen
-// (settings.aiEndpoint) – siehe server/README.md fürs Deployment.
-const AI_ENDPOINT = ''
+// Fest eingebauter Endpunkt: der eigene Cloudflare Worker (server/).
+// Der KI-Modus-Schalter in den Einstellungen aktiviert ihn; über
+// settings.aiEndpoint ließe sich intern ein anderer Server testen.
+const AI_ENDPOINT = 'https://sternenorakel-orakel.sternenorakel.workers.dev'
 const AI_TIMEOUT_MS = 8000
 
 export const aiAvailable = Boolean(AI_ENDPOINT)
