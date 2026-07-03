@@ -24,15 +24,19 @@ export default function Rechtliches() {
       <div className="glass" style={{ marginTop: 14, padding: '4px 16px 16px' }}>
         <H>Impressum · Angaben gemäß § 5 DDG</H>
         <P>
-          <b style={{ color: 'var(--text)' }}>Marcel Lenk</b><br />
+          Anbieterin:<br />
+          <b style={{ color: 'var(--text)' }}>KPK Ingrid Lenk</b> – Bereich „Mister Hochzeit"<br />
           Alte Auerbacher Str. 23<br />
           08304 Schönheide<br />
           Deutschland
         </P>
         <P>
-          Kontakt: <a href="mailto:mlbibliolenk@gmail.com" style={{ color: 'var(--purple-2)' }}>mlbibliolenk@gmail.com</a>
+          Kontakt: <a href="mailto:ml@mittel-bar.com" style={{ color: 'var(--purple-2)' }}>ml@mittel-bar.com</a>
         </P>
-        <P>Idee, Entwicklung und Umsetzung: Marcel Lenk.</P>
+        <P>
+          Verantwortlich für den Inhalt sowie Idee, Entwicklung und Umsetzung:{' '}
+          <b style={{ color: 'var(--text)' }}>Marcel Lenk</b> (Anschrift wie oben).
+        </P>
 
         <H>Nur zur Unterhaltung &amp; Selbstreflexion</H>
         <P>
@@ -80,7 +84,8 @@ export default function Rechtliches() {
         <P>
           Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung,
           Datenübertragbarkeit und Widerspruch sowie das Recht auf Beschwerde bei einer
-          Datenschutz-Aufsichtsbehörde. Verantwortlicher im Sinne der DSGVO ist der oben genannte Betreiber.
+          Datenschutz-Aufsichtsbehörde. Verantwortliche im Sinne der DSGVO ist die oben genannte Anbieterin;
+          erreichbar über die angegebene Kontaktadresse.
         </P>
 
         <H>Urheberrecht</H>

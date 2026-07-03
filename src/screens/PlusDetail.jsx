@@ -86,7 +86,7 @@ export default function PlusDetail() {
       {/* CTA ganz oben: aktivieren ohne Scrollen (die Vorteile stehen darunter zum Nachlesen) */}
       {!active && (
         <button className="btn-gold" style={{ marginTop: 14 }} onClick={activate}>
-          ✧ Plus 7 Tage kostenlos testen
+          ✧ Plus kostenfrei testen · Beta
         </button>
       )}
       {active && (
@@ -108,7 +108,9 @@ export default function PlusDetail() {
       </div>
 
       <div style={{ textAlign: 'center', marginTop: 14, color: 'var(--text-dim)', font: '500 13px var(--font-body)' }}>
-        Schon ab <b style={{ color: 'var(--text)', fontSize: 17 }}>3,99 €</b> / Monat
+        Nach der Beta: <b style={{ color: 'var(--text)', fontSize: 17 }}>4,99 €</b> / Monat
+        <span style={{ color: '#7a7494' }}> · oder </span>
+        <b style={{ color: 'var(--text)' }}>39,99 €</b> / Jahr
       </div>
 
       {active ? (
@@ -117,8 +119,9 @@ export default function PlusDetail() {
         </button>
       ) : (
         <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10.5px/1.5 var(--font-body)', marginTop: 10 }}>
-          7 Tage gratis, danach 3,99 € / Monat · jederzeit kündbar · <span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={() => nav('/rechtliches')}>Rechtliches &amp; Datenschutz</span>
-          <br /><b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Demo:</b> Es wird nichts berechnet – der Schalter aktiviert Plus nur zum Ausprobieren.
+          <b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Beta-Test-Phase:</b> derzeit ohne Berechnung –
+          probiere Plus für kurze Zeit kostenfrei aus. Nach der Beta: 7 Tage gratis, dann 4,99 € / Monat
+          oder 39,99 € / Jahr · jederzeit kündbar · <span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={() => nav('/rechtliches')}>Rechtliches &amp; Datenschutz</span>
         </div>
       )}
     </div>
