@@ -12,7 +12,7 @@ const WD = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
 export default function Dashboard() {
   const nav = useNavigate()
   const loc = useLocation()
-  const { profile, stats, journal, rank, drawnToday, moodToday, pausedReturn } = useStore()
+  const { profile, stats, journal, rank, drawnToday, moodToday, pausedReturn, settings } = useStore()
   const [reward, setReward] = useState(loc.state?.reward || null)
 
   // Tagesziehung: erst Befinden (falls heute noch nicht abgefragt), dann Ritual.
@@ -45,10 +45,14 @@ export default function Dashboard() {
               STERNENORAKEL
             </span>
           </div>
-          <div style={{ position: 'relative', width: 32, height: 32, borderRadius: '50%', border: '1px solid rgba(232,199,122,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {/* Glocke → Erinnerungs-Einstellungen; Punkt zeigt aktive Erinnerung */}
+          <button onClick={() => nav('/profil/erinnerung')} aria-label="Erinnerung einstellen"
+            style={{ position: 'relative', width: 32, height: 32, borderRadius: '50%', border: '1px solid rgba(232,199,122,.3)', background: 'none', color: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <IcBell />
-            <span style={{ position: 'absolute', top: 4, right: 5, width: 6, height: 6, borderRadius: '50%', background: 'var(--purple-2)', boxShadow: '0 0 6px var(--purple-2)' }} />
-          </div>
+            {settings.reminder && (
+              <span style={{ position: 'absolute', top: 4, right: 5, width: 6, height: 6, borderRadius: '50%', background: 'var(--purple-2)', boxShadow: '0 0 6px var(--purple-2)' }} />
+            )}
+          </button>
         </div>
 
         {/* Begrüßung */}

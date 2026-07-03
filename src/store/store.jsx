@@ -28,8 +28,8 @@ const DEFAULT_STATE = {
     moodTodayISO: null, // Tag, an dem das Befinden zuletzt abgefragt wurde
   },
   settings: {
-    aiMode: false,
-    aiEndpoint: '', // eigene KI-Server-Adresse (server/README.md) – leer = Offline-Bibliothek
+    aiMode: true, // KI ist Standard – der Schalter in den Einstellungen schaltet sie ab
+    aiEndpoint: '', // interner Override für Tests – leer = eingebauter Worker
     reminder: true,
     reminderTime: '21:00',
     reminderWhen: 'abends', // morgens | mittags | abends | aus
