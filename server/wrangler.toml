@@ -5,8 +5,8 @@ main = "orakel-worker.js"
 compatibility_date = "2026-06-01"
 
 [vars]
-# Nur die eigene App darf anfragen (CORS). Für lokale Tests mit der
-# standalone.html notfalls auf "*" stellen.
-ALLOWED_ORIGIN = "https://flash78de.github.io"
+# Erlaubte Absender (kommagetrennt): eigene Domain + alte GitHub-Adresse.
+# Für lokale Tests mit der standalone.html notfalls auf "*" stellen.
+ALLOWED_ORIGIN = "https://sternenluna.de,https://www.sternenluna.de,https://flash78de.github.io"
 # Optional anderes Modell:
 # MODEL = "claude-opus-4-8"

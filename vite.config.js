@@ -2,13 +2,15 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// Sternenorakel — mobil-first, installierbare PWA (local-first)
-// Basis-Pfad: Dev unter '/', Produktions-Build (GitHub Pages) unter '/sternenorakel/'.
-const REPO_BASE = '/sternenorakel/'
-export default defineConfig(({ command }) => ({
-  base: command === 'build' ? REPO_BASE : '/',
+// Sternenluna — mobil-first, installierbare PWA (local-first)
+// Basis-Pfad: '/' — die App läuft unter der eigenen Domain https://sternenluna.de
+// (GitHub Pages mit Custom Domain serviert an der Wurzel; die alte
+// github.io-Unterpfad-Adresse leitet automatisch dorthin um).
+const BASE = '/'
+export default defineConfig(() => ({
+  base: BASE,
   define: {
-    __ASSET_BASE__: JSON.stringify(command === 'build' ? REPO_BASE : '/'),
+    __ASSET_BASE__: JSON.stringify(BASE),
   },
   plugins: [
     react(),

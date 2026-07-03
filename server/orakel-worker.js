@@ -32,7 +32,7 @@ const OUTPUT_SCHEMA = {
 }
 
 // Luna-Charakter (Kurzfassung der Character Bible in docs/luna-character-bible.md).
-const SYSTEM = `Du schreibst als Luna, die Sternweberin der App „Sternenorakel" — eine ruhige, warme, leicht verspielte Begleiterin, die Menschen hilft, den eigenen Tag zu reflektieren.
+const SYSTEM = `Du schreibst als Luna, die Sternweberin der App „Sternenluna" — eine ruhige, warme, leicht verspielte Begleiterin, die Menschen hilft, den eigenen Tag zu reflektieren.
 
 Grundregeln (nicht verhandelbar):
 - Deutsch, du-Form, warm und klar. Kein Esoterik-Kitsch, keine Engel, keine Energien-Beschwörung.
@@ -44,17 +44,25 @@ Grundregeln (nicht verhandelbar):
 - Wenn hasName=true ist: beginne den Text mit dem Platzhalter „{{name}}, …" — die App ersetzt ihn lokal durch den echten Namen. Erfinde NIE einen Namen.
 - Beziehe das mitgelieferte Ritual-Ergebnis (Archetyp, Karte oder Runen) inhaltlich ein — es ist das, was die Person gerade gezogen hat.`
 
-const cors = (env) => ({
-  'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Max-Age': '86400',
-})
+// ALLOWED_ORIGIN darf eine kommagetrennte Liste sein; geantwortet wird
+// mit dem passenden Origin der Anfrage (oder dem ersten der Liste).
+const cors = (env, request) => {
+  const allowed = (env.ALLOWED_ORIGIN || '*').split(',').map((s) => s.trim()).filter(Boolean)
+  const origin = request?.headers?.get('Origin')
+  const allow = allowed.includes('*') ? '*' : allowed.includes(origin) ? origin : allowed[0]
+  return {
+    'Access-Control-Allow-Origin': allow,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400',
+    Vary: 'Origin',
+  }
+}
 
-const json = (body, status, env) =>
+const json = (body, status, env, request) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json; charset=utf-8', ...cors(env) },
+    headers: { 'Content-Type': 'application/json; charset=utf-8', ...cors(env, request) },
   })
 
 const MOOD_LABEL = { 1: 'erschöpft', 2: 'müde', 3: 'ausgeglichen', 4: 'wach', 5: 'voller Energie' }
@@ -95,15 +103,15 @@ function buildPrompt(b) {
 
 export default {
   async fetch(request, env) {
-    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(env) })
-    if (request.method !== 'POST') return json({ error: 'Nur POST.' }, 405, env)
-    if (!env.ANTHROPIC_API_KEY) return json({ error: 'ANTHROPIC_API_KEY fehlt.' }, 500, env)
+    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(env, request) })
+    if (request.method !== 'POST') return json({ error: 'Nur POST.' }, 405, env, request)
+    if (!env.ANTHROPIC_API_KEY) return json({ error: 'ANTHROPIC_API_KEY fehlt.' }, 500, env, request)
 
     let body
     try {
       body = await request.json()
     } catch {
-      return json({ error: 'Ungültiges JSON.' }, 400, env)
+      return json({ error: 'Ungültiges JSON.' }, 400, env, request)
     }
 
     try {
@@ -126,20 +134,20 @@ export default {
 
       if (!res.ok) {
         const detail = await res.text().catch(() => '')
-        return json({ error: 'KI-Dienst nicht erreichbar.', status: res.status, detail: detail.slice(0, 300) }, 502, env)
+        return json({ error: 'KI-Dienst nicht erreichbar.', status: res.status, detail: detail.slice(0, 300) }, 502, env, request)
       }
 
       const data = await res.json()
-      if (data.stop_reason === 'refusal') return json({ error: 'Anfrage wurde abgelehnt.' }, 502, env)
+      if (data.stop_reason === 'refusal') return json({ error: 'Anfrage wurde abgelehnt.' }, 502, env, request)
 
       // Bei aktiviertem Thinking kommen thinking- UND text-Blöcke; wir brauchen den Text.
       const textBlock = (data.content || []).find((c) => c.type === 'text')
-      if (!textBlock) return json({ error: 'Leere Antwort.' }, 502, env)
+      if (!textBlock) return json({ error: 'Leere Antwort.' }, 502, env, request)
 
       const msg = JSON.parse(textBlock.text) // dank json_schema garantiert valide
-      return json(msg, 200, env)
+      return json(msg, 200, env, request)
     } catch (e) {
-      return json({ error: 'Interner Fehler.', detail: String(e).slice(0, 200) }, 500, env)
+      return json({ error: 'Interner Fehler.', detail: String(e).slice(0, 200) }, 500, env, request)
     }
   },
 }
