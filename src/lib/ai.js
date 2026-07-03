@@ -10,7 +10,9 @@ import { generateMessage } from '../data/generator.js'
 // Der KI-Modus-Schalter in den Einstellungen aktiviert ihn; über
 // settings.aiEndpoint ließe sich intern ein anderer Server testen.
 const AI_ENDPOINT = 'https://sternenorakel-orakel.sternenorakel.workers.dev'
-const AI_TIMEOUT_MS = 8000
+// Opus mit Thinking braucht oft 8–15 s – großzügig warten,
+// die Offenbarungs-Animation überbrückt die Zeit.
+const AI_TIMEOUT_MS = 20000
 
 export const aiAvailable = Boolean(AI_ENDPOINT)
 

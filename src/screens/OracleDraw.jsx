@@ -349,7 +349,11 @@ export default function OracleDraw() {
         <div style={{ marginTop: 10, display: 'flex', gap: 8, alignItems: 'flex-start', background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 12, padding: '9px 11px' }}>
           <span style={{ color: '#7a7494', fontSize: 13 }}>ⓘ</span>
           <div style={{ color: '#7a7494', font: '400 10.5px/1.45 var(--font-body)' }}>
-            Bewusst offen formuliert (Barnum-Effekt): Ihre Kraft entsteht durch <b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>deine</b> Deutung.
+            {/* Ehrliche Kennzeichnung: KI-Botschaften tragen die id ki-… (auch gespeichert als mid) */}
+            <b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>
+              {(message.source === 'ki' || String(message.mid || message.id || '').startsWith('ki-')) ? '✦ Live für dich formuliert (KI)' : '✦ Aus Lunas Sternenbibliothek'}
+            </b>
+            {' · '}Bewusst offen formuliert (Barnum-Effekt): Ihre Kraft entsteht durch <b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>deine</b> Deutung.
           </div>
         </div>
 
