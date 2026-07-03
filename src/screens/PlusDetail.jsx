@@ -70,7 +70,7 @@ export default function PlusDetail() {
     <div className="screen-scroll" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 20px 22px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         <button className="back" onClick={() => nav(-1)}>‹</button>
-        <span className="h-serif" style={{ fontWeight: 600, fontSize: 17, color: 'var(--text)' }}>Sternenorakel Plus</span>
+        <span className="h-serif" style={{ fontWeight: 600, fontSize: 17, color: 'var(--text)' }}>Sternenluna Plus</span>
       </div>
 
       <div style={{ textAlign: 'center', marginTop: 8 }}>

@@ -10,7 +10,7 @@ export default function Privacy() {
   // Vollständiges Backup: Tagebuch + Profil + Fortschritt + Einstellungen.
   const exportData = () => {
     const backup = {
-      app: 'sternenorakel',
+      app: 'sternenluna',
       version: 1,
       exportedAt: new Date().toISOString(),
       profile,
@@ -22,7 +22,7 @@ export default function Privacy() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'sternenorakel-backup.json'
+    a.download = 'sternenluna-backup.json'
     a.click()
     URL.revokeObjectURL(url)
   }

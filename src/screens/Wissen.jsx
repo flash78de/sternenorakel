@@ -22,7 +22,7 @@ export default function Wissen() {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '16px 17px 16px' }}>
       <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 21, color: 'var(--gold-1)', textAlign: 'center', marginBottom: 12 }}>
-        Über Sternenorakel
+        Über Sternenluna
       </div>
 
       <div className="card">

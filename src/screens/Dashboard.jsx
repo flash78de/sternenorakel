@@ -42,7 +42,7 @@ export default function Dashboard() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
             <span style={{ color: 'var(--gold-1)', fontSize: 16 }}>☾</span>
             <span style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 13, color: 'var(--gold-1)', letterSpacing: 1.5 }}>
-              STERNENORAKEL
+              STERNENLUNA
             </span>
           </div>
           {/* Glocke → Erinnerungs-Einstellungen; Punkt zeigt aktive Erinnerung */}
@@ -238,7 +238,7 @@ function EmptyDashboard() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <span style={{ color: 'var(--gold-1)', fontSize: 16 }}>☾</span>
-          <span style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 13, color: 'var(--gold-1)', letterSpacing: 1.5 }}>STERNENORAKEL</span>
+          <span style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 13, color: 'var(--gold-1)', letterSpacing: 1.5 }}>STERNENLUNA</span>
         </div>
         <LunaAvatar size={34} />
       </div>

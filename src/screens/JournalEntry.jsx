@@ -62,7 +62,7 @@ export default function JournalEntry() {
     `✦ ${entry.title}\n${entry.theme}${entry.constellation ? ' · ' + entry.constellation : ''} · ${dateStr.short}\n\n` +
     `${entry.text}\n\n„${entry.mantra}"` +
     (note.trim() ? `\n\nMeine Notiz:\n${note.trim()}` : '') +
-    `\n\n— Sternenorakel`
+    `\n\n— Sternenluna`
 
   const share = async () => {
     try {

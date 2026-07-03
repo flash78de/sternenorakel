@@ -49,7 +49,7 @@ export default function OracleRitual() {
             : 'Mit Plus stehen dir alle Rituale offen. ✦'
           : drawnToday
             ? 'Du hast heute schon gezogen – morgen wartet das nächste Ritual.'
-            : <>Weitere Rituale gibt es in <span style={{ color: 'var(--gold-1)', cursor: 'pointer' }} onClick={() => nav('/profil/plus')}>Sternenorakel Plus</span>.</>}
+            : <>Weitere Rituale gibt es in <span style={{ color: 'var(--gold-1)', cursor: 'pointer' }} onClick={() => nav('/profil/plus')}>Sternenluna Plus</span>.</>}
       </div>
     </div>
   )

@@ -235,7 +235,7 @@ export default function Settings() {
       <div style={{ marginTop: 12, background: 'linear-gradient(150deg,rgba(232,199,122,.2),rgba(232,199,122,.05))', border: '1px solid rgba(232,199,122,.4)', borderRadius: 18, padding: '14px 16px', boxShadow: '0 8px 26px rgba(232,199,122,.12)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ color: 'var(--gold-1)', fontSize: 16 }}>✦</span>
-          <span style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 16, color: 'var(--gold-1)' }}>Sternenorakel Plus</span>
+          <span style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 16, color: 'var(--gold-1)' }}>Sternenluna Plus</span>
         </div>
         <div style={{ marginTop: 8, color: 'var(--text)', font: '400 12px/1.7 var(--font-body)' }}>
           Unbegrenzt ziehen · alle Rituale &amp; Sternbilder · tiefere Botschaften &amp; Monatsrückblick · Export
@@ -285,7 +285,7 @@ export default function Settings() {
       )}
 
       <div onClick={() => setDevTaps((n) => n + 1)} style={{ textAlign: 'center', color: '#7a7494', font: '400 10px var(--font-body)', paddingTop: 12, cursor: 'default', userSelect: 'none' }}>
-        Sternenorakel · v1.0 · local-first{devMode ? ' · 🧪' : ''}
+        Sternenluna · v1.0 · local-first{devMode ? ' · 🧪' : ''}
       </div>
     </div>
   )

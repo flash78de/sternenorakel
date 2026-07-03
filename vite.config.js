@@ -16,8 +16,8 @@ export default defineConfig(({ command }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['uploads/luna-icon.png'],
       manifest: {
-        name: 'Sternenorakel',
-        short_name: 'Sternenorakel',
+        name: 'Sternenluna',
+        short_name: 'Sternenluna',
         description:
           'Luna schenkt dir täglich eine persönlich wirkende, reflektierende Botschaft – mit Tagebuch, Habit-Tracking und Sternenband.',
         lang: 'de',

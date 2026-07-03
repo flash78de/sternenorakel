@@ -15,7 +15,7 @@ export default function Splash({ onDone }) {
       <div className="screen" style={{ position: 'relative', overflow: 'hidden' }}>
         <img
           src={asset('uploads/opt/luna-erwacht-md.webp')}
-          alt="Luna erwacht … Sternenorakel"
+          alt="Luna erwacht … Sternenluna"
           className="fade-up"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
         />
