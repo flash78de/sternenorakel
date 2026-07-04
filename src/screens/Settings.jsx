@@ -293,6 +293,15 @@ export default function Settings() {
           <span>§ Rechtliches</span>
           <span className="meta">Impressum · Datenschutz · Haftung ›</span>
         </button>
+        {/* Beta-Feedback: öffnet die Mail-App mit vorbereiteter Nachricht + Versions-Kennung */}
+        <button className="list-row" onClick={() => {
+          const build = typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev'
+          const body = `Hallo Marcel,\n\nmein Feedback zu Sternenluna:\n\n(Was gefällt dir? Was klemmt? Was fehlt?)\n\n—\nVersion: ${build}\nGerät: ${navigator.userAgent}`
+          window.location.href = `mailto:ml@mittel-bar.com?subject=${encodeURIComponent('Sternenluna Beta-Feedback')}&body=${encodeURIComponent(body)}`
+        }}>
+          <span>💬 Feedback senden</span>
+          <span className="meta">Beta · hilf Luna zu wachsen ›</span>
+        </button>
       </div>
 
       {/* Therapie-Hinweis */}
