@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/store.jsx'
 import { THEMES, MONTHS, zodiacOf, formatDate } from '../data/library.js'
 import { COMM_STYLES, COPING, generateMessage } from '../data/generator.js'
 import { asset } from '../lib/asset.js'
+import { isInstalled, isIOS, canPromptInstall, promptInstall, onInstallChange } from '../lib/install.js'
 import DarkPicker from '../components/DarkPicker.jsx'
 
 const TONES = [
@@ -18,6 +19,8 @@ export default function Settings() {
   const [devTaps, setDevTaps] = useState(0)
   const devMode = devTaps >= 5
   const [updating, setUpdating] = useState(false)
+  const [, setInstallTick] = useState(0) // neu rendern, wenn Installierbarkeit sich ändert
+  useEffect(() => onInstallChange(() => setInstallTick((n) => n + 1)), [])
 
   // Holt die neueste App-Version: Service Worker + Cache verwerfen, frisch laden.
   // Tagebuch & Einstellungen (localStorage) bleiben dabei vollständig erhalten.
@@ -294,6 +297,28 @@ export default function Settings() {
           <b style={{ color: 'var(--text)', fontWeight: 600 }}>Telefonseelsorge: 0800 111 0 111</b>
         </div>
       </div>
+
+      {/* PWA-Installation: schützt den lokalen Speicher (iOS räumt Browser-Tabs nach ~7 Tagen auf) */}
+      {!isInstalled() && (
+        <div className="glass" style={{ marginTop: 12, padding: '13px 15px', border: '1px solid rgba(232,199,122,.35)' }}>
+          <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>📲 Als App installieren – wichtig!</div>
+          <div style={{ color: 'var(--text-dim)', font: '400 10.5px/1.5 var(--font-body)', marginTop: 3 }}>
+            Nur als installierte App ist dein Tagebuch dauerhaft sicher – im Browser-Tab kann iOS
+            gespeicherte Daten nach längerer Pause automatisch löschen.
+          </div>
+          {canPromptInstall() ? (
+            <button className="btn-gold" style={{ marginTop: 10, padding: 11, fontSize: 13 }} onClick={() => promptInstall()}>
+              Jetzt installieren
+            </button>
+          ) : (
+            <div style={{ marginTop: 8, color: 'var(--gold-1)', font: '500 11px/1.5 var(--font-body)' }}>
+              {isIOS()
+                ? <>So geht's: <b>Teilen-Symbol</b> (□↑) tippen → „<b>Zum Home-Bildschirm</b>" wählen.</>
+                : <>So geht's: Browser-Menü (⋮) öffnen → „<b>App installieren</b>" bzw. „Zum Startbildschirm hinzufügen".</>}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* App-Update: Cache & Service Worker erneuern – Tagebuch bleibt unberührt */}
       <div className="glass" style={{ marginTop: 12, padding: '13px 15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>

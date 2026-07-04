@@ -156,6 +156,20 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Backup-Erinnerung: ab 7 Einträgen ohne frisches Backup (max. alle 14 Tage) */}
+        {journal.length >= 7 && (!settings.lastBackupISO || (Date.now() - new Date(settings.lastBackupISO + 'T12:00').getTime()) > 14 * 86400000) && (
+          <div className="card" style={{ marginTop: 10, borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, border: '1px solid rgba(232,199,122,.35)' }} onClick={() => nav('/profil/privacy')}>
+            <span style={{ width: 40, height: 40, borderRadius: 12, flexShrink: 0, display: 'grid', placeItems: 'center', fontSize: 18, background: 'radial-gradient(circle,rgba(232,199,122,.25),rgba(40,30,70,.5))', border: '1px solid rgba(232,199,122,.35)' }}>🛡️</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>Sichere dein Sternenband</div>
+              <div style={{ color: 'var(--text-dim)', font: '400 11px/1.4 var(--font-body)', marginTop: 1 }}>
+                {settings.lastBackupISO ? 'Dein letztes Backup ist über zwei Wochen alt.' : `${journal.length} Einträge – noch kein Backup. Ein Tipp genügt.`}
+              </div>
+            </div>
+            <span style={{ color: 'var(--gold-1)', fontSize: 16 }}>›</span>
+          </div>
+        )}
+
         {/* Wochenrückblick — echter Langzeitnutzen statt reiner Punkte */}
         <div className="card" style={{ marginTop: 10, borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }} onClick={() => nav('/woche')}>
           <span style={{ width: 40, height: 40, borderRadius: 12, flexShrink: 0, display: 'grid', placeItems: 'center', fontSize: 18, background: 'radial-gradient(circle,rgba(106,59,232,.45),rgba(40,30,70,.5))', border: '1px solid rgba(232,199,122,.3)' }}>✧</span>

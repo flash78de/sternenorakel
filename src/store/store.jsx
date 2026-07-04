@@ -35,8 +35,9 @@ const DEFAULT_STATE = {
     reminderTime: '21:00',
     reminderWhen: 'abends', // morgens | mittags | abends | aus
     tone: 'Sanft',
-    premium: false, // Sternenorakel Plus (Demo)
+    premium: false, // Sternenluna Plus (Beta)
     splash: true, // „Luna erwacht"-Startanimation
+    lastBackupISO: null, // Tag des letzten Exports (für die Backup-Erinnerung)
   },
   journal: [], // {id, ts, iso, mid, title, symbol, constellation, theme, mantra, text, luck, energy, question, reflection}
   seenReward: null, // id der zuletzt gezeigten Belohnung
@@ -69,6 +70,16 @@ export function StoreProvider({ children }) {
   // Spiegel des aktuellen Zustands für synchrone Berechnungen (z. B. Sternbild-Unlock).
   const stateRef = useRef(state)
   stateRef.current = state
+
+  // Dauerhafte Speicherung anfordern: schützt v. a. auf iOS davor, dass der
+  // Browser den lokalen Speicher (das Tagebuch!) nach Inaktivität aufräumt.
+  useEffect(() => {
+    try {
+      navigator.storage?.persist?.().catch(() => {})
+    } catch {
+      /* ältere Browser */
+    }
+  }, [])
 
   useEffect(() => {
     try {
