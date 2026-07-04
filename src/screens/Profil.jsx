@@ -77,6 +77,11 @@ export default function Profil() {
       <button className="btn-gold" style={{ background: 'rgba(255,255,255,.04)', color: 'var(--text)', border: '1px solid rgba(255,255,255,.1)', boxShadow: 'none', fontWeight: 600 }} onClick={() => nav('/profil/settings')}>
         ⚙ Einstellungen öffnen
       </button>
+      {/* Rechtlicher Einstieg direkt im Profil (Impressumspflicht: leicht auffindbar) */}
+      <button className="list-row" style={{ marginTop: 10, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 16 }} onClick={() => nav('/rechtliches')}>
+        <span>ⓘ Über Luna &amp; Sternenluna</span>
+        <span className="meta">Impressum · Datenschutz · Haftung ›</span>
+      </button>
     </div>
   )
 }

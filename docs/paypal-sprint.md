@@ -11,6 +11,7 @@
 | Jahresabo | **39,99 € / Jahr** (≈ 33 % Ersparnis – Hauptverkäufer, Monatspreis ist der Anker) |
 | Testphase | 7 Tage kostenlos, danach automatische Abbuchung |
 | Kündigung | jederzeit; wirkt zum Ende des laufenden Abrechnungszeitraums |
+| **KI-Zugang nach der Beta** | **Ohne Plus: KI-Botschaft nur während der ersten 7 Tage (1×/Tag), danach Offline-Bibliothek. Mit Plus: KI unbegrenzt (Tagesbotschaft + freie Impulse).** Umsetzung: `installISO` beim ersten Start speichern; `aiAllowed = premium \|\| (heute − installISO < 7 Tage)`; abgelaufene Tester sehen beim Ziehen einen sanften Hinweis „Deine KI-Sterntage sind vorbei – mit Plus formuliert Luna weiter live" statt eines Fehlers. Entscheidung Marcel, 04.07.2026 – schützt vor KI-Kosten durch Gratis-Dauernutzer. |
 | Abrechnungsstichtag | PayPal Subscriptions rechnet zyklusgenau ab Aktivierungstag ab; existiert der Stichtag im Monat nicht (31. → Februar), bucht PayPal automatisch am Monatsletzten. Keine Eigenlogik nötig. |
 
 ## Umsetzungsplan (mein Teil, ~1 Sprint)

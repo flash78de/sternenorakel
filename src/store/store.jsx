@@ -26,6 +26,7 @@ const DEFAULT_STATE = {
     drawDays: [], // ISO-Tage mit Ziehung (für 7-Tage-Serie)
     constellationsDone: 0,
     moodTodayISO: null, // Tag, an dem das Befinden zuletzt abgefragt wurde
+    installISO: null, // erster App-Start (Basis für die 7 KI-Sterntage nach der Beta)
   },
   settings: {
     aiMode: true, // KI ist Standard – wirksam aber erst nach aktiver Einwilligung (aiConsent)
@@ -79,6 +80,8 @@ export function StoreProvider({ children }) {
     } catch {
       /* ältere Browser */
     }
+    // Erster App-Start einmalig festhalten (auch bei Bestandsnutzern ab jetzt)
+    setState((s) => (s.stats.installISO ? s : { ...s, stats: { ...s.stats, installISO: formatDate().iso } }))
   }, [])
 
   useEffect(() => {
