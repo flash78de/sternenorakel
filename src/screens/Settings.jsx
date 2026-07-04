@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/store.jsx'
-import { THEMES, MONTHS, zodiacOf, formatDate } from '../data/library.js'
+import { THEMES, MONTHS, zodiacOf, formatDate, isUnder16 } from '../data/library.js'
 import { COMM_STYLES, COPING, generateMessage } from '../data/generator.js'
 import { asset } from '../lib/asset.js'
 import { isInstalled, isIOS, canPromptInstall, promptInstall, onInstallChange } from '../lib/install.js'
@@ -225,6 +225,12 @@ export default function Settings() {
             Ohne Verbindung nutzt sie automatisch die Offline-Sternenbibliothek.
             Übertragen werden nur Stimmung, Themen und das Ritual-Ergebnis – nie dein Name oder deine Notizen.
           </div>
+          {isUnder16(profile.birth) && (
+            <div style={{ color: 'var(--gold-1)', font: '500 10.5px/1.45 var(--font-body)', marginTop: 6 }}>
+              🛡️ Unter 16: Bitte nur gemeinsam mit einem Erziehungsberechtigten einschalten –
+              das Aktivieren gilt als dessen Zustimmung zur Datenübertragung.
+            </div>
+          )}
         </div>
         {/* Aktives Einschalten = Einwilligung, Ausschalten = Widerruf (DSGVO) */}
         <span className={'toggle' + (settings.aiMode && settings.aiConsent === true ? ' on' : '')}
@@ -265,7 +271,7 @@ export default function Settings() {
           <span style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 16, color: 'var(--gold-1)' }}>Sternenluna Plus</span>
         </div>
         <div style={{ marginTop: 8, color: 'var(--text)', font: '400 12px/1.7 var(--font-body)' }}>
-          Unbegrenzt ziehen · alle Rituale &amp; Sternbilder · tiefere Botschaften &amp; Monatsrückblick · Export
+          Alle drei Rituale · freie Impulse · Monatsbild · KI ohne Begrenzung · Vorlesen
         </div>
         <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ color: 'var(--text-dim)', font: '500 12px var(--font-body)' }}>

@@ -42,7 +42,9 @@ export default function Erinnerung() {
       try { ok = (await Notification.requestPermission()) === 'granted' } catch { ok = false }
     }
     updateSettings({ reminder: ok && when !== 'aus' })
-    setHint(ok ? 'Erinnerung aktiv. Luna meldet sich sanft – ganz ohne Druck.' : 'Benachrichtigungen sind nicht erlaubt. Du kannst sie in den Browsereinstellungen freigeben.')
+    setHint(ok
+      ? 'Gespeichert ✓ Deine Wunschzeit ist vorgemerkt – echte Push-Erinnerungen kommen mit einem der nächsten Updates.'
+      : 'Benachrichtigungen sind nicht erlaubt. Du kannst sie in den Browsereinstellungen freigeben.')
   }
 
   return (
@@ -57,6 +59,16 @@ export default function Erinnerung() {
       </div>
       <div style={{ color: 'var(--text-dim)', font: '400 12.5px/1.5 var(--font-body)', marginTop: 6 }}>
         ✦ Sanft, nie aufdringlich – nur ein leiser Impuls für deinen Moment mit dir selbst.
+      </div>
+
+      {/* Ehrlicher Beta-Hinweis: gespeicherte Zeiten ja, echte Push-Nachrichten noch nicht */}
+      <div className="glass-purple" style={{ marginTop: 12, padding: '11px 13px' }}>
+        <div style={{ color: 'var(--gold-1)', font: '600 11px var(--font-body)', marginBottom: 3 }}>Ehrlich gesagt (Beta)</div>
+        <div style={{ color: 'var(--text-dim)', font: '400 11px/1.5 var(--font-body)' }}>
+          Deine Wunschzeit wird gespeichert und die Berechtigung vorbereitet – <b style={{ color: 'var(--text)' }}>echte
+          Push-Erinnerungen kann die Web-Beta aber noch nicht senden</b>. Sie kommen mit einem der nächsten Updates;
+          auf dem iPhone funktionieren sie dann nur, wenn Luna als App auf dem Home-Bildschirm installiert ist.
+        </div>
       </div>
 
       {/* Zeitfenster */}

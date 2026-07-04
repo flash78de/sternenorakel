@@ -4,14 +4,13 @@ import Luna from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
 import { buzz } from '../lib/haptics.js'
 
+// Nur echte, vorhandene Vorteile – keine Versprechen, die die App (noch) nicht hält.
 const BENEFITS = [
-  { t: 'Tiefere Botschaften', d: 'Längere, persönlichere Impulse und vertiefende Deutungen.' },
-  { t: 'Monatsrückblick mit Luna', d: 'Erkenne Muster, Themen und Entwicklungen in deinem Monatsbild.' },
-  { t: 'Erweiterte Symbolwelt', d: 'Mehr Symboldeutungen und tiefere Musteranalyse deiner Sternbilder.' },
-  { t: 'Zusätzliche freie Impulse', d: 'Neben deiner Tagesbotschaft zusätzliche Impulse, wann du magst.' },
-  { t: 'Cloud-Sync & Backup', d: 'Dein Sternenband sicher auf allen Geräten – mit automatischem Backup.' },
-  { t: 'Export & unbegrenztes Tagebuch', d: 'Dein ganzer Weg bleibt erhalten – als PDF/Text exportierbar.' },
-  { t: 'Exklusive Luna-Momente', d: 'Gesprochene Botschaften und zusätzliche Reaktionen nur für dich.' },
+  { t: 'Alle drei Rituale', d: 'Sternenkarten und Runen zusätzlich zum Sternenwürfel – jede mit eigener Deutungswelt.' },
+  { t: 'Freie Impulse', d: 'Zieh zusätzlich zur Tagesbotschaft, wann immer du einen Impuls brauchst.' },
+  { t: 'Dein Monatsbild', d: 'Stimmungsverlauf, wiederkehrende Themen und Worte über Wochen – mit Lunas Rückblick.' },
+  { t: 'KI-Botschaften ohne Begrenzung', d: 'Luna formuliert jede Botschaft live für dich – auch nach den 7 kostenlosen Sterntagen.' },
+  { t: 'Gesprochene Botschaften', d: 'Luna liest dir deine Botschaft vor – zum Zurücklehnen und Nachklingenlassen.' },
 ]
 
 // Konfetti wie auf dem Feier-Screen (deterministische Positionen)

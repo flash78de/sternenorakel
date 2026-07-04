@@ -67,6 +67,17 @@ const ZODIAC = [
   { name: 'Schütze', symbol: '♐', from: [11, 22], to: [12, 21] },
 ]
 
+// Jugendschutz: unter 16 braucht die KI-Einwilligung einen Erziehungs-
+// berechtigten (Art. 8 DSGVO). Ohne bekanntes Geburtsjahr → false (16+ angenommen).
+export function isUnder16(birth) {
+  if (!birth?.year) return false
+  const now = new Date()
+  let age = now.getFullYear() - birth.year
+  const m = now.getMonth() + 1
+  if (birth.month && (m < birth.month || (m === birth.month && birth.day && now.getDate() < birth.day))) age -= 1
+  return age < 16
+}
+
 export function zodiacOf(day, month) {
   if (!day || !month) return null
   for (const z of ZODIAC) {

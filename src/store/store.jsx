@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, useCallback } from 'react'
-import { formatDate, rankInfo, constellationStatus } from '../data/library.js'
+import { formatDate, rankInfo, constellationStatus, isUnder16 } from '../data/library.js'
 
 // ============================================================
 // Sternenorakel — local-first Zustand (localStorage)
@@ -103,12 +103,18 @@ export function StoreProvider({ children }) {
   const completeOnboarding = useCallback((profile) => {
     // Befinden wurde im Onboarding erfragt → zählt als heutige Abfrage.
     const today = formatDate().iso
-    setState((s) => ({
-      ...s,
-      onboarded: true,
-      profile: { ...s.profile, ...profile },
-      stats: { ...s.stats, moodTodayISO: today },
-    }))
+    setState((s) => {
+      // Jugendschutz: unter 16 startet der KI-Modus ausgeschaltet –
+      // Erziehungsberechtigte können ihn in den Einstellungen aktivieren.
+      const minor = isUnder16(profile?.birth ?? s.profile.birth)
+      return {
+        ...s,
+        onboarded: true,
+        profile: { ...s.profile, ...profile },
+        stats: { ...s.stats, moodTodayISO: today },
+        settings: minor ? { ...s.settings, aiMode: false, aiConsent: false } : s.settings,
+      }
+    })
   }, [])
 
   const updateProfile = useCallback((p) => {

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import Luna from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
-import { formatDate } from '../data/library.js'
+import { formatDate, isUnder16 } from '../data/library.js'
 import { fetchMessage } from '../lib/ai.js'
 import { speak, speechSupported } from '../lib/audio.js'
 import { asset } from '../lib/asset.js'
@@ -192,8 +192,9 @@ export default function OracleDraw() {
           )}
         </div>
 
-        {/* Einmalige KI-Einwilligung (DSGVO-Opt-in) – die App funktioniert in beiden Fällen */}
-        {settings.aiMode && settings.aiConsent === null && (
+        {/* Einmalige KI-Einwilligung (DSGVO-Opt-in) – die App funktioniert in beiden Fällen.
+            Unter 16 keine Selbst-Einwilligung: Erziehungsberechtigte schalten in den Einstellungen frei. */}
+        {settings.aiMode && settings.aiConsent === null && !isUnder16(profile.birth) && (
           <div className="glass" style={{ padding: '11px 13px', marginBottom: 12 }}>
             <div style={{ color: 'var(--text)', font: '600 12px var(--font-body)' }}>✨ Darf Luna deine Botschaften mit KI formulieren?</div>
             <div style={{ color: 'var(--text-dim)', font: '400 10.5px/1.5 var(--font-body)', marginTop: 4 }}>
