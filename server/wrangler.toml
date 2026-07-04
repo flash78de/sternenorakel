@@ -10,3 +10,12 @@ compatibility_date = "2026-06-01"
 ALLOWED_ORIGIN = "https://sternenluna.de,https://www.sternenluna.de,https://flash78de.github.io"
 # Optional anderes Modell:
 # MODEL = "claude-opus-4-8"
+
+# Rate-Limit pro IP: max. 6 KI-Anfragen pro Minute – normale Nutzung
+# (1 Botschaft + einige freie Impulse) bleibt unberührt, Skript-Missbrauch
+# des API-Guthabens wird ausgebremst.
+[[unsafe.bindings]]
+name = "RATE_LIMITER"
+type = "ratelimit"
+namespace_id = "1001"
+simple = { limit = 6, period = 60 }

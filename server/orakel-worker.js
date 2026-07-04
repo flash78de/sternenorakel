@@ -101,11 +101,41 @@ function buildPrompt(b) {
   return lines.join('\n')
 }
 
+// Eigenes Rate-Limit (Schutz des API-Guthabens): 6 Anfragen/Minute pro IP,
+// 60/Minute insgesamt pro Worker-Instanz. Das Cloudflare-Ratelimit-Binding
+// greift auf dem Free-Plan nicht zuverlässig, daher zählen wir selbst.
+const ipHits = new Map()
+let allHits = []
+function rateOk(ip) {
+  const now = Date.now()
+  const win = 60000
+  allHits = allHits.filter((t) => now - t < win)
+  if (allHits.length >= 60) return false
+  const mine = (ipHits.get(ip) || []).filter((t) => now - t < win)
+  if (mine.length >= 6) {
+    ipHits.set(ip, mine)
+    return false
+  }
+  mine.push(now)
+  ipHits.set(ip, mine)
+  allHits.push(now)
+  if (ipHits.size > 5000) ipHits.clear() // Speicher-Backstop
+  return true
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(env, request) })
     if (request.method !== 'POST') return json({ error: 'Nur POST.' }, 405, env, request)
     if (!env.ANTHROPIC_API_KEY) return json({ error: 'ANTHROPIC_API_KEY fehlt.' }, 500, env, request)
+
+    // Rate-Limit: bei Überschreitung 429 – die App fällt lautlos auf offline zurück.
+    const ip = request.headers.get('CF-Connecting-IP') || 'unbekannt'
+    if (!rateOk(ip)) return json({ error: 'Zu viele Anfragen – bitte kurz warten.' }, 429, env, request)
+    if (env.RATE_LIMITER) {
+      const { success } = await env.RATE_LIMITER.limit({ key: ip }).catch(() => ({ success: true }))
+      if (!success) return json({ error: 'Zu viele Anfragen – bitte kurz warten.' }, 429, env, request)
+    }
 
     let body
     try {
@@ -124,7 +154,9 @@ export default {
         },
         body: JSON.stringify({
           model: env.MODEL || DEFAULT_MODEL,
-          max_tokens: 1500,
+          // Großzügig: adaptives Thinking zählt mit ins Budget – zu knapp
+          // bemessen wurde der Botschaftstext mitten im Satz abgeschnitten.
+          max_tokens: 4000,
           thinking: { type: 'adaptive' },
           system: SYSTEM,
           output_config: { format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
@@ -133,12 +165,15 @@ export default {
       })
 
       if (!res.ok) {
-        const detail = await res.text().catch(() => '')
-        return json({ error: 'KI-Dienst nicht erreichbar.', status: res.status, detail: detail.slice(0, 300) }, 502, env, request)
+        // Keine API-Fehlerdetails nach außen geben (Info-Leak) – die App
+        // braucht nur das Signal „nicht verfügbar" für den Offline-Fallback.
+        return json({ error: 'KI-Dienst derzeit nicht verfügbar.' }, 502, env, request)
       }
 
       const data = await res.json()
       if (data.stop_reason === 'refusal') return json({ error: 'Anfrage wurde abgelehnt.' }, 502, env, request)
+      // Abgeschnittene Antworten NIE ausliefern – die App soll offline zurückfallen
+      if (data.stop_reason === 'max_tokens') return json({ error: 'Antwort unvollständig.' }, 502, env, request)
 
       // Bei aktiviertem Thinking kommen thinking- UND text-Blöcke; wir brauchen den Text.
       const textBlock = (data.content || []).find((c) => c.type === 'text')
@@ -147,7 +182,7 @@ export default {
       const msg = JSON.parse(textBlock.text) // dank json_schema garantiert valide
       return json(msg, 200, env, request)
     } catch (e) {
-      return json({ error: 'Interner Fehler.', detail: String(e).slice(0, 200) }, 500, env, request)
+      return json({ error: 'Interner Fehler.' }, 500, env, request)
     }
   },
 }

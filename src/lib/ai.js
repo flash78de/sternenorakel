@@ -59,6 +59,9 @@ export async function fetchMessage(params, { aiMode = false, endpoint = '' } = {
     const data = await res.json()
     // Minimal-Validierung: Backend muss mindestens einen Text liefern.
     if (!data || typeof data.text !== 'string' || !data.text.trim()) return offline()
+    // Abgeschnittene Texte erkennen (Token-Limit): endet die Botschaft nicht
+    // mit einem Satzzeichen, lieber die Offline-Bibliothek als ein halber Satz.
+    if (!/[.!?…"“”)]\s*$/.test(data.text.trim())) return offline()
 
     const name = (params.name || '').trim()
     const text = data.text.replaceAll('{{name}}', name || 'Du')
