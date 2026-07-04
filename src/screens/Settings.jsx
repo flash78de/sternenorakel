@@ -203,7 +203,11 @@ export default function Settings() {
             Übertragen werden nur Stimmung, Themen und das Ritual-Ergebnis – nie dein Name oder deine Notizen.
           </div>
         </div>
-        <span className={'toggle' + (settings.aiMode ? ' on' : '')} onClick={() => updateSettings({ aiMode: !settings.aiMode })}>
+        {/* Aktives Einschalten = Einwilligung, Ausschalten = Widerruf (DSGVO) */}
+        <span className={'toggle' + (settings.aiMode && settings.aiConsent === true ? ' on' : '')}
+          onClick={() => (settings.aiMode && settings.aiConsent === true
+            ? updateSettings({ aiMode: false, aiConsent: false })
+            : updateSettings({ aiMode: true, aiConsent: true }))}>
           <span className="knob" />
         </span>
       </div>

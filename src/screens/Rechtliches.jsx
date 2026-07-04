@@ -72,8 +72,9 @@ export default function Rechtliches() {
           Anthropic-API übermittelt: Stimmungswert, gewählte Themen, Ritual und das gezogene Ergebnis sowie
           Ton-Präferenzen. <b style={{ color: 'var(--text)' }}>Niemals übertragen werden dein Name oder deine
           Tagebuch-Notizen.</b> Die Verarbeitung kann in den USA stattfinden. Rechtsgrundlage ist deine
-          Einwilligung durch Aktivieren des KI-Modus (Art. 6 Abs. 1 lit. a DSGVO); du kannst sie jederzeit
-          durch Abschalten des KI-Modus in den Einstellungen widerrufen.
+          Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die wir vor der ersten KI-Nutzung aktiv abfragen bzw.
+          die du durch Einschalten des KI-Modus erteilst; du kannst sie jederzeit durch Abschalten des
+          KI-Modus in den Einstellungen widerrufen.
         </P>
         <P>
           <b style={{ color: 'var(--text)' }}>Hosting:</b> Die App wird über GitHub Pages (GitHub Inc., USA)

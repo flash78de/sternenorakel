@@ -56,10 +56,13 @@ export default function Privacy() {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ color: 'var(--text)', font: '600 14px var(--font-body)' }}>KI-Modus</span>
             <span style={{ color: 'var(--purple-2)', font: '600 11px var(--font-body)', marginTop: 2, letterSpacing: 0.5, textTransform: 'uppercase' }}>
-              {settings.aiMode ? 'An' : 'Aus'}
+              {settings.aiMode && settings.aiConsent === true ? 'An' : 'Aus'}
             </span>
           </div>
-          <span className={'toggle' + (settings.aiMode ? ' on' : '')} onClick={() => updateSettings({ aiMode: !settings.aiMode })}>
+          <span className={'toggle' + (settings.aiMode && settings.aiConsent === true ? ' on' : '')}
+            onClick={() => (settings.aiMode && settings.aiConsent === true
+              ? updateSettings({ aiMode: false, aiConsent: false })
+              : updateSettings({ aiMode: true, aiConsent: true }))}>
             <span className="knob" />
           </span>
         </div>

@@ -28,7 +28,8 @@ const DEFAULT_STATE = {
     moodTodayISO: null, // Tag, an dem das Befinden zuletzt abgefragt wurde
   },
   settings: {
-    aiMode: true, // KI ist Standard – der Schalter in den Einstellungen schaltet sie ab
+    aiMode: true, // KI ist Standard – wirksam aber erst nach aktiver Einwilligung (aiConsent)
+    aiConsent: null, // null = noch nicht gefragt · true = eingewilligt · false = abgelehnt (DSGVO-Opt-in)
     aiEndpoint: '', // interner Override für Tests – leer = eingebauter Worker
     reminder: true,
     reminderTime: '21:00',
