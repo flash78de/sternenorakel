@@ -17,6 +17,26 @@ export default function Settings() {
   const { settings, updateSettings, profile, updateProfile, patch, journal } = useStore()
   const [devTaps, setDevTaps] = useState(0)
   const devMode = devTaps >= 5
+  const [updating, setUpdating] = useState(false)
+
+  // Holt die neueste App-Version: Service Worker + Cache verwerfen, frisch laden.
+  // Tagebuch & Einstellungen (localStorage) bleiben dabei vollständig erhalten.
+  const forceUpdate = async () => {
+    setUpdating(true)
+    try {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations()
+        await Promise.all(regs.map((r) => r.unregister()))
+      }
+      if (window.caches) {
+        const keys = await caches.keys()
+        await Promise.all(keys.map((k) => caches.delete(k)))
+      }
+    } catch {
+      /* auch bei Fehlern: neu laden holt zumindest frisches HTML */
+    }
+    window.location.reload()
+  }
 
   // ---- Test-Werkzeuge (nur für die Erprobung, erreichbar über 5× Tippen auf die Version) ----
   const seedDemo = () => {
@@ -275,6 +295,20 @@ export default function Settings() {
         </div>
       </div>
 
+      {/* App-Update: Cache & Service Worker erneuern – Tagebuch bleibt unberührt */}
+      <div className="glass" style={{ marginTop: 12, padding: '13px 15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>App aktualisieren</div>
+          <div style={{ color: 'var(--text-dim)', font: '400 10.5px/1.45 var(--font-body)', marginTop: 2 }}>
+            Holt sofort die neueste Version. Dein Tagebuch und alle Einstellungen bleiben erhalten.
+          </div>
+        </div>
+        <button onClick={forceUpdate} disabled={updating}
+          style={{ flexShrink: 0, padding: '10px 14px', borderRadius: 12, border: '1px solid rgba(232,199,122,.4)', background: 'rgba(232,199,122,.1)', color: 'var(--gold-1)', font: '600 12px var(--font-body)', cursor: 'pointer', opacity: updating ? 0.6 : 1 }}>
+          {updating ? 'Lädt …' : '↻ Nach Update suchen'}
+        </button>
+      </div>
+
       {/* Test-Werkzeuge — erscheinen nach 5× Tippen auf die Versionszeile */}
       {devMode && (
         <div className="glass" style={{ marginTop: 12, padding: '13px 15px', border: '1px dashed rgba(255,122,154,.5)' }}>
@@ -296,6 +330,7 @@ export default function Settings() {
 
       <div onClick={() => setDevTaps((n) => n + 1)} style={{ textAlign: 'center', color: '#7a7494', font: '400 10px var(--font-body)', paddingTop: 12, cursor: 'default', userSelect: 'none' }}>
         Sternenluna · v1.0 · local-first{devMode ? ' · 🧪' : ''}
+        <br />Stand: {typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev'}
       </div>
     </div>
   )

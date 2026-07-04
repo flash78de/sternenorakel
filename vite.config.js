@@ -11,6 +11,8 @@ export default defineConfig(() => ({
   base: BASE,
   define: {
     __ASSET_BASE__: JSON.stringify(BASE),
+    // Build-Kennung: macht in den Einstellungen sichtbar, welcher Stand läuft
+    __BUILD_ID__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC'),
   },
   plugins: [
     react(),
