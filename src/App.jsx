@@ -30,6 +30,7 @@ import Monat from './screens/Monat.jsx'
 import Woche from './screens/Woche.jsx'
 import Rechtliches from './screens/Rechtliches.jsx'
 import Reisen from './screens/Reisen.jsx'
+import Kuendigen from './screens/Kuendigen.jsx'
 import ChakraStation from './screens/ChakraStation.jsx'
 
 // Schützt Tab-Bereich, bis Onboarding abgeschlossen ist.
@@ -88,8 +89,9 @@ export default function App() {
         <Route path="/profil/glueck" element={<Gate><Glueck /></Gate>} />
         <Route path="/reisen" element={<Gate><Reisen /></Gate>} />
         <Route path="/reisen/chakren/:n" element={<Gate><ChakraStation /></Gate>} />
-        {/* Rechtliches bewusst OHNE Gate: Impressum muss immer erreichbar sein */}
+        {/* Rechtliches & Kündigung bewusst OHNE Gate: müssen immer erreichbar sein */}
         <Route path="/rechtliches" element={<Rechtliches />} />
+        <Route path="/kuendigen" element={<Kuendigen />} />
       </Route>
 
       {/* Tab-Bereich — mit unterer Navigation */}

@@ -34,9 +34,15 @@ export default function Welcome() {
         <button className="link-soft" style={{ marginTop: 14 }} onClick={() => nav('/auth')}>
           Ich habe schon ein <b>Sternenband</b>
         </button>
-        <button className="link-soft" style={{ marginTop: 10, fontSize: 11, color: '#7a7494' }} onClick={() => nav('/rechtliches')}>
-          Impressum &amp; Datenschutz
-        </button>
+        <div style={{ marginTop: 10, display: 'flex', gap: 14, justifyContent: 'center' }}>
+          <button className="link-soft" style={{ fontSize: 11, color: '#7a7494', marginTop: 0 }} onClick={() => nav('/rechtliches')}>
+            Impressum &amp; Datenschutz
+          </button>
+          {/* § 312k BGB: ständig verfügbare Kündigungsschaltfläche */}
+          <button className="link-soft" style={{ fontSize: 11, color: '#7a7494', marginTop: 0 }} onClick={() => nav('/kuendigen')}>
+            Verträge hier kündigen
+          </button>
+        </div>
       </div>
     </>
   )

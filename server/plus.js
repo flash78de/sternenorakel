@@ -151,6 +151,27 @@ async function captureOrder(env, orderId) {
   return { status: 200, body: { ok: true, days: plan.days, plan: planKey, captureId: cap.id } }
 }
 
+// ---- Kündigung (§ 312k BGB): Eingang speichern + Bestätigung zurückgeben ----
+// Marcel sieht Eingänge im Cloudflare-Dashboard (KV, Präfix kuendigung:)
+// und bestätigt die Vertragsbeendigung dann per E-Mail an die Nutzerin.
+async function kuendigungEinreichen(env, body) {
+  const name = String(body.name || '').trim().slice(0, 120)
+  const email = String(body.email || '').trim().slice(0, 160)
+  if (!name || !/.+@.+\..+/.test(email)) return { status: 400, body: { error: 'Name oder E-Mail fehlt.' } }
+  const rec = {
+    name,
+    email,
+    vertrag: body.vertrag === 'plus-jahr' ? 'plus-jahr' : 'plus-monat',
+    art: body.art === 'ausserordentlich' ? 'ausserordentlich' : 'ordentlich',
+    grund: String(body.grund || '').slice(0, 1000),
+    zeitpunkt: body.zeitpunkt === 'datum' && body.datum ? String(body.datum).slice(0, 10) : 'naechstmoeglich',
+    eingangISO: new Date().toISOString(),
+  }
+  const nummer = 'K-' + rec.eingangISO.slice(0, 10).replace(/-/g, '') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase()
+  await env.PUSH.put('kuendigung:' + nummer, JSON.stringify(rec))
+  return { status: 200, body: { ok: true, nummer, ts: rec.eingangISO } }
+}
+
 // ---- HTTP-Routing (json(body, status) kommt vom Haupt-Worker) ----
 export async function handlePlus(request, env, url, json) {
   let body
@@ -164,6 +185,11 @@ export async function handlePlus(request, env, url, json) {
     if (url.pathname === '/coupon/redeem') {
       if (!env.PUSH) return json({ error: 'Gutscheine nicht konfiguriert.' }, 500)
       const r = await redeemCoupon(env, body.code, body.device)
+      return json(r.body, r.status)
+    }
+    if (url.pathname === '/kuendigen') {
+      if (!env.PUSH) return json({ error: 'Derzeit nicht erreichbar – bitte per E-Mail an ml@mittel-bar.com kündigen.' }, 500)
+      const r = await kuendigungEinreichen(env, body)
       return json(r.body, r.status)
     }
     if (url.pathname === '/coupon/trial') {

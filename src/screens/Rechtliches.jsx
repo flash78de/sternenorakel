@@ -49,6 +49,21 @@ export default function Rechtliches() {
           <b style={{ color: 'var(--text)' }}>0800&nbsp;111&nbsp;0&nbsp;111</b> (kostenlos, rund um die Uhr).
         </P>
 
+        <H>Abo &amp; Kündigung</H>
+        <P>
+          Sternenluna Plus kostet 4,99&nbsp;€ / Monat oder 39,99&nbsp;€ / Jahr und verlängert sich automatisch –
+          wir kündigen jede Verlängerung vorher offen in der App an (bei Jahres-Abos 14 und 3 Tage vorher,
+          sonst 3 Tage vorher). Du kannst jederzeit bis einen Tag vor der Verlängerung kündigen; dein Zugang
+          bleibt bis zum Ende der bezahlten Laufzeit bestehen. Gratis-Test, Gutscheine und Einmalkäufe
+          (z.&nbsp;B. die Chakren-Reise) verlängern sich nie und lösen keine Abbuchung aus.
+        </P>
+        <button
+          onClick={() => nav('/kuendigen')}
+          style={{ width: '100%', padding: 13, borderRadius: 12, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(232,199,122,.4)', color: 'var(--gold-1)', font: '700 13.5px var(--font-body)', cursor: 'pointer', marginBottom: 6 }}
+        >
+          Verträge hier kündigen
+        </button>
+
         <H>Haftungsausschluss</H>
         <P>
           Die Inhalte dieser App wurden mit Sorgfalt erstellt. Für Richtigkeit, Vollständigkeit und Aktualität

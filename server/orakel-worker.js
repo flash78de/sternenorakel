@@ -145,8 +145,8 @@ export default {
     if (url.pathname.startsWith('/push/')) {
       return handlePush(request, env, url, (body, status) => json(body, status, env, request))
     }
-    // Plus-Freischaltung: Gutscheine & PayPal-Zahlungen
-    if (url.pathname.startsWith('/coupon/') || url.pathname.startsWith('/pay/')) {
+    // Plus-Freischaltung (Gutscheine, PayPal) + Kündigungsbutton (§ 312k BGB)
+    if (url.pathname.startsWith('/coupon/') || url.pathname.startsWith('/pay/') || url.pathname === '/kuendigen') {
       return handlePlus(request, env, url, (body, status) => json(body, status, env, request))
     }
 

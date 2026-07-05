@@ -336,6 +336,7 @@ export default function PlusDetail() {
         Gratis-Test und Gutscheine enden von selbst, ohne Abbuchung. Zahlung per
         PayPal{pay.configured ? '' : ' (wird gerade eingerichtet – nutze solange einen Gutschein-Code)'}.
         {' '}<span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={() => nav('/rechtliches')}>Rechtliches &amp; Datenschutz</span>
+        {' · '}<span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={() => nav('/kuendigen')}>Verträge hier kündigen</span>
       </div>
 
       {/* Kündigen: zweistufig, mit klarer Folgen-Erklärung */}
