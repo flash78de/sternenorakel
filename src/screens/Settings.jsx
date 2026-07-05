@@ -189,7 +189,7 @@ export default function Settings() {
       </div>
 
       <div onClick={() => setDevTaps((n) => n + 1)} style={{ textAlign: 'center', color: '#8a83a6', font: '400 11px/1.6 var(--font-body)', paddingTop: 12, cursor: 'default', userSelect: 'none' }}>
-        Sternenluna · v1.0 · local-first{devMode ? ' · 🧪' : ''}
+        Sternenluna · v1.1 · local-first{devMode ? ' · 🧪' : ''}
         <br />Stand: {typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev'}
       </div>
     </div>
