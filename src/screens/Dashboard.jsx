@@ -30,6 +30,32 @@ export default function Dashboard() {
     if (goBackup) nav('/profil/privacy')
   }
 
+  // Anti-Abo-Falle: konkretes Popup BEVOR das Plus endet (Jahr: 14 + 3 Tage
+  // vorher, kürzere Zugänge: 3 Tage) – mit Kaufdatum, damit jede zuordnen
+  // kann, was sie sich wann gesichert hat. Es wird nie automatisch abgebucht.
+  const [plusEnde, setPlusEnde] = useState(null) // {stage, until, start, daysLeft}
+  useEffect(() => {
+    const s = settings
+    if (!s.premium || !s.plusUntilISO) return
+    const daysLeft = Math.ceil((new Date(s.plusUntilISO + 'T12:00').getTime() - Date.now()) / 86400000)
+    const spanDays = s.plusStartISO
+      ? Math.round((new Date(s.plusUntilISO + 'T12:00') - new Date(s.plusStartISO + 'T12:00')) / 86400000)
+      : 0
+    const isYear = spanDays >= 180
+    const stage14 = isYear && daysLeft <= 14 && daysLeft > 3 && s.plusNotice14For !== s.plusUntilISO
+    const stage3 = daysLeft <= 3 && daysLeft >= 0 && s.plusNotice3For !== s.plusUntilISO
+    if (stage3) setPlusEnde({ stage: 3, until: s.plusUntilISO, start: s.plusStartISO, daysLeft })
+    else if (stage14) setPlusEnde({ stage: 14, until: s.plusUntilISO, start: s.plusStartISO, daysLeft })
+  }, []) // eslint-disable-line
+  const closePlusEnde = (verlaengern) => {
+    updateSettings(plusEnde.stage === 3 ? { plusNotice3For: plusEnde.until } : { plusNotice14For: plusEnde.until })
+    setPlusEnde(null)
+    if (verlaengern) nav('/profil/plus')
+  }
+
+  // Sofort-Hilfe: Button ist schon da, Inhalte kommen im nächsten Sprint
+  const [sosPeek, setSosPeek] = useState(false)
+
   // Tagesziehung: erst Befinden (falls heute noch nicht abgefragt), dann Ritual.
   // Bereits gezogen → direkt die heutige Botschaft erneut ansehen.
   const goDraw = () => nav(drawnToday ? '/oracle/draw' : moodToday ? '/oracle' : '/oracle/befinden')
@@ -69,14 +95,21 @@ export default function Dashboard() {
               STERNENLUNA
             </span>
           </div>
-          {/* Glocke → Erinnerungs-Einstellungen; Punkt zeigt aktive Erinnerung */}
-          <button onClick={() => nav('/profil/erinnerung')} aria-label="Erinnerung einstellen"
-            style={{ position: 'relative', width: 32, height: 32, borderRadius: '50%', border: '1px solid rgba(232,199,122,.3)', background: 'none', color: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <IcBell />
-            {settings.reminder && (
-              <span style={{ position: 'absolute', top: 4, right: 5, width: 6, height: 6, borderRadius: '50%', background: 'var(--purple-2)', boxShadow: '0 0 6px var(--purple-2)' }} />
-            )}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Sofort-Hilfe: immer sichtbar oben – Inhalte folgen in Kürze */}
+            <button onClick={() => setSosPeek(true)} aria-label="Sofort-Hilfe"
+              style={{ display: 'flex', alignItems: 'center', gap: 6, height: 32, padding: '0 12px', borderRadius: 999, border: '1px solid rgba(232,199,122,.4)', background: 'rgba(232,199,122,.1)', color: 'var(--gold-1)', font: '650 11px var(--font-body)', cursor: 'pointer' }}>
+              ✦ Sofort-Hilfe
+            </button>
+            {/* Glocke → Erinnerungs-Einstellungen; Punkt zeigt aktive Erinnerung */}
+            <button onClick={() => nav('/profil/erinnerung')} aria-label="Erinnerung einstellen"
+              style={{ position: 'relative', width: 32, height: 32, borderRadius: '50%', border: '1px solid rgba(232,199,122,.3)', background: 'none', color: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <IcBell />
+              {settings.reminder && (
+                <span style={{ position: 'absolute', top: 4, right: 5, width: 6, height: 6, borderRadius: '50%', background: 'var(--purple-2)', boxShadow: '0 0 6px var(--purple-2)' }} />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Begrüßung */}
@@ -253,8 +286,67 @@ export default function Dashboard() {
 
       <RewardModal reward={reward} onClose={() => { setReward(null); nav('.', { replace: true, state: {} }) }} />
 
+      {/* Anti-Abo-Falle: klare Vorwarnung, bevor das Plus endet */}
+      {plusEnde && !reward && (
+        <div className="overlay" onClick={() => closePlusEnde(false)}>
+          <div className="modal pop" onClick={(e) => e.stopPropagation()} style={{ paddingTop: 24, textAlign: 'center' }}>
+            <span style={{ fontSize: 28 }}>✦</span>
+            <div className="title-lg" style={{ fontSize: 19, color: 'var(--text)', marginTop: 8 }}>
+              Dein Plus endet {plusEnde.daysLeft <= 0 ? 'heute' : plusEnde.daysLeft === 1 ? 'morgen' : `in ${plusEnde.daysLeft} Tagen`}
+            </div>
+            <div style={{ color: 'var(--text-dim)', font: '400 12.5px/1.65 var(--font-body)', marginTop: 10 }}>
+              Am <b style={{ color: 'var(--gold-1)' }}>{plusEnde.until.split('-').reverse().join('.')}</b> läuft dein Plus-Zugang aus
+              {plusEnde.start ? <> – du hast ihn dir am <b style={{ color: 'var(--text)' }}>{plusEnde.start.split('-').reverse().join('.')}</b> gesichert</> : null}.
+              <br /><b style={{ color: 'var(--text)' }}>Es wird nichts abgebucht und nichts verlängert sich von allein.</b>{' '}
+              Wenn Luna dich weiter begleiten soll, verlängere einfach, wann du magst.
+            </div>
+            <button className="btn-gold" style={{ marginTop: 16 }} onClick={() => closePlusEnde(true)}>
+              ✦ Verlängern ansehen
+            </button>
+            <button
+              onClick={() => closePlusEnde(false)}
+              style={{ marginTop: 10, width: '100%', padding: 12, borderRadius: 12, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.16)', color: 'var(--text-dim)', font: '600 13px var(--font-body)', cursor: 'pointer' }}
+            >
+              Alles klar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Sofort-Hilfe: Vorschau der kommenden Inhalte */}
+      {sosPeek && (
+        <div className="overlay" onClick={() => setSosPeek(false)}>
+          <div className="modal pop" onClick={(e) => e.stopPropagation()} style={{ paddingTop: 22 }}>
+            <div className="title-lg" style={{ fontSize: 19, color: 'var(--text)', textAlign: 'center' }}>✦ Sofort-Hilfe</div>
+            <div style={{ color: 'var(--text-dim)', font: '400 12px/1.55 var(--font-body)', marginTop: 8, textAlign: 'center' }}>
+              Luna lernt gerade, dich zu halten – diese Momente kommen in Kürze:
+            </div>
+            <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 7 }}>
+              {[
+                ['🌊', 'Zur Ruhe kommen', 'geführter Atemkreis bei Unruhe & Stress'],
+                ['🌙', 'Gedanken loslassen', 'Meditation & Grounding bei Grübeln und zum Einschlafen'],
+                ['⭐', 'Stärke sammeln', '90 Sekunden Mut – vor Prüfung, Gespräch oder großem Moment'],
+              ].map(([g, t, d]) => (
+                <div key={t} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 12, padding: '10px 12px' }}>
+                  <span style={{ fontSize: 16 }}>{g}</span>
+                  <span style={{ flex: 1 }}>
+                    <b style={{ display: 'block', color: 'var(--text)', font: '600 12.5px var(--font-body)' }}>{t}</b>
+                    <span style={{ color: 'var(--text-dim)', font: '400 11px/1.4 var(--font-body)' }}>{d}</span>
+                  </span>
+                  <span style={{ color: 'var(--gold-1)', font: '600 9.5px var(--font-body)', letterSpacing: 0.8, textTransform: 'uppercase', border: '1px solid rgba(232,199,122,.4)', borderRadius: 999, padding: '2px 7px', flexShrink: 0 }}>in Kürze</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 10, color: '#7a7494', font: '400 10.5px/1.5 var(--font-body)', textAlign: 'center' }}>
+              Wenn es dir gerade ernsthaft nicht gut geht: Telefonseelsorge <b style={{ color: 'var(--text-dim)' }}>0800 111 0 111</b> – kostenlos, rund um die Uhr.
+            </div>
+            <button className="btn-gold" style={{ marginTop: 14 }} onClick={() => setSosPeek(false)}>Alles klar ✦</button>
+          </div>
+        </div>
+      )}
+
       {/* 7-Tage-Backup-Popup: sanfte, wiederkehrende Sicherungs-Anregung */}
-      {backupNudge && !reward && (
+      {backupNudge && !reward && !plusEnde && (
         <div className="overlay" onClick={() => closeBackupNudge(false)}>
           <div className="modal pop" onClick={(e) => e.stopPropagation()} style={{ paddingTop: 24, textAlign: 'center' }}>
             <span style={{ fontSize: 30 }}>🛡️</span>

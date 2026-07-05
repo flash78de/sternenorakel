@@ -162,6 +162,18 @@ if (download) {
   check('Privacy: Backup enthält profile+stats+settings+journal', Boolean(content.profile && content.stats && content.settings && content.journal && content.app === 'sternenluna'))
 } else check('Privacy: Download ausgelöst', false)
 
+// --- 8) Reisen: Chakren-Übersicht, Station 1, Reihenfolge-Sperre ---
+await page.goto('http://localhost:4173/#/reisen')
+await page.waitForTimeout(600)
+check('Reisen: Chakren-Reise sichtbar', await bodyHas('Chakren-Reise'))
+check('Reisen: ehrliche Rahmung vorhanden', await bodyHas('Symbolsprache'))
+await page.goto('http://localhost:4173/#/reisen/chakren/1')
+await page.waitForTimeout(600)
+check('Station 1: Muladhara mit Affirmationen', (await bodyHas('Muladhara')) && (await bodyHas('geerdet')))
+await page.goto('http://localhost:4173/#/reisen/chakren/3')
+await page.waitForTimeout(500)
+check('Station 3: Reihenfolge gesperrt', await bodyHas('noch nicht offen'))
+
 console.log(`\n${pass} bestanden, ${fail} fehlgeschlagen`)
 await browser.close()
 server.close()

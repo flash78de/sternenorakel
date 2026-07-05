@@ -39,6 +39,9 @@ const DEFAULT_STATE = {
     premium: false, // Sternenluna Plus – aktiv (abgeleitet aus Quelle + Ablaufdatum)
     plusSource: null, // trial | coupon | paypal | beta – woher kommt das Plus?
     plusUntilISO: null, // letzter gültiger Tag (null = unbefristet)
+    plusStartISO: null, // Tag der Sicherung („am xx.xx.xxxx gesichert")
+    plusNotice14For: null, // 14-Tage-Endehinweis gezeigt für dieses Enddatum
+    plusNotice3For: null, // 3-Tage-Endehinweis gezeigt für dieses Enddatum
     trialUsedISO: null, // Tag, an dem der einmalige Gratis-Test gestartet wurde
     plusExpiredSeenISO: null, // Ablauf-Hinweis für dieses Enddatum bereits gezeigt
     splash: true, // „Luna erwacht"-Startanimation
@@ -46,6 +49,10 @@ const DEFAULT_STATE = {
     backupNudgeISO: null, // Tag des letzten Backup-Popups (max. alle 7 Tage)
   },
   journal: [], // {id, ts, iso, mid, title, symbol, constellation, theme, mantra, text, luck, energy, question, reflection}
+  // Reisen: geführte Mehr-Stationen-Programme (Plus). Notizen bleiben lokal.
+  reisen: {
+    chakren: { done: [], notes: {}, startISO: null, completedISO: null },
+  },
   seenReward: null, // id der zuletzt gezeigten Belohnung
   seenReturnISO: null, // Tag, an dem der Rückkehr-Screen zuletzt gezeigt wurde
 }
@@ -63,6 +70,11 @@ function load() {
       stats: { ...DEFAULT_STATE.stats, ...(parsed.stats || {}) },
       settings: { ...DEFAULT_STATE.settings, ...(parsed.settings || {}) },
       journal: parsed.journal || [],
+      reisen: {
+        ...structuredClone(DEFAULT_STATE.reisen),
+        ...(parsed.reisen || {}),
+        chakren: { ...structuredClone(DEFAULT_STATE.reisen.chakren), ...(parsed.reisen?.chakren || {}) },
+      },
     }
     return migratePlus(migrateThemes(state))
   } catch {

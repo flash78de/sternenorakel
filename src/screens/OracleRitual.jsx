@@ -41,6 +41,26 @@ export default function OracleRitual() {
         <Ritual premium={premium} nav={nav} ritual="karten" title="Sternenkarten" desc="Du ziehst selbst: ein inneres Bild für tiefere Gefühle & Themen." icon={cardsIcon} />
         <Ritual premium={premium} nav={nav} ritual="runen" title="Runen" desc="Drei Zeichen: was nachwirkt, was jetzt zählt, was entstehen darf."
           icon={runesIcon} />
+
+        {/* Reisen: mehrtägige geführte Programme (erste Reise: Chakren) */}
+        <button onClick={() => nav('/reisen')}
+          style={{ display: 'flex', alignItems: 'center', gap: 14, textAlign: 'left', cursor: 'pointer', borderRadius: 18, padding: '13px 15px', background: 'linear-gradient(140deg, rgba(183,63,142,.14), rgba(63,182,201,.1))', border: '1px solid rgba(232,199,122,.28)' }}>
+          <span style={{ position: 'relative', width: 58, height: 62, flexShrink: 0, display: 'block' }}>
+            <img src={asset('uploads/opt/chakra-4-sm.webp')} alt=""
+              style={{ position: 'absolute', left: 0, top: 5, width: 34, transform: 'rotate(-9deg)', borderRadius: 4, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,.5))' }} />
+            <img src={asset('uploads/opt/chakra-6-sm.webp')} alt="Chakren-Reise"
+              style={{ position: 'absolute', left: 20, top: 0, width: 36, transform: 'rotate(9deg)', borderRadius: 4, filter: 'drop-shadow(0 5px 10px rgba(0,0,0,.55))' }} />
+          </span>
+          <span style={{ flex: 1 }}>
+            <span style={{ display: 'block', fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 16.5, color: 'var(--text)' }}>
+              Reisen · Die Chakren-Reise {!premium && <span style={{ color: 'var(--gold-1)', fontSize: 11 }}>✦ Plus</span>}
+            </span>
+            <span style={{ display: 'block', color: 'var(--text-dim)', font: '400 11.5px/1.45 var(--font-body)', marginTop: 3 }}>
+              Sieben Stationen in deinem Tempo – Station 1 ist frei.
+            </span>
+          </span>
+          <span style={{ color: 'var(--gold-1)', fontSize: 16 }}>›</span>
+        </button>
       </div>
       <div style={{ textAlign: 'center', color: '#7a7494', font: '400 11.5px/1.5 var(--font-body)', padding: '14px 0' }}>
         {premium

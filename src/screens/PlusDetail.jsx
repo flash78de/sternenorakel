@@ -17,6 +17,7 @@ const COMPARE = [
   { f: 'Freie Impulse (mehrfach ziehen)', free: false, plus: true },
   { f: 'Monatsbild mit Lunas Rückblick', free: false, plus: true },
   { f: 'Gesprochene Botschaften', free: false, plus: true },
+  { f: 'Die Chakren-Reise (7 Stationen)', free: 'Station 1', plus: true },
 ]
 
 // Nur echte, vorhandene Vorteile – keine Versprechen, die die App (noch) nicht hält.
@@ -26,6 +27,7 @@ const BENEFITS = [
   { t: 'Dein Monatsbild', d: 'Stimmungsverlauf, wiederkehrende Themen und Worte über Wochen – mit Lunas Rückblick.' },
   { t: 'KI-Botschaften ohne Begrenzung', d: 'Luna formuliert jede Botschaft live für dich – auch nach den 7 kostenlosen Sterntagen.' },
   { t: 'Gesprochene Botschaften', d: 'Luna liest dir deine Botschaft vor – zum Zurücklehnen und Nachklingenlassen.' },
+  { t: 'Die Chakren-Reise', d: 'Sieben handgemalte Stationen für sieben Lebensbereiche – mit Klang, Affirmationen und Reflexion. Station 1 ist für alle frei.' },
 ]
 
 // Konfetti wie auf dem Feier-Screen (deterministische Positionen)
@@ -64,7 +66,7 @@ export default function PlusDetail() {
       ? new Date(settings.plusUntilISO + 'T12:00').getTime()
       : Date.now()
     const until = new Date(base + days * 86400000).toISOString().slice(0, 10)
-    updateSettings({ premium: true, plusSource: source, plusUntilISO: until, plusExpiredSeenISO: null })
+    updateSettings({ premium: true, plusSource: source, plusUntilISO: until, plusStartISO: today, plusExpiredSeenISO: null })
     setJustActivated({ until, quelle: source })
     buzz([20, 30, 20])
     return until
