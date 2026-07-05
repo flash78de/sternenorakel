@@ -119,8 +119,14 @@ export default function Onboarding() {
               </div>
             ))}
           </div>
-          <div style={{ marginTop: 14, color: '#7a7494', font: '400 11.5px/1.55 var(--font-body)', textAlign: 'center' }}>
-            Luna sagt dir nicht voraus, was passieren wird. Sie hilft dir, einen Gedanken zu hören, der im Alltag vielleicht zu leise ist.
+          {/* Dezenter Ausblick auf die größere Welt – keine Feature-Liste, nur ein Versprechen */}
+          <div style={{ marginTop: 12, textAlign: 'center', color: 'var(--text-dim)', font: '500 12px/1.6 var(--font-body)' }}>
+            Und wenn du mehr willst: <b style={{ color: 'var(--gold-1)', fontWeight: 600 }}>Karten, Runen, die Chakren-Reise
+            und eine Sofort-Hilfe</b> warten schon auf dich.
+          </div>
+          <div style={{ marginTop: 10, color: '#7a7494', font: '400 11.5px/1.55 var(--font-body)', textAlign: 'center' }}>
+            Luna sagt dir nicht voraus, was passieren wird. Sie hilft dir, einen Gedanken zu hören, der im Alltag
+            vielleicht zu leise ist. Und alles, was du ihr anvertraust, bleibt auf deinem Gerät.
           </div>
         </StepWrap>
       )}
@@ -345,7 +351,8 @@ export default function Onboarding() {
             {lichtpunkt.styleNote}
           </div>
           <div style={{ marginTop: 14, color: '#7a7494', font: '400 11.5px/1.5 var(--font-body)', textAlign: 'center' }}>
-            Jedes Innehalten wird ein Stern in eurem gemeinsamen Sternenband.
+            Jedes Innehalten wird ein Stern in eurem gemeinsamen Sternenband – und mit jedem Stern
+            öffnen sich neue Kapitel deiner Geschichte.
           </div>
         </StepWrap>
       )}
