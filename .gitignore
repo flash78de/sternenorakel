@@ -9,3 +9,6 @@ dist-ssr
 standalone.html
 standalone-dist
 scripts/.slice-preview/
+
+# Wrangler-Arbeitsverzeichnis (lokaler Cache)
+server/.wrangler/
