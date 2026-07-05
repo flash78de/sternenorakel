@@ -7,6 +7,7 @@ import { fetchMessage } from '../lib/ai.js'
 import { speak, speechSupported } from '../lib/audio.js'
 import { asset } from '../lib/asset.js'
 import { ritualTheme } from '../lib/ritualTheme.js'
+import { shareCard } from '../lib/shareCard.js'
 import { buzz } from '../lib/haptics.js'
 import { karteBild, karteBanner, runeBild } from '../lib/ritualAssets.js'
 
@@ -25,6 +26,20 @@ export default function OracleDraw() {
     if (message) speak(`${message.title}. ${message.text} Dein Mantra: ${message.mantra}`, settings.tone)
   }
 
+  // Share-Karte: schönes Bild statt Text – bewusst ohne Persönliches (Wachstum, für alle frei)
+  const shareAsImage = async () => {
+    if (!message || sharing) return
+    setSharing(true)
+    try {
+      await shareCard(message)
+      buzz(12)
+    } catch {
+      /* abgebrochen oder Bild nicht ladbar – kein Fehler nötig */
+    } finally {
+      setSharing(false)
+    }
+  }
+
   const todaysEntry = journal.find((e) => e.iso === formatDate().iso)
 
   // Freier Impuls (Entscheidung 2a): Die Tagesbotschaft bleibt 1×/Tag.
@@ -39,6 +54,7 @@ export default function OracleDraw() {
   const [note, setNote] = useState('')
   const [saved, setSaved] = useState(null)
   const [micro, setMicro] = useState(0)
+  const [sharing, setSharing] = useState(false)
   const timers = useRef([])
   const reflectRef = useRef(null)
 
@@ -391,6 +407,14 @@ export default function OracleDraw() {
             🔊 Botschaft anhören {!settings.premium && <span style={{ color: 'var(--gold-1)', fontSize: 11 }}>· Plus</span>}
           </button>
         )}
+        {/* Teilen als Bild – nur Mantra & Motiv, nichts Persönliches */}
+        <button
+          onClick={shareAsImage}
+          disabled={sharing}
+          style={{ marginTop: 10, width: '100%', padding: 12, borderRadius: 12, background: t.soft, border: `1px solid ${t.border}`, color: 'var(--text)', font: '600 13px var(--font-body)', cursor: 'pointer', opacity: sharing ? 0.6 : 1 }}
+        >
+          {sharing ? '✨ Karte entsteht …' : '✨ Als Bild teilen'}
+        </button>
         <button
           className="btn-gold"
           style={{ padding: 14, borderRadius: 15, marginTop: 10 }}

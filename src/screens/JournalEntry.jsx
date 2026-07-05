@@ -4,6 +4,7 @@ import { useStore } from '../store/store.jsx'
 import { MESSAGES, formatDate } from '../data/library.js'
 import { speak, speechSupported } from '../lib/audio.js'
 import { karteBild, runeBild } from '../lib/ritualAssets.js'
+import { shareCard } from '../lib/shareCard.js'
 
 const softBtn = {
   flex: 1,
@@ -28,6 +29,7 @@ export default function JournalEntry() {
   const [note, setNote] = useState(entry?.reflection || '')
   const [confirm, setConfirm] = useState(false)
   const [savedHint, setSavedHint] = useState(false)
+  const [sharing, setSharing] = useState(false)
 
   if (!entry) {
     return (
@@ -58,31 +60,44 @@ export default function JournalEntry() {
     setTimeout(() => setSavedHint(false), 1600)
   }
 
-  const shareText =
+  // Für den privaten Export (inkl. eigener Notiz) …
+  const exportText =
     `✦ ${entry.title}\n${entry.theme}${entry.constellation ? ' · ' + entry.constellation : ''} · ${dateStr.short}\n\n` +
     `${entry.text}\n\n„${entry.mantra}"` +
     (note.trim() ? `\n\nMeine Notiz:\n${note.trim()}` : '') +
     `\n\n— Sternenluna`
+  // … und fürs Teilen bewusst OHNE Persönliches (keine Notiz)
+  const shareText = `✦ ${entry.title}\n\n„${entry.mantra}"\n\n— Sternenluna · sternenluna.de`
 
+  // Teilen als Bild-Karte (nur Mantra & Motiv – nie Text, Name oder Notiz).
+  // Fällt aufs Text-Teilen zurück, falls die Karte nicht gebaut werden kann.
   const share = async () => {
+    if (sharing) return
+    setSharing(true)
     try {
-      if (navigator.share) await navigator.share({ title: entry.title, text: shareText })
-      else {
-        await navigator.clipboard.writeText(shareText)
-        setSavedHint(true)
-        setTimeout(() => setSavedHint(false), 1600)
-      }
+      await shareCard(entry)
     } catch {
-      /* abgebrochen – kein Fehler */
+      try {
+        if (navigator.share) await navigator.share({ title: entry.title, text: shareText })
+        else {
+          await navigator.clipboard.writeText(shareText)
+          setSavedHint(true)
+          setTimeout(() => setSavedHint(false), 1600)
+        }
+      } catch {
+        /* abgebrochen – kein Fehler */
+      }
+    } finally {
+      setSharing(false)
     }
   }
 
   const exportTxt = () => {
-    const blob = new Blob([shareText], { type: 'text/plain;charset=utf-8' })
+    const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `sternenorakel-${entry.iso}.txt`
+    a.download = `sternenluna-${entry.iso}.txt`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -193,7 +208,9 @@ export default function JournalEntry() {
       </button>
 
       <div style={{ marginTop: 10, display: 'flex', gap: 10 }}>
-        <button onClick={share} style={softBtn}>⇪ Teilen</button>
+        <button onClick={share} disabled={sharing} style={{ ...softBtn, opacity: sharing ? 0.6 : 1 }}>
+          {sharing ? '✨ …' : '✨ Teilen'}
+        </button>
         <button onClick={exportTxt} style={softBtn}>⬇ Export</button>
         {speechSupported && (
           <button style={softBtn} onClick={() => {
