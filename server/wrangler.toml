@@ -19,6 +19,9 @@ crons = ["*/15 * * * *"]
 ALLOWED_ORIGIN = "https://sternenluna.de,https://www.sternenluna.de,https://flash78de.github.io"
 # Öffentlicher VAPID-Schlüssel (Web Push); privates Gegenstück als Secret VAPID_PRIVATE_JWK
 VAPID_PUBLIC = "BHkBrf0O-w77EpXz_5NxHXL5EdtNOz8X6V8xF1UpscXY1yaTa5_8t0SojqvZd46dtSZ-OOBXDv53eCBjeNisat4"
+# Auf "true" stellen, sobald PayPal das Geschäftskonto freigegeben hat
+# (bis dahin: PAYEE_ACCOUNT_RESTRICTED → Buttons bleiben ausgeblendet)
+PAY_ACTIVE = "false"
 # Optional anderes Modell:
 # MODEL = "claude-opus-4-8"
 

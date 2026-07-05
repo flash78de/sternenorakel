@@ -87,7 +87,9 @@ async function redeemTrial(env, device) {
 }
 
 // ---- PayPal (Orders API v2, Einmalzahlung) ----
-const payConfigured = (env) => Boolean(env.PAYPAL_CLIENT_ID && env.PAYPAL_SECRET)
+// PAY_ACTIVE="false" hält die Zahlung ausgeblendet, bis PayPal das
+// Geschäftskonto freigegeben hat (PAYEE_ACCOUNT_RESTRICTED bei neuen Konten).
+const payConfigured = (env) => Boolean(env.PAYPAL_CLIENT_ID && env.PAYPAL_SECRET && env.PAY_ACTIVE !== 'false')
 
 async function paypalToken(env) {
   const res = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {
