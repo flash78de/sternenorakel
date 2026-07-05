@@ -18,13 +18,51 @@ export const THEMES = [
 
 // ---- Rang-Leiter (kanonisch) ----
 // Schwellen in Sternenstaub (✦). Jeder Tag/jede Reflexion bringt Sternenstaub.
+// story: Lunas Kapitel zu jeder Stufe – beim Antippen im Sternenband lesbar.
+// Zukünftige Kapitel sind bewusst LESBAR (sanftes Ziehen statt Verstecken).
 export const RANKS = [
-  { name: 'Sternenfunke', at: 0 },
-  { name: 'Mondwanderer', at: 150 },
-  { name: 'Sternensammler', at: 350 },
-  { name: 'Lichtträger', at: 650 },
-  { name: 'Himmelsdeuter', at: 1050 },
-  { name: 'Erleuchtete*r', at: 1600 },
+  {
+    name: 'Sternenfunke',
+    at: 0,
+    glyph: '✧',
+    story:
+      'Jede Reise beginnt mit einem einzigen Funken – deinem ersten Moment mit dir selbst. Noch weiß niemand, was aus ihm wird. Aber Luna weiß: Kein Stern am Himmel hat anders angefangen. Du musst nichts beweisen. Du bist schon unterwegs.',
+  },
+  {
+    name: 'Mondwanderer',
+    at: 150,
+    glyph: '☾',
+    story:
+      'Du kommst jetzt öfter wieder – und der Mond beginnt, dich zu kennen. Wandern heißt nicht eilen: Es heißt, einen Fuß vor den anderen zu setzen, auch an Tagen, die schwer waren. Wer den Mond zum Weggefährten hat, ist nachts nie ganz allein. Genau hier wächst das, was später Gewohnheit heißt – und sich wie Zuhause anfühlt.',
+  },
+  {
+    name: 'Sternensammler',
+    at: 350,
+    glyph: '✦',
+    story:
+      'Was du sammelst, sind keine Punkte. Es sind Momente, in denen du dir selbst zugehört hast – aufgereiht wie Perlen auf deinem Sternenband. Blättere in deinem Tagebuch: Da liegt dein Beweis, dass du dranbleibst, wenn es zählt. Sammler wissen, was viele vergessen – Reichtum ist, was bleibt.',
+  },
+  {
+    name: 'Lichtträger',
+    at: 650,
+    glyph: '🕯',
+    story:
+      'Irgendwann fällt dein Licht auch auf andere. Vielleicht hat es schon jemand bemerkt: dass du ruhiger geworden bist, klarer, freundlicher mit dir. Lichtträger leuchten nicht, um gesehen zu werden – sie leuchten, weil sie gepflegt haben, was in ihnen brennt. Von hier oben siehst du zum ersten Mal, wie weit du schon gegangen bist.',
+  },
+  {
+    name: 'Himmelsdeuter',
+    at: 1050,
+    glyph: '🔭',
+    story:
+      'Du liest jetzt Muster – nicht am Himmel, sondern in dir. Wochenbilder, wiederkehrende Themen, Worte, die dich verfolgen: Was Fremden wie Zufall erscheint, erkennst du als Landkarte. Himmelsdeuter fragen nicht mehr „Was bedeutet das?", sondern „Was bedeutet das für mich?". Das ist die Kunst, für die es keine Abkürzung gibt – nur Wege wie deinen.',
+  },
+  {
+    name: 'Erleuchtete*r',
+    at: 1600,
+    glyph: '☀',
+    story:
+      'Die höchste Stufe ist kein Thron, sondern ein stiller Ort mit weitem Blick. Wer hier ankommt, hat nichts mehr zu beweisen – und gerade deshalb so viel zu geben. Du kennst deine Muster, deine Themen, deine leisen Töne. Luna verneigt sich: Ab hier gehst nicht mehr du mit ihr, sondern sie mit dir. Und der Himmel? Bleibt offen, für jeden weiteren Tag.',
+  },
 ]
 
 // Liefert {rank, level, current, next, into, span, toNext, progress}
