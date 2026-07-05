@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "build:standalone": "vite build --config vite.config.standalone.js && node scripts/build-standalone.mjs",
-    "test": "node tests/e2e.mjs && node tests/e2e-ki.mjs"
+    "test": "node tests/push-crypto.mjs && node tests/e2e.mjs && node tests/e2e-ki.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

@@ -1,13 +1,25 @@
-# Cloudflare-Worker-Konfiguration für das Sternenorakel-KI-Backend.
-# Deployment: siehe server/README.md
+# Cloudflare-Worker-Konfiguration für das Sternenluna-Backend
+# (KI-Botschaften + Push-Erinnerungen). Deployment: siehe server/README.md
 name = "sternenorakel-orakel"
 main = "orakel-worker.js"
 compatibility_date = "2026-06-01"
+
+# Cron für die täglichen Push-Erinnerungen: alle 15 Minuten prüfen,
+# wer gerade seine Wunschzeit (in seiner Zeitzone) erreicht.
+[triggers]
+crons = ["*/15 * * * *"]
+
+# Push-Abos (Endpoint, Wunschzeit, Zeitzone – nichts Persönliches).
+# Namespace anlegen: npx wrangler kv namespace create PUSH
+# → benötigt Token-Berechtigung „Workers KV Storage: Bearbeiten“.
+# kv_namespaces = [{ binding = "PUSH", id = "HIER_NAMESPACE_ID" }]
 
 [vars]
 # Erlaubte Absender (kommagetrennt): eigene Domain + alte GitHub-Adresse.
 # Für lokale Tests mit der standalone.html notfalls auf "*" stellen.
 ALLOWED_ORIGIN = "https://sternenluna.de,https://www.sternenluna.de,https://flash78de.github.io"
+# Öffentlicher VAPID-Schlüssel (Web Push); privates Gegenstück als Secret VAPID_PRIVATE_JWK
+VAPID_PUBLIC = "BHkBrf0O-w77EpXz_5NxHXL5EdtNOz8X6V8xF1UpscXY1yaTa5_8t0SojqvZd46dtSZ-OOBXDv53eCBjeNisat4"
 # Optional anderes Modell:
 # MODEL = "claude-opus-4-8"
 

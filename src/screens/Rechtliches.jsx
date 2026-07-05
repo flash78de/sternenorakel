@@ -77,6 +77,15 @@ export default function Rechtliches() {
           KI-Modus in den Einstellungen widerrufen.
         </P>
         <P>
+          <b style={{ color: 'var(--text)' }}>Push-Erinnerungen (optional):</b> Aktivierst du die tägliche Erinnerung,
+          speichert unser Server (Cloudflare Workers) dafür die pseudonyme Push-Adresse deines Browsers, deine
+          Wunschzeit und deine Zeitzone – <b style={{ color: 'var(--text)' }}>keinen Namen und keine Inhalte</b>.
+          Die Zustellung erfolgt über den Push-Dienst deines Systems (z.&nbsp;B. Apple oder Google); der Nachrichtentext
+          ist dabei Ende-zu-Ende verschlüsselt und für den Push-Dienst nicht lesbar. Rechtsgrundlage ist deine
+          Einwilligung (Art. 6 Abs. 1 lit. a DSGVO); mit dem Ausschalten der Erinnerung wird das Abo auf dem
+          Server gelöscht.
+        </P>
+        <P>
           <b style={{ color: 'var(--text)' }}>Hosting:</b> Die App wird über GitHub Pages (GitHub Inc., USA)
           ausgeliefert. Beim Aufruf verarbeitet GitHub technisch notwendige Verbindungsdaten (z.&nbsp;B. IP-Adresse)
           in Server-Protokollen. Diese App setzt <b style={{ color: 'var(--text)' }}>keine Cookies</b> ein und

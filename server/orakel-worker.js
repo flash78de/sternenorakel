@@ -13,6 +13,8 @@
 //   MODEL              (optional, Standard: claude-opus-4-8)
 // ============================================================
 
+import { handlePush, pushScheduled } from './push.js'
+
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages'
 const DEFAULT_MODEL = 'claude-opus-4-8'
 
@@ -124,14 +126,26 @@ function rateOk(ip) {
 }
 
 export default {
+  // Cron (*/15): tägliche Erinnerungen zur Wunschzeit der Nutzerin
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(pushScheduled(env))
+  },
+
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(env, request) })
     if (request.method !== 'POST') return json({ error: 'Nur POST.' }, 405, env, request)
-    if (!env.ANTHROPIC_API_KEY) return json({ error: 'ANTHROPIC_API_KEY fehlt.' }, 500, env, request)
 
     // Rate-Limit: bei Überschreitung 429 – die App fällt lautlos auf offline zurück.
     const ip = request.headers.get('CF-Connecting-IP') || 'unbekannt'
     if (!rateOk(ip)) return json({ error: 'Zu viele Anfragen – bitte kurz warten.' }, 429, env, request)
+
+    // Push-Erinnerungen (Abo an/aus, Testnachricht) – gleiche CORS-/Rate-Regeln
+    const url = new URL(request.url)
+    if (url.pathname.startsWith('/push/')) {
+      return handlePush(request, env, url, (body, status) => json(body, status, env, request))
+    }
+
+    if (!env.ANTHROPIC_API_KEY) return json({ error: 'ANTHROPIC_API_KEY fehlt.' }, 500, env, request)
     if (env.RATE_LIMITER) {
       const { success } = await env.RATE_LIMITER.limit({ key: ip }).catch(() => ({ success: true }))
       if (!success) return json({ error: 'Zu viele Anfragen – bitte kurz warten.' }, 429, env, request)

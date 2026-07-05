@@ -19,8 +19,9 @@ export default defineConfig(() => ({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['uploads/luna-icon.png'],
-      // Lokale Schriften mit vorab cachen → Typografie auch offline
-      workbox: { globPatterns: ['**/*.{js,css,html,woff2}'] },
+      // Lokale Schriften mit vorab cachen → Typografie auch offline.
+      // push-sw.js hängt die Push-Handler (Erinnerungen) an den Service Worker.
+      workbox: { globPatterns: ['**/*.{js,css,html,woff2}'], importScripts: ['push-sw.js'] },
       manifest: {
         name: 'Sternenluna',
         short_name: 'Sternenluna',

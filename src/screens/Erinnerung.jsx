@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/store.jsx'
 import { asset } from '../lib/asset.js'
+import { pushSupported, pushActive, enablePush, disablePush, sendTestPush } from '../lib/push.js'
+import { isIOS, isInstalled } from '../lib/install.js'
 
 const WHEN = [
   { key: 'morgens', icon: '☀', label: 'Morgens', desc: 'Sanfter Start in den Tag', time: '08:00' },
@@ -20,13 +22,22 @@ export default function Erinnerung() {
   const nav = useNavigate()
   const { settings, updateSettings } = useStore()
   const [hint, setHint] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [active, setActive] = useState(false) // echtes Push-Abo auf DIESEM Gerät
+
+  useEffect(() => {
+    pushActive().then(setActive)
+  }, [])
 
   const when = settings.reminderWhen || 'abends'
   const [hh, mm] = (settings.reminderTime || '21:00').split(':')
 
+  // iPhone: Web-Push gibt es nur in der installierten App (Apple-Vorgabe)
+  const iosNeedsInstall = isIOS() && !isInstalled()
+
   const setWhen = (w) => {
     const def = WHEN.find((x) => x.key === w)
-    updateSettings({ reminderWhen: w, reminder: w !== 'aus', ...(def?.time ? { reminderTime: def.time } : {}) })
+    updateSettings({ reminderWhen: w, ...(def?.time ? { reminderTime: def.time } : {}) })
   }
 
   const bump = (field, delta, max) => {
@@ -36,15 +47,51 @@ export default function Erinnerung() {
     updateSettings({ reminderTime: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}` })
   }
 
+  // Echtes Web-Push-Abo an-/abmelden (Server speichert nur Push-Adresse, Zeit, Zeitzone)
   const activate = async () => {
-    let ok = true
-    if ('Notification' in window && Notification.permission !== 'granted') {
-      try { ok = (await Notification.requestPermission()) === 'granted' } catch { ok = false }
+    if (busy) return
+    setBusy(true)
+    try {
+      if (when === 'aus') {
+        await disablePush()
+        setActive(false)
+        updateSettings({ reminder: false })
+        setHint('Erinnerungen sind ausgeschaltet.')
+        return
+      }
+      if (iosNeedsInstall) {
+        setHint('Auf dem iPhone braucht Luna dafür einen Platz auf dem Home-Bildschirm: Teilen-Symbol → „Zum Home-Bildschirm". Danach klappt es hier.')
+        return
+      }
+      if (!pushSupported()) {
+        setHint('Dieser Browser unterstützt leider keine Push-Nachrichten.')
+        return
+      }
+      await enablePush(settings.reminderTime || '21:00')
+      setActive(true)
+      updateSettings({ reminder: true })
+      setHint(`Aktiviert ✓ Luna erinnert dich täglich gegen ${settings.reminderTime || '21:00'} Uhr – auch wenn die App geschlossen ist.`)
+    } catch (e) {
+      updateSettings({ reminder: false })
+      setHint(e?.code === 'denied'
+        ? 'Benachrichtigungen sind nicht erlaubt. Du kannst sie in den Einstellungen deines Geräts freigeben.'
+        : 'Das hat gerade nicht geklappt – bitte prüfe deine Verbindung und versuche es noch einmal.')
+    } finally {
+      setBusy(false)
     }
-    updateSettings({ reminder: ok && when !== 'aus' })
-    setHint(ok
-      ? 'Gespeichert ✓ Deine Wunschzeit ist vorgemerkt – echte Push-Erinnerungen kommen mit einem der nächsten Updates.'
-      : 'Benachrichtigungen sind nicht erlaubt. Du kannst sie in den Browsereinstellungen freigeben.')
+  }
+
+  const testPush = async () => {
+    if (busy) return
+    setBusy(true)
+    try {
+      await sendTestPush()
+      setHint('Testnachricht ist unterwegs ✓ – sie erscheint gleich als Benachrichtigung.')
+    } catch {
+      setHint('Test fehlgeschlagen – aktiviere die Erinnerung zuerst neu.')
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
@@ -61,15 +108,24 @@ export default function Erinnerung() {
         ✦ Sanft, nie aufdringlich – nur ein leiser Impuls für deinen Moment mit dir selbst.
       </div>
 
-      {/* Ehrlicher Beta-Hinweis: gespeicherte Zeiten ja, echte Push-Nachrichten noch nicht */}
-      <div className="glass-purple" style={{ marginTop: 12, padding: '11px 13px' }}>
-        <div style={{ color: 'var(--gold-1)', font: '600 11px var(--font-body)', marginBottom: 3 }}>Ehrlich gesagt (Beta)</div>
-        <div style={{ color: 'var(--text-dim)', font: '400 11px/1.5 var(--font-body)' }}>
-          Deine Wunschzeit wird gespeichert und die Berechtigung vorbereitet – <b style={{ color: 'var(--text)' }}>echte
-          Push-Erinnerungen kann die Web-Beta aber noch nicht senden</b>. Sie kommen mit einem der nächsten Updates;
-          auf dem iPhone funktionieren sie dann nur, wenn Luna als App auf dem Home-Bildschirm installiert ist.
+      {/* Hinweis nur, wo er nötig ist: iPhone ohne installierte App */}
+      {iosNeedsInstall && (
+        <div className="glass-purple" style={{ marginTop: 12, padding: '11px 13px' }}>
+          <div style={{ color: 'var(--gold-1)', font: '600 11px var(--font-body)', marginBottom: 3 }}>Ein Schritt vorher (iPhone)</div>
+          <div style={{ color: 'var(--text-dim)', font: '400 11px/1.5 var(--font-body)' }}>
+            Damit Luna dich erinnern darf, braucht sie einen Platz auf deinem Home-Bildschirm:
+            <b style={{ color: 'var(--text)' }}> Teilen-Symbol → „Zum Home-Bildschirm"</b>. Danach hier die Erinnerung aktivieren.
+          </div>
         </div>
-      </div>
+      )}
+      {active && (
+        <div className="glass-purple" style={{ marginTop: 12, padding: '11px 13px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 16 }}>🔔</span>
+          <div style={{ color: 'var(--text)', font: '500 11.5px/1.45 var(--font-body)' }}>
+            Erinnerung aktiv auf diesem Gerät – Luna meldet sich täglich zu deiner Wunschzeit.
+          </div>
+        </div>
+      )}
 
       {/* Zeitfenster */}
       <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 10 }}>
@@ -121,14 +177,23 @@ export default function Erinnerung() {
         </div>
       </div>
 
-      <button className="btn-gold" style={{ marginTop: 14 }} onClick={activate}>
-        🔔 Erinnerung aktivieren
+      <button className="btn-gold" style={{ marginTop: 14, opacity: busy ? 0.6 : 1 }} disabled={busy} onClick={activate}>
+        {busy ? '✦ Einen Moment …' : when === 'aus' ? 'Erinnerungen ausschalten' : active ? '🔔 Zeit aktualisieren' : '🔔 Erinnerung aktivieren'}
       </button>
+      {active && when !== 'aus' && (
+        <button
+          onClick={testPush}
+          disabled={busy}
+          style={{ marginTop: 10, width: '100%', padding: 12, borderRadius: 12, background: 'rgba(166,107,255,.14)', border: '1px solid rgba(167,139,250,.4)', color: 'var(--text)', font: '600 13px var(--font-body)', cursor: 'pointer', opacity: busy ? 0.6 : 1 }}
+        >
+          ✨ Testnachricht senden
+        </button>
+      )}
       <div style={{ textAlign: 'center', color: hint ? 'var(--gold-1)' : '#7a7494', font: '400 10.5px/1.45 var(--font-body)', marginTop: 8 }}>
-        {hint || 'Du kannst das jederzeit in den Einstellungen ändern.'}
+        {hint || 'Du kannst das jederzeit ändern oder ausschalten.'}
       </div>
       <div style={{ textAlign: 'center', color: '#7a7494', font: '400 9.5px/1.4 var(--font-body)', marginTop: 6 }}>
-        Hinweis: Browser-Erinnerungen funktionieren nur, wenn die App geöffnet bzw. installiert ist – zuverlässige tägliche Push-Nachrichten folgen später.
+        Gespeichert werden nur die Push-Adresse deines Geräts, deine Wunschzeit und Zeitzone – kein Name, nichts aus deinem Tagebuch.
       </div>
     </div>
   )
