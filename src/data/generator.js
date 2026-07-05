@@ -69,13 +69,14 @@ export const themen = {
     ],
   },
   schule: {
-    label: 'Schule & Lernen',
+    // interner Schlüssel bleibt 'schule' (gespeicherte Daten!), Label neu positioniert
+    label: 'Lernen & Wachstum',
     constellation: 'Das Tor',
     saetze: [
       'Du musst heute nicht alles verstehen – es genügt, den nächsten Gedanken wirklich zu durchdringen.',
       'Lernen ist kein Wettlauf; dein eigenes Tempo trägt dich am weitesten.',
       'Ein Fehler ist kein Urteil über dich, sondern eine Stelle, an der du gerade wächst.',
-      'Setz dich heute nicht mehr unter Druck, als es dir beim Lernen wirklich hilft.',
+      'Wachstum zeigt sich selten laut – oft ist es das leise Dranbleiben.',
     ],
   },
   entscheidungen: {
@@ -221,7 +222,8 @@ export const ritualSymbols = {
 export const THEME_KEY = {
   'Liebe & Beziehungen': 'liebe',
   'Beruf & Berufung': 'beruf',
-  'Schule & Lernen': 'schule',
+  'Lernen & Wachstum': 'schule',
+  'Schule & Lernen': 'schule', // Alt-Name (unmigrierte Backups) weiter zuordenbar
   'Selbstwert & innere Ruhe': 'selbstwert',
   'Veränderung & Neuanfang': 'veraenderung',
   'Entscheidungen & Klarheit': 'entscheidungen',

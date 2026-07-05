@@ -7,7 +7,7 @@
 export const THEMES = [
   'Liebe & Beziehungen',
   'Beruf & Berufung',
-  'Schule & Lernen',
+  'Lernen & Wachstum',
   'Selbstwert & innere Ruhe',
   'Veränderung & Neuanfang',
   'Entscheidungen & Klarheit',
@@ -242,7 +242,7 @@ const CONST_RULES = {
   'Der Mond': { type: 'any', need: 1, desc: 'Halte deine erste Reflexion fest' },
   'Das Herz': { type: 'theme', theme: 'Liebe & Beziehungen', need: 3 },
   'Die Quelle': { type: 'theme', theme: 'Beruf & Berufung', need: 3 },
-  'Das Tor': { type: 'theme', theme: 'Schule & Lernen', need: 3 },
+  'Das Tor': { type: 'theme', theme: 'Lernen & Wachstum', need: 3 },
   'Die Weite': { type: 'theme', theme: 'Selbstwert & innere Ruhe', need: 3 },
   'Der Wandel': { type: 'theme', theme: 'Veränderung & Neuanfang', need: 3 },
   'Der Pfad': { type: 'theme', theme: 'Entscheidungen & Klarheit', need: 3 },

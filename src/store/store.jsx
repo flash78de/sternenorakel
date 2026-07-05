@@ -51,7 +51,7 @@ function load() {
     if (!raw) return structuredClone(DEFAULT_STATE)
     const parsed = JSON.parse(raw)
     // sanftes Mergen, falls neue Felder dazukommen
-    return {
+    const state = {
       ...structuredClone(DEFAULT_STATE),
       ...parsed,
       profile: { ...DEFAULT_STATE.profile, ...(parsed.profile || {}) },
@@ -59,8 +59,29 @@ function load() {
       settings: { ...DEFAULT_STATE.settings, ...(parsed.settings || {}) },
       journal: parsed.journal || [],
     }
+    return migrateThemes(state)
   } catch {
     return structuredClone(DEFAULT_STATE)
+  }
+}
+
+// Themen-Umbenennung „Schule & Lernen" → „Lernen & Wachstum" (Positionierung).
+// Bestandsdaten (Profil-Themen + Tagebucheinträge) werden beim Laden migriert,
+// damit Sternbild-Regeln und Monatsbild weiter zusammenpassen.
+const THEME_RENAMES = { 'Schule & Lernen': 'Lernen & Wachstum' }
+
+function migrateThemes(state) {
+  try {
+    const ren = (t) => THEME_RENAMES[t] || t
+    if (state.profile?.themes?.some((t) => THEME_RENAMES[t])) {
+      state.profile.themes = state.profile.themes.map(ren)
+    }
+    if (state.journal?.some((e) => THEME_RENAMES[e.theme])) {
+      state.journal = state.journal.map((e) => (THEME_RENAMES[e.theme] ? { ...e, theme: ren(e.theme) } : e))
+    }
+    return state
+  } catch {
+    return state // Migration darf nie Daten kosten
   }
 }
 

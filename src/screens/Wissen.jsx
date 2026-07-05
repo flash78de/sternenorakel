@@ -1,6 +1,27 @@
 import { useState } from 'react'
 import { asset } from '../lib/asset.js'
 
+// Kurze Grundlagen-Artikel: die Psychologie hinter der App, ehrlich erklärt.
+// Vertrauensanker für Neugierige – und echter Mehrwert über die FAQ hinaus.
+const ARTIKEL = [
+  {
+    t: 'Warum Selbstreflexion wirkt',
+    a: 'Wer Erlebtes in Worte fasst, verarbeitet es messbar besser – die Psychologie nennt das „Affect Labeling": Gefühle benennen beruhigt nachweislich das emotionale Alarmsystem im Gehirn. Schon wenige Minuten am Tag reichen. Genau dafür ist Lunas Frage unter jeder Botschaft da: nicht um eine „richtige" Antwort zu finden, sondern um dem, was ohnehin in dir arbeitet, einen Moment Raum zu geben.',
+  },
+  {
+    t: 'Journaling: kleine Rituale, große Wirkung',
+    a: 'Tagebuchschreiben gehört zu den am besten untersuchten Selbsthilfe-Werkzeugen: Es ordnet Gedanken, schafft Abstand zu Grübelschleifen und macht Entwicklung sichtbar. Der wichtigste Faktor ist nicht Länge, sondern Regelmäßigkeit – ein ehrlicher Satz zählt mehr als eine perfekte Seite. Dein Sternenband belohnt deshalb das Dranbleiben, nie die Menge. Und alles bleibt dabei auf deinem Gerät.',
+  },
+  {
+    t: 'Symbolsprache: Warum Bilder mehr sagen',
+    a: 'Karten, Runen und Archetypen sind keine Botschaften „von außen" – sie sind Projektionsflächen. Ein offenes Symbol wie „Das offene Tor" zwingt deinen Kopf, es mit deinem eigenen Leben zu füllen: Was ist bei MIR gerade ein Tor? Dieser Deutungsschritt ist der eigentliche Wert. Deshalb erklärt dir Luna auch offen den Barnum-Effekt – die Magie liegt nicht in der Karte, sondern in dem, was du in ihr erkennst.',
+  },
+  {
+    t: 'Die Psychologie hinter Ritualen',
+    a: 'Feste kleine Rituale – gleiche Zeit, gleiche Geste, gleicher Ort – senken Stress und erleichtern es dem Gehirn, eine Gewohnheit aufzubauen. Die Verhaltensforschung spricht von Ankern: Der Würfelwurf ist so ein Anker, der den Übergang vom Alltagsmodus ins Innehalten markiert. Nicht der Zufall des Wurfs verändert etwas, sondern der Moment der Ruhe, den du dir damit verlässlich schenkst.',
+  },
+]
+
 const FAQ = [
   {
     q: 'Ist das echte Astrologie?',
@@ -18,6 +39,7 @@ const FAQ = [
 
 export default function Wissen() {
   const [open, setOpen] = useState(0)
+  const [openArt, setOpenArt] = useState(-1)
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '16px 17px 16px' }}>
@@ -44,6 +66,20 @@ export default function Wissen() {
           (<b style={{ color: 'var(--purple-2)', fontWeight: 600 }}>Barnum-Effekt</b>), damit du deinen eigenen Sinn
           hineinlegen kannst.
         </div>
+      </div>
+
+      {/* Vertiefung: die Psychologie dahinter, zum Aufklappen */}
+      <div className="card" style={{ marginTop: 11, padding: '6px 15px 8px' }}>
+        <div className="card-title" style={{ padding: '9px 0 2px' }}>Wissen &amp; Hintergrund</div>
+        {ARTIKEL.map((item, i) => (
+          <div key={i}>
+            <div className="faq-q" onClick={() => setOpenArt(openArt === i ? -1 : i)}>
+              <span>{item.t}</span>
+              <span className={'car' + (openArt === i ? ' open' : '')}>▾</span>
+            </div>
+            {openArt === i && <div className="faq-a">{item.a}</div>}
+          </div>
+        ))}
       </div>
 
       <div className="card" style={{ marginTop: 11 }}>

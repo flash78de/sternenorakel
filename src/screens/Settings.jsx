@@ -59,7 +59,7 @@ export default function Settings() {
       ['Kreativität', 'karten', ''],
       ['Loslassen', 'runen', 'Ich muss nicht alles festhalten.'],
       ['Entscheidungen & Klarheit', 'wuerfel', ''],
-      ['Schule & Lernen', 'karten', 'Lernen fällt mir abends leichter.'],
+      ['Lernen & Wachstum', 'karten', 'Lernen fällt mir abends leichter.'],
     ]
     const entries = plan.map(([theme, ritual, reflection], i) => {
       const ts = Date.now() - (i + 1) * 86400000
