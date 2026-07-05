@@ -35,7 +35,7 @@ wrangler deploy
 Minimales `server/wrangler.toml`:
 
 ```toml
-name = "sternenorakel-orakel"
+name = "sternenluna-orakel"
 main = "orakel-worker.js"
 compatibility_date = "2026-06-01"
 
@@ -47,7 +47,7 @@ ALLOWED_ORIGIN = "https://flash78de.github.io"
 ```
 
 `wrangler deploy` gibt am Ende die URL aus, z. B.
-`https://sternenorakel-orakel.<dein-account>.workers.dev`.
+`https://sternenluna-orakel.<dein-account>.workers.dev`.
 
 ## In der App verbinden
 

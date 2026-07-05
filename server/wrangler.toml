@@ -1,6 +1,6 @@
 # Cloudflare-Worker-Konfiguration für das Sternenluna-Backend
 # (KI-Botschaften + Push-Erinnerungen). Deployment: siehe server/README.md
-name = "sternenorakel-orakel"
+name = "sternenluna-orakel"
 main = "orakel-worker.js"
 compatibility_date = "2026-06-01"
 
