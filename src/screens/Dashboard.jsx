@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import Luna, { LunaAvatar } from '../components/Luna.jsx'
 import RewardModal from '../components/RewardModal.jsx'
+import SofortHilfe from '../components/SofortHilfe.jsx'
 import { IcBell, IcCalendar, IcCompass, IcBook } from '../components/icons.jsx'
 import { useStore } from '../store/store.jsx'
 import { formatDate, greeting, lunaSays, constellationStatus } from '../data/library.js'
@@ -54,7 +55,6 @@ export default function Dashboard() {
   }
 
   // Sofort-Hilfe: Button ist schon da, Inhalte kommen im nächsten Sprint
-  const [sosPeek, setSosPeek] = useState(false)
 
   // Tagesziehung: erst Befinden (falls heute noch nicht abgefragt), dann Ritual.
   // Bereits gezogen → direkt die heutige Botschaft erneut ansehen.
@@ -97,10 +97,7 @@ export default function Dashboard() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {/* Sofort-Hilfe: immer sichtbar oben – Inhalte folgen in Kürze */}
-            <button onClick={() => setSosPeek(true)} aria-label="Sofort-Hilfe"
-              style={{ display: 'flex', alignItems: 'center', gap: 6, height: 32, padding: '0 12px', borderRadius: 999, border: '1px solid rgba(232,199,122,.4)', background: 'rgba(232,199,122,.1)', color: 'var(--gold-1)', font: '650 11px var(--font-body)', cursor: 'pointer' }}>
-              ✦ Sofort-Hilfe
-            </button>
+            <SofortHilfe />
             {/* Glocke → Erinnerungs-Einstellungen; Punkt zeigt aktive Erinnerung */}
             <button onClick={() => nav('/profil/erinnerung')} aria-label="Erinnerung einstellen"
               style={{ position: 'relative', width: 32, height: 32, borderRadius: '50%', border: '1px solid rgba(232,199,122,.3)', background: 'none', color: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -321,38 +318,6 @@ export default function Dashboard() {
             >
               Alles klar
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Sofort-Hilfe: Vorschau der kommenden Inhalte */}
-      {sosPeek && (
-        <div className="overlay" onClick={() => setSosPeek(false)}>
-          <div className="modal pop" onClick={(e) => e.stopPropagation()} style={{ paddingTop: 22 }}>
-            <div className="title-lg" style={{ fontSize: 19, color: 'var(--text)', textAlign: 'center' }}>✦ Sofort-Hilfe</div>
-            <div style={{ color: 'var(--text-dim)', font: '400 12px/1.55 var(--font-body)', marginTop: 8, textAlign: 'center' }}>
-              Luna lernt gerade, dich zu halten – diese Momente kommen in Kürze:
-            </div>
-            <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 7 }}>
-              {[
-                ['🌊', 'Zur Ruhe kommen', 'geführter Atemkreis bei Unruhe & Stress'],
-                ['🌙', 'Gedanken loslassen', 'Meditation & Grounding bei Grübeln und zum Einschlafen'],
-                ['⭐', 'Stärke sammeln', '90 Sekunden Mut – vor Prüfung, Gespräch oder großem Moment'],
-              ].map(([g, t, d]) => (
-                <div key={t} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 12, padding: '10px 12px' }}>
-                  <span style={{ fontSize: 16 }}>{g}</span>
-                  <span style={{ flex: 1 }}>
-                    <b style={{ display: 'block', color: 'var(--text)', font: '600 12.5px var(--font-body)' }}>{t}</b>
-                    <span style={{ color: 'var(--text-dim)', font: '400 11px/1.4 var(--font-body)' }}>{d}</span>
-                  </span>
-                  <span style={{ color: 'var(--gold-1)', font: '600 9.5px var(--font-body)', letterSpacing: 0.8, textTransform: 'uppercase', border: '1px solid rgba(232,199,122,.4)', borderRadius: 999, padding: '2px 7px', flexShrink: 0 }}>in Kürze</span>
-                </div>
-              ))}
-            </div>
-            <div style={{ marginTop: 10, color: '#7a7494', font: '400 10.5px/1.5 var(--font-body)', textAlign: 'center' }}>
-              Wenn es dir gerade ernsthaft nicht gut geht: Telefonseelsorge <b style={{ color: 'var(--text-dim)' }}>0800 111 0 111</b> – kostenlos, rund um die Uhr.
-            </div>
-            <button className="btn-gold" style={{ marginTop: 14 }} onClick={() => setSosPeek(false)}>Alles klar ✦</button>
           </div>
         </div>
       )}

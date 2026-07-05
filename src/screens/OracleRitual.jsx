@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/store.jsx'
 import { asset } from '../lib/asset.js'
 import { ritualTheme } from '../lib/ritualTheme.js'
+import SofortHilfe from '../components/SofortHilfe.jsx'
 
 export default function OracleRitual() {
   const nav = useNavigate()
@@ -27,8 +28,12 @@ export default function OracleRitual() {
   )
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '20px 18px 14px' }}>
-      <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 24, color: 'var(--gold-1)', textAlign: 'center', textShadow: '0 2px 14px rgba(232,199,122,.3)' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '13px 18px 14px' }}>
+      {/* Sofort-Hilfe auch hier erreichbar – wer Luna öffnet, sucht manchmal Halt */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <SofortHilfe />
+      </div>
+      <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 24, color: 'var(--gold-1)', textAlign: 'center', marginTop: 2, textShadow: '0 2px 14px rgba(232,199,122,.3)' }}>
         Wähle dein Ritual
       </div>
       <div style={{ color: 'var(--text-dim)', font: '400 13px/1.5 var(--font-body)', textAlign: 'center', fontStyle: 'italic', marginTop: 8, padding: '0 6px' }}>
