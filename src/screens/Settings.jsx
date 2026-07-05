@@ -285,6 +285,10 @@ export default function Settings() {
 
       {/* Privatsphäre & Rechtliches */}
       <div className="list" style={{ marginTop: 12 }}>
+        <button className="list-row" onClick={() => nav('/profil/erinnerung')}>
+          <span>🔔 Erinnerung &amp; Benachrichtigung</span>
+          <span className="meta">{settings.reminder ? `täglich ${settings.reminderTime || '21:00'}` : 'aus'} ›</span>
+        </button>
         <button className="list-row" onClick={() => nav('/profil/privacy')}>
           <span>🔒 Daten &amp; Privatsphäre</span>
           <span className="meta">Export · Löschen ›</span>
