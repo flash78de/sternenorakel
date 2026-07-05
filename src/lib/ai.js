@@ -10,9 +10,10 @@ import { generateMessage } from '../data/generator.js'
 // Der KI-Modus-Schalter in den Einstellungen aktiviert ihn; über
 // settings.aiEndpoint ließe sich intern ein anderer Server testen.
 export const AI_ENDPOINT = 'https://sternenluna-orakel.sternenorakel.workers.dev'
-// Opus mit Thinking braucht oft 8–15 s – großzügig warten,
-// die Offenbarungs-Animation überbrückt die Zeit.
-const AI_TIMEOUT_MS = 20000
+// Harter Deckel für die Wartezeit: Der Aufruf startet schon beim Antippen
+// (parallel zu ~4 s Inszenierung). Antwortet die KI bis dahin nicht,
+// übernimmt still die Offline-Bibliothek – niemand wartet länger als ~9 s.
+const AI_TIMEOUT_MS = 9000
 
 export const aiAvailable = Boolean(AI_ENDPOINT)
 

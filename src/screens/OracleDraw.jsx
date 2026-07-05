@@ -13,7 +13,18 @@ import { karteBild, karteBanner, runeBild } from '../lib/ritualAssets.js'
 
 // Kern-Flow: trigger (Würfel) → listening (Luna lauscht) → revelation →
 // message + Reflexion auf EINEM Screen (auto-gespeichert). Fehler = sanfter Zwischenzustand.
+// Die KI-Botschaft wird schon beim Antippen angefragt – Inszenierung und
+// Wartezeit überlagern sich, statt sich zu addieren.
 const LISTEN_TEXTS = ['Luna lauscht …', 'Ein Gedanke sortiert sich.', 'Die Botschaft nimmt Gestalt an.']
+
+// Wechselnde Texte in der Offenbarungs-Phase: solange die Botschaft noch
+// unterwegs ist, bleibt der Screen lebendig (kein „hakt die App?“-Gefühl).
+// Es wird nicht zyklisch gewechselt, sondern beim letzten Satz gehalten.
+const REVEAL_TEXTS = {
+  wuerfel: ['Der Würfel fällt – ein Zeichen leuchtet auf …', 'Luna liest das Zeichen …', 'Die Worte finden sich …', 'Gleich ist sie da.'],
+  karten: ['Deine Karte dreht sich um …', 'Luna liest die Zeichen …', 'Die Worte finden sich …', 'Gleich ist sie da.'],
+  runen: ['Die Runen ordnen sich …', 'Luna liest die Zeichen …', 'Die Worte finden sich …', 'Gleich ist sie da.'],
+}
 
 export default function OracleDraw() {
   const nav = useNavigate()
@@ -72,6 +83,16 @@ export default function OracleDraw() {
     return () => clearInterval(iv)
   }, [phase])
 
+  // Auch die Offenbarung wechselt ihre Texte, ruhiger Takt – falls die
+  // KI-Antwort noch läuft, wirkt die App weiter lebendig statt eingefroren.
+  useEffect(() => {
+    if (phase !== 'revelation') return
+    setMicro(0)
+    const texts = REVEAL_TEXTS[ritual] || REVEAL_TEXTS.wuerfel
+    const iv = setInterval(() => setMicro((i) => Math.min(i + 1, texts.length - 1)), 2500)
+    return () => clearInterval(iv)
+  }, [phase, ritual])
+
   useEffect(() => {
     if (drawnToday && todaysEntry && !freeImpulse) {
       // Wiederansicht direkt aus dem Eintrag (generierte Botschaften stehen nicht in MESSAGES).
@@ -93,24 +114,27 @@ export default function OracleDraw() {
   // die Offline-Generierung selbst kann nicht fehlschlagen (kein Fake-Fehler mehr).
   const draw = useCallback(() => {
     setPhase('listening')
+    // KI-Aufruf SOFORT starten (fetchMessage fällt bei Fehlern selbst auf die
+    // Offline-Bibliothek zurück, das Promise löst also immer auf). Die
+    // Inszenierung läuft parallel und deckt die ersten ~4 s der Wartezeit.
+    const pending = fetchMessage(
+      {
+        name: profile.name,
+        themes: profile.themes,
+        mood: profile.mood,
+        ritual,
+        styles: profile.commStyles,
+        coping: profile.coping,
+      },
+      // KI nur mit Einwilligung (DSGVO) UND innerhalb der 7 Sterntage bzw. mit Plus
+      { aiMode: settings.aiMode && settings.aiConsent === true && kiErlaubt, endpoint: settings.aiEndpoint }
+    )
     timers.current.push(
       setTimeout(() => {
         setPhase('revelation')
         timers.current.push(
           setTimeout(async () => {
-            // Hybrid: KI-Modus wenn aktiviert & erreichbar, sonst Offline-Bibliothek.
-            const msg = await fetchMessage(
-              {
-                name: profile.name,
-                themes: profile.themes,
-                mood: profile.mood,
-                ritual,
-                styles: profile.commStyles,
-                coping: profile.coping,
-              },
-              // KI nur mit Einwilligung (DSGVO) UND innerhalb der 7 Sterntage bzw. mit Plus
-              { aiMode: settings.aiMode && settings.aiConsent === true && kiErlaubt, endpoint: settings.aiEndpoint }
-            )
+            const msg = await pending
             const res = saveEntry(msg, '')
             setMessage(msg)
             setSaved(res)
@@ -273,8 +297,8 @@ export default function OracleDraw() {
           className="anim-burst"
         />
         <Luna state="offenbarung" width="min(255px, 65vw)" glowSize={300} float={false} burst />
-        <div style={{ position: 'relative', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 22, color: '#fff', marginTop: 6, textAlign: 'center', textShadow: '0 0 24px rgba(232,199,122,.8)' }}>
-          {ritual === 'karten' ? <>Deine Karte<br />dreht sich um …</> : ritual === 'runen' ? <>Die Runen<br />ordnen sich …</> : <>Der Würfel fällt –<br />ein Zeichen leuchtet auf …</>}
+        <div style={{ position: 'relative', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 22, color: '#fff', marginTop: 6, textAlign: 'center', maxWidth: 280, lineHeight: 1.3, minHeight: 58, textShadow: '0 0 24px rgba(232,199,122,.8)' }}>
+          {(REVEAL_TEXTS[ritual] || REVEAL_TEXTS.wuerfel)[micro]}
         </div>
       </div>
     )
