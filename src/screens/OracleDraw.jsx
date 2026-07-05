@@ -19,7 +19,13 @@ export default function OracleDraw() {
   const nav = useNavigate()
   const loc = useLocation()
   const ritual = loc.state?.ritual || 'wuerfel' // von OracleRitual durchgereicht
-  const { profile, journal, drawnToday, saveEntry, updateReflection, settings, updateSettings } = useStore()
+  const { profile, journal, drawnToday, saveEntry, updateReflection, settings, updateSettings, stats } = useStore()
+
+  // KI-Kostenregel: ohne Plus gibt es KI-Botschaften nur in den ersten
+  // 7 Sterntagen (ab erstem App-Start) – danach still die Offline-Bibliothek.
+  const kiErlaubt =
+    settings.premium ||
+    (stats.installISO && Date.now() - new Date(stats.installISO + 'T12:00').getTime() < 7 * 86400000)
 
   const listen = () => {
     if (!settings.premium) { nav('/profil/plus'); return }
@@ -102,8 +108,8 @@ export default function OracleDraw() {
                 styles: profile.commStyles,
                 coping: profile.coping,
               },
-              // KI nur mit aktiver Einwilligung (DSGVO-Opt-in) – sonst Offline-Bibliothek
-              { aiMode: settings.aiMode && settings.aiConsent === true, endpoint: settings.aiEndpoint }
+              // KI nur mit Einwilligung (DSGVO) UND innerhalb der 7 Sterntage bzw. mit Plus
+              { aiMode: settings.aiMode && settings.aiConsent === true && kiErlaubt, endpoint: settings.aiEndpoint }
             )
             const res = saveEntry(msg, '')
             setMessage(msg)
@@ -114,7 +120,7 @@ export default function OracleDraw() {
         )
       }, 2300)
     )
-  }, [profile.name, profile.themes, profile.mood, profile.commStyles, profile.coping, ritual, settings.aiMode, settings.aiConsent, settings.aiEndpoint, saveEntry])
+  }, [profile.name, profile.themes, profile.mood, profile.commStyles, profile.coping, ritual, settings.aiMode, settings.aiConsent, settings.aiEndpoint, kiErlaubt, saveEntry])
 
   // Jede NEUE Tagesbotschaft endet im Feier-Moment (Dopamin-Schleife schließen):
   // Sternbild > Rangaufstieg > tägliche Vollendung (+Sternenstaub, Serie).
@@ -210,7 +216,7 @@ export default function OracleDraw() {
 
         {/* Einmalige KI-Einwilligung (DSGVO-Opt-in) – die App funktioniert in beiden Fällen.
             Unter 16 keine Selbst-Einwilligung: Erziehungsberechtigte schalten in den Einstellungen frei. */}
-        {settings.aiMode && settings.aiConsent === null && !isUnder16(profile.birth) && (
+        {settings.aiMode && settings.aiConsent === null && kiErlaubt && !isUnder16(profile.birth) && (
           <div className="glass" style={{ padding: '11px 13px', marginBottom: 12 }}>
             <div style={{ color: 'var(--text)', font: '600 12px var(--font-body)' }}>✨ Darf Luna deine Botschaften mit KI formulieren?</div>
             <div style={{ color: 'var(--text-dim)', font: '400 10.5px/1.5 var(--font-body)', marginTop: 4 }}>
