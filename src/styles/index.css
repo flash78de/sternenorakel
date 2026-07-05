@@ -1,7 +1,25 @@
 /* ============================================================
-   Sternenorakel — Design System
+   Sternenluna — Design System
    Farben, Typografie, Glassmorphism 2.0, Animationen
    ============================================================ */
+
+/* Schriften lokal aus dem Repo (public/fonts) — keine Google-Server,
+   kein IP-Transfer (DSGVO), funktioniert offline. Variable Fonts:
+   eine Datei deckt alle genutzten Gewichte ab. */
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('/fonts/cinzel-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-latin.woff2') format('woff2');
+}
 :root {
   /* Hintergründe */
   --bg-0: #0b0a12;

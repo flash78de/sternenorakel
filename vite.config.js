@@ -19,6 +19,8 @@ export default defineConfig(() => ({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['uploads/luna-icon.png'],
+      // Lokale Schriften mit vorab cachen → Typografie auch offline
+      workbox: { globPatterns: ['**/*.{js,css,html,woff2}'] },
       manifest: {
         name: 'Sternenluna',
         short_name: 'Sternenluna',
