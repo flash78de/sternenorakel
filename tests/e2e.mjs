@@ -172,7 +172,8 @@ await page.waitForTimeout(600)
 check('Station 1: Muladhara mit Affirmationen', (await bodyHas('Muladhara')) && (await bodyHas('geerdet')))
 await page.goto('http://localhost:4173/#/reisen/chakren/3')
 await page.waitForTimeout(500)
-check('Station 3: Reihenfolge gesperrt', await bodyHas('noch nicht offen'))
+// Ohne Zugang: Kauf-Screen (9,99 €) · mit Zugang: Reihenfolge-/Tagessperre
+check('Station 3: gesperrt (Kauf- oder Reihenfolge-Screen)', (await bodyHas('9,99')) || (await bodyHas('noch nicht offen')) || (await bodyHas('öffnet sich morgen')))
 
 console.log(`\n${pass} bestanden, ${fail} fehlgeschlagen`)
 await browser.close()
