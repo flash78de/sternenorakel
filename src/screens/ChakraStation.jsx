@@ -36,6 +36,7 @@ export default function ChakraStation() {
   const [note, setNote] = useState(reisen.chakren.notes?.[num] || '')
   const [finished, setFinished] = useState(false)
   const [lightbox, setLightbox] = useState(false)
+  const [figurGross, setFigurGross] = useState(false) // Körperkarte im Vollbild
   const [guideOpen, setGuideOpen] = useState(!done.includes(num))
 
   // Beim Stationswechsel (gleiche Route, anderer Parameter) Zustand nachziehen
@@ -200,12 +201,19 @@ export default function ChakraStation() {
         </button>
         {guideOpen && (
           <div style={{ paddingBottom: 11 }}>
-            {/* Körperkarte: wo dieses Chakra sitzt */}
+            {/* Körperkarte: wo dieses Chakra sitzt – Tipp öffnet sie groß */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
-              <ChakraFigur aktiv={num} width={92} />
+              <button onClick={() => setFigurGross(true)}
+                style={{ background: 'none', border: 'none', padding: 0, cursor: 'zoom-in', flexShrink: 0 }}
+                aria-label="Körperkarte groß ansehen">
+                <ChakraFigur aktiv={num} width={92} />
+              </button>
               <div style={{ color: 'var(--text-dim)', font: '400 12.5px/1.55 var(--font-body)' }}>
                 Dieses Chakra sitzt <b style={{ color: 'var(--text)' }}>{c.ort}</b>.
                 Leg beim Summen sanft eine Hand dorthin, wenn du magst.
+                <span style={{ display: 'block', marginTop: 3, color: '#7a7494', font: '400 10.5px var(--font-body)' }}>
+                  Figur antippen zum Vergrößern
+                </span>
               </div>
             </div>
             {[
@@ -257,6 +265,25 @@ export default function ChakraStation() {
       <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10px/1.5 var(--font-body)', marginTop: 10 }}>
         Symbolsprache, keine Heilslehre – nimm mit, was dir guttut.
       </div>
+
+      {/* Körperkarte im Vollbild: aktives Chakra markiert, Punkte antippbar */}
+      {figurGross && (
+        <div onClick={() => setFigurGross(false)}
+          style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(8,7,14,.94)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 18 }}>
+          <ChakraFigur aktiv={num} width={Math.min(330, window.innerWidth - 90)}
+            onSelect={(m) => { if (canVisit(m)) { setFigurGross(false); goTo(m) } }} />
+          <div style={{ marginTop: 10, color: 'var(--text)', font: '600 13px var(--font-body)', textAlign: 'center' }}>
+            {c.n} · {c.dt}
+            <span style={{ display: 'block', marginTop: 3, color: 'var(--text-dim)', fontWeight: 400, fontSize: 11.5, maxWidth: 260 }}>
+              Sitzt {c.ort}. Offene Stationen lassen sich antippen · Tippen daneben schließt.
+            </span>
+          </div>
+          <button className="link-soft" style={{ marginTop: 14 }}
+            onClick={(e) => { e.stopPropagation(); nav('/wissen/chakren') }}>
+            Mehr über die Chakren im Wissen ↗
+          </button>
+        </div>
+      )}
 
       {/* Lightbox: Karte im Vollbild, Wischen wechselt auch hier */}
       {lightbox && (
