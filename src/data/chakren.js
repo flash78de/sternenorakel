@@ -14,6 +14,7 @@ export const CHAKREN_INTRO =
 export const CHAKREN = [
   {
     n: 1,
+    ort: 'am Beckenboden, an der Basis der Wirbelsäule',
     name: 'Muladhara',
     bija: 'Lam',
     klang: 'Laanngg',
@@ -36,6 +37,7 @@ export const CHAKREN = [
   },
   {
     n: 2,
+    ort: 'eine Handbreit unterhalb des Bauchnabels',
     name: 'Swadhisthana',
     bija: 'Vam',
     klang: 'Vaammm',
@@ -58,6 +60,7 @@ export const CHAKREN = [
   },
   {
     n: 3,
+    ort: 'über dem Bauchnabel, unter dem Brustbein',
     name: 'Manipura',
     bija: 'Ram',
     klang: 'Raammm',
@@ -80,6 +83,7 @@ export const CHAKREN = [
   },
   {
     n: 4,
+    ort: 'in der Mitte der Brust, auf Herzhöhe',
     name: 'Anahata',
     bija: 'Yam',
     klang: 'Yaammm',
@@ -100,6 +104,7 @@ export const CHAKREN = [
   },
   {
     n: 5,
+    ort: 'am Hals, auf Höhe des Kehlkopfs',
     name: 'Vishudda',
     bija: 'Ham',
     klang: 'Haammm',
@@ -121,6 +126,7 @@ export const CHAKREN = [
   },
   {
     n: 6,
+    ort: 'auf der Stirn, zwischen den Augenbrauen',
     name: 'Ajna',
     bija: 'Om',
     klang: 'Oommmm oder Auumm',
@@ -141,6 +147,7 @@ export const CHAKREN = [
   },
   {
     n: 7,
+    ort: 'am Scheitel, ganz oben auf dem Kopf',
     name: 'Sahasrara',
     bija: 'Om',
     klang: 'Or-gomm · Sa-tiamm · O-hoomm',

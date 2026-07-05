@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams, Navigate } from 'react-router-dom'
 import { asset } from '../lib/asset.js'
+import ChakraFigur from '../components/ChakraFigur.jsx'
 import { karteBild, runeBild } from '../lib/ritualAssets.js'
 import { ARCHETYPEN, KARTEN, RUNEN } from '../data/generator.js'
 import { CHAKREN, chakraBild } from '../data/chakren.js'
@@ -57,6 +58,33 @@ const SectionLabel = ({ children }) => (
     {children}
   </div>
 )
+
+// Körperkarte: sitzende Figur + Info-Karte zum angetippten Chakra
+function ChakrenKarte() {
+  const [sel, setSel] = useState(4) // Herz als einladender Startpunkt
+  const c = CHAKREN.find((x) => x.n === sel)
+  return (
+    <div className="card" style={{ marginTop: 14 }}>
+      <div className="card-title" style={{ marginBottom: 4 }}>Wo sitzt welches Chakra?</div>
+      <div style={{ color: 'var(--text-dim)', font: '400 12.5px/1.5 var(--font-body)' }}>
+        Tippe die Punkte an – von der Wurzel (1) bis zur Krone (7).
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 6 }}>
+        <ChakraFigur aktiv={sel} onSelect={setSel} width={200} />
+      </div>
+      <div style={{ background: `linear-gradient(160deg, ${c.farbe}22, ${c.farbe}0d)`, border: `1px solid ${c.farbe}55`, borderRadius: 14, padding: '11px 13px' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+          <span style={{ color: c.farbe, filter: 'brightness(1.3)', font: '700 14px var(--font-body)' }}>{c.n}</span>
+          <span style={{ color: 'var(--text)', font: '600 14.5px var(--font-body)' }}>{c.dt}</span>
+          <span style={{ color: 'var(--text-dim)', font: '500 12px var(--font-body)' }}>· „{c.wort}“</span>
+        </div>
+        <div style={{ color: 'var(--text-dim)', font: '400 13px/1.55 var(--font-body)', marginTop: 4 }}>
+          Sitzt <b style={{ color: 'var(--text)' }}>{c.ort}</b> · {c.thema} · Klang „{c.bija}“
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function WissenThema() {
   const nav = useNavigate()
@@ -189,12 +217,8 @@ export default function WissenThema() {
 
       {thema === 'chakren' && (
         <>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 14, flexWrap: 'wrap' }}>
-            {CHAKREN.map((c) => (
-              <img key={c.n} src={asset(chakraBild(c.n, 'sm'))} alt={c.dt}
-                style={{ width: 42, height: 'auto', borderRadius: 5, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,.4))' }} />
-            ))}
-          </div>
+          {/* Körperkarte: WO sitzt welches Chakra? Punkte antippbar */}
+          <ChakrenKarte />
           <div className="card" style={{ marginTop: 13 }}>
             <div style={{ color: 'var(--text)', font: '400 13.5px/1.7 var(--font-body)' }}>{CHAKREN_TEXT}</div>
           </div>

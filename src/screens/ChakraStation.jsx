@@ -6,6 +6,7 @@ import { asset } from '../lib/asset.js'
 import { buzz } from '../lib/haptics.js'
 import { formatDate } from '../data/library.js'
 import { CHAKREN, chakraBild } from '../data/chakren.js'
+import ChakraFigur from '../components/ChakraFigur.jsx'
 
 // Konfetti-Positionen für die Reise-Vollendung (deterministisch)
 const PARTS = [
@@ -199,6 +200,14 @@ export default function ChakraStation() {
         </button>
         {guideOpen && (
           <div style={{ paddingBottom: 11 }}>
+            {/* Körperkarte: wo dieses Chakra sitzt */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
+              <ChakraFigur aktiv={num} width={92} />
+              <div style={{ color: 'var(--text-dim)', font: '400 12.5px/1.55 var(--font-body)' }}>
+                Dieses Chakra sitzt <b style={{ color: 'var(--text)' }}>{c.ort}</b>.
+                Leg beim Summen sanft eine Hand dorthin, wenn du magst.
+              </div>
+            </div>
             {[
               ['1', 'Ankommen', 'Setz dich bequem hin. Drei ruhige Atemzüge – länger aus als ein.'],
               ['2', 'Summen', `„${c.klang}“ auf einem langen Ausatmen – zwei- oder dreimal. Spür, wo es brummt.`],
