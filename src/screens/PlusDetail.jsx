@@ -115,7 +115,9 @@ export default function PlusDetail() {
     }
   }
 
-  // PayPal-Buttons rendern, sobald konfiguriert (Einmalzahlung, kein Abo)
+  // PayPal-Buttons rendern, sobald konfiguriert. Technisch derzeit noch
+  // Einmal-Orders; echte PayPal-Subscriptions folgen, sobald das Konto
+  // freigegeben ist (bis dahin verlängert nichts von allein).
   useEffect(() => {
     if (!pay.configured || !pay.clientId || active || justActivated || !paypalRef.current) return
     let cancelled = false
@@ -197,7 +199,8 @@ export default function PlusDetail() {
         </div>
       </div>
 
-      {/* Preis prominent OBEN: Einmalzahlung, kein Abo – endet automatisch */}
+      {/* Preis prominent OBEN: Abo mit offener Ansage – Erinnerung vor jeder
+          Abbuchung (14+3 bzw. 3 Tage), kündbar bis einen Tag vorher. */}
       <div style={{ marginTop: 12, textAlign: 'center' }}>
         <span style={{ display: 'inline-block', padding: '7px 16px', borderRadius: 999, background: 'rgba(232,199,122,.12)', border: '1px solid rgba(232,199,122,.35)', color: 'var(--text)', font: '600 12.5px var(--font-body)' }}>
           <b style={{ color: 'var(--gold-1)' }}>4,99 €</b> / Monat
@@ -206,7 +209,7 @@ export default function PlusDetail() {
         </span>
         <div style={{ marginTop: 6, color: 'var(--text-dim)', font: '500 11px var(--font-body)' }}>
           Jahres-Zugang = <span style={{ color: 'var(--gold-1)', fontWeight: 700 }}>4 Monate geschenkt</span>
-          <span style={{ color: '#7a7494' }}> · Einmalzahlung, kein Abo – endet automatisch</span>
+          <span style={{ color: '#7a7494' }}> · verlängert sich automatisch – wir erinnern dich vor jeder Abbuchung, kündbar bis einen Tag vorher</span>
         </div>
       </div>
 
