@@ -13,6 +13,7 @@ import Befinden from './screens/Befinden.jsx'
 import OracleRitual from './screens/OracleRitual.jsx'
 import OracleDraw from './screens/OracleDraw.jsx'
 import Wissen from './screens/Wissen.jsx'
+import WissenThema from './screens/WissenThema.jsx'
 import Tagebuch from './screens/Tagebuch.jsx'
 import JournalEntry from './screens/JournalEntry.jsx'
 import Profil from './screens/Profil.jsx'
@@ -105,6 +106,7 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/oracle" element={<OracleRitual />} />
         <Route path="/wissen" element={<Wissen />} />
+        <Route path="/wissen/:thema" element={<WissenThema />} />
         <Route path="/tagebuch" element={<Tagebuch />} />
         <Route path="/profil" element={<Profil />} />
         <Route path="/profil/privacy" element={<Privacy />} />

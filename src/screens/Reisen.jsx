@@ -79,9 +79,21 @@ export default function Reisen() {
         <div style={{ color: 'var(--text-dim)', font: '400 12.5px/1.55 var(--font-body)', marginTop: 6 }}>
           Sieben Stationen, sieben Lebensbereiche – eine Station pro Tag.
         </div>
-        <button onClick={() => nav('/wissen')} className="link-soft" style={{ marginTop: 6, fontSize: 11.5 }}>
+        <button onClick={() => nav('/wissen/chakren')} className="link-soft" style={{ marginTop: 6, fontSize: 11.5 }}>
           Was sind Chakren? · Mehr im Wissen ›
         </button>
+      </div>
+
+      {/* Geführte Chakren-Meditation: prominent oben (Audio folgt) */}
+      <div style={{ marginTop: 12, display: 'flex', gap: 12, alignItems: 'center', borderRadius: 15, padding: '12px 14px', background: 'linear-gradient(150deg,rgba(166,107,255,.14),rgba(232,199,122,.08))', border: '1px solid rgba(232,199,122,.3)' }}>
+        <span style={{ fontSize: 20 }}>🎧</span>
+        <span style={{ flex: 1 }}>
+          <span style={{ display: 'block', color: 'var(--text)', font: '600 13px var(--font-body)' }}>Chakren-Meditation · geführt</span>
+          <span style={{ display: 'block', color: 'var(--text-dim)', font: '400 11px/1.4 var(--font-body)', marginTop: 1 }}>
+            Eine gesprochene Reise durch alle sieben Stationen – zum Zurücklehnen.
+          </span>
+        </span>
+        <span style={{ color: 'var(--gold-1)', font: '600 9.5px var(--font-body)', letterSpacing: 0.8, textTransform: 'uppercase', border: '1px solid rgba(232,199,122,.4)', borderRadius: 999, padding: '3px 8px', flexShrink: 0 }}>in Kürze</span>
       </div>
 
       {/* Ehrliche Rahmung – derselbe Geist wie der Barnum-Hinweis */}
@@ -175,18 +187,6 @@ export default function Reisen() {
           </button>
         </div>
       )}
-
-      {/* Ausblick: geführte Chakren-Meditation (Audio folgt) */}
-      <div style={{ marginTop: 12, display: 'flex', gap: 12, alignItems: 'center', borderRadius: 15, padding: '12px 14px', background: 'rgba(255,255,255,.03)', border: '1px dashed rgba(255,255,255,.16)', opacity: 0.75 }}>
-        <span style={{ fontSize: 20 }}>🎧</span>
-        <span style={{ flex: 1 }}>
-          <span style={{ display: 'block', color: 'var(--text)', font: '600 13px var(--font-body)' }}>Chakren-Meditation · geführt</span>
-          <span style={{ display: 'block', color: 'var(--text-dim)', font: '400 11px/1.4 var(--font-body)', marginTop: 1 }}>
-            Eine gesprochene Reise durch alle sieben Stationen – zum Zurücklehnen.
-          </span>
-        </span>
-        <span style={{ color: 'var(--gold-1)', font: '600 9.5px var(--font-body)', letterSpacing: 0.8, textTransform: 'uppercase', border: '1px solid rgba(232,199,122,.4)', borderRadius: 999, padding: '3px 8px', flexShrink: 0 }}>in Kürze</span>
-      </div>
 
       <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10px/1.5 var(--font-body)', marginTop: 12 }}>
         Symbolsprache, keine Heilslehre – nimm mit, was dir guttut.
