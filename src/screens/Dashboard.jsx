@@ -292,16 +292,28 @@ export default function Dashboard() {
           <div className="modal pop" onClick={(e) => e.stopPropagation()} style={{ paddingTop: 24, textAlign: 'center' }}>
             <span style={{ fontSize: 28 }}>✦</span>
             <div className="title-lg" style={{ fontSize: 19, color: 'var(--text)', marginTop: 8 }}>
-              Dein Plus endet {plusEnde.daysLeft <= 0 ? 'heute' : plusEnde.daysLeft === 1 ? 'morgen' : `in ${plusEnde.daysLeft} Tagen`}
+              {settings.plusRenews ? 'Dein Plus verlängert sich' : 'Dein Plus endet'}{' '}
+              {plusEnde.daysLeft <= 0 ? 'heute' : plusEnde.daysLeft === 1 ? 'morgen' : `in ${plusEnde.daysLeft} Tagen`}
             </div>
             <div style={{ color: 'var(--text-dim)', font: '400 12.5px/1.65 var(--font-body)', marginTop: 10 }}>
-              Am <b style={{ color: 'var(--gold-1)' }}>{plusEnde.until.split('-').reverse().join('.')}</b> läuft dein Plus-Zugang aus
-              {plusEnde.start ? <> – du hast ihn dir am <b style={{ color: 'var(--text)' }}>{plusEnde.start.split('-').reverse().join('.')}</b> gesichert</> : null}.
-              <br /><b style={{ color: 'var(--text)' }}>Es wird nichts abgebucht und nichts verlängert sich von allein.</b>{' '}
-              Wenn Luna dich weiter begleiten soll, verlängere einfach, wann du magst.
+              {settings.plusRenews ? (
+                <>
+                  Am <b style={{ color: 'var(--gold-1)' }}>{plusEnde.until.split('-').reverse().join('.')}</b> werden{' '}
+                  <b style={{ color: 'var(--text)' }}>{settings.plusPlan === 'jahr' ? '39,99 €' : '4,99 €'}</b> über PayPal abgebucht
+                  {plusEnde.start ? <> – zuordenbar: dein Abo vom <b style={{ color: 'var(--text)' }}>{plusEnde.start.split('-').reverse().join('.')}</b></> : null}.
+                  <br />Kündigen ist <b style={{ color: 'var(--text)' }}>bis einen Tag vorher</b> möglich – dein Plus bleibt dann bis zum Ende bestehen.
+                </>
+              ) : (
+                <>
+                  Am <b style={{ color: 'var(--gold-1)' }}>{plusEnde.until.split('-').reverse().join('.')}</b> läuft dein Plus-Zugang aus
+                  {plusEnde.start ? <> – du hast ihn dir am <b style={{ color: 'var(--text)' }}>{plusEnde.start.split('-').reverse().join('.')}</b> gesichert</> : null}.
+                  <br /><b style={{ color: 'var(--text)' }}>Es wird nichts abgebucht und nichts verlängert sich von allein.</b>{' '}
+                  Wenn Luna dich weiter begleiten soll, verlängere einfach, wann du magst.
+                </>
+              )}
             </div>
             <button className="btn-gold" style={{ marginTop: 16 }} onClick={() => closePlusEnde(true)}>
-              ✦ Verlängern ansehen
+              {settings.plusRenews ? '✦ Passt – oder verwalten' : '✦ Verlängern ansehen'}
             </button>
             <button
               onClick={() => closePlusEnde(false)}

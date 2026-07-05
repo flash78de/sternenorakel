@@ -40,8 +40,11 @@ const DEFAULT_STATE = {
     plusSource: null, // trial | coupon | paypal | beta – woher kommt das Plus?
     plusUntilISO: null, // letzter gültiger Tag (null = unbefristet)
     plusStartISO: null, // Tag der Sicherung („am xx.xx.xxxx gesichert")
-    plusNotice14For: null, // 14-Tage-Endehinweis gezeigt für dieses Enddatum
-    plusNotice3For: null, // 3-Tage-Endehinweis gezeigt für dieses Enddatum
+    plusNotice14For: null, // 14-Tage-Hinweis gezeigt für dieses Enddatum
+    plusNotice3For: null, // 3-Tage-Hinweis gezeigt für dieses Enddatum
+    plusRenews: false, // Abo: verlängert sich automatisch (offen angekündigt)
+    plusPlan: null, // 'monat' | 'jahr' – für Preis in den Verlängerungs-Hinweisen
+    chakrenOwned: false, // Chakren-Reise als Einmalkauf (unabhängig von Plus)
     trialUsedISO: null, // Tag, an dem der einmalige Gratis-Test gestartet wurde
     plusExpiredSeenISO: null, // Ablauf-Hinweis für dieses Enddatum bereits gezeigt
     splash: true, // „Luna erwacht"-Startanimation

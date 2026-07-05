@@ -20,6 +20,10 @@ const ARTIKEL = [
     t: 'Die Psychologie hinter Ritualen',
     a: 'Feste kleine Rituale – gleiche Zeit, gleiche Geste, gleicher Ort – senken Stress und erleichtern es dem Gehirn, eine Gewohnheit aufzubauen. Die Verhaltensforschung spricht von Ankern: Der Würfelwurf ist so ein Anker, der den Übergang vom Alltagsmodus ins Innehalten markiert. Nicht der Zufall des Wurfs verändert etwas, sondern der Moment der Ruhe, den du dir damit verlässlich schenkst.',
   },
+  {
+    t: 'Was sind Chakren?',
+    a: 'Die Chakrenlehre stammt aus jahrtausendealten indischen Yoga-Traditionen. Sie beschreibt sieben „Räder" (Sanskrit: chakra) entlang der Körpermitte – vom Wurzel-Chakra am Beckenboden bis zum Kronen-Chakra am Scheitel. Jedem sind ein Lebensbereich, eine Farbe, ein Klang (Bija-Mantra) und ein Leitsatz zugeordnet: Sicherheit („Ich habe"), Freude („Ich fühle"), Selbstwert („Ich kann"), Liebe („Ich liebe"), Ausdruck („Ich verstehe"), Intuition („Ich sehe"), Verbundenheit („Ich weiß"). Ob man Chakren als Energiezentren versteht oder als kluge Landkarte der eigenen Themen, ist Ansichtssache – und in Sternenluna ausdrücklich deine Entscheidung. Wirksam sind die Zutaten der Praxis in jedem Fall: langsames Ausatmen und Summen beruhigen das Nervensystem, Affirmationen stärken den Blick auf die eigenen Werte, und die sieben Stationen geben deiner Selbstreflexion eine Reihenfolge. Genau so nutzt sie die Chakren-Reise – als Ritual, nicht als Heilslehre.',
+  },
 ]
 
 const FAQ = [

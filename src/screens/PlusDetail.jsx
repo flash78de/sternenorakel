@@ -55,6 +55,15 @@ export default function PlusDetail() {
   const [payMsg, setPayMsg] = useState('')
   const paypalRef = useRef(null)
 
+  // Kündigen mit DOPPELTER Bestätigung – bewusste Entscheidung statt
+  // Versehens-Klick (und kein 1-Klick-Deaktivieren wie in der Frühphase).
+  const [cancelStep, setCancelStep] = useState(0) // 0=zu, 1=Nachfrage, 2=bestätigt
+  const doCancel = () => {
+    // Später zusätzlich: Kündigungs-Aufruf an PayPal (Subscription API)
+    updateSettings({ plusRenews: false })
+    setCancelStep(2)
+  }
+
   useEffect(() => {
     payConfig().then(setPay).catch(() => {})
   }, [])
@@ -201,8 +210,24 @@ export default function PlusDetail() {
       </div>
 
       {active ? (
-        <div style={{ marginTop: 12, textAlign: 'center', color: 'var(--gold-1)', font: '700 14px var(--font-body)' }}>
-          ✦ Plus ist aktiv{settings.plusUntilISO ? <> · bis {bisDatum(settings.plusUntilISO)}</> : null}
+        <div style={{ marginTop: 12 }}>
+          <div style={{ textAlign: 'center', color: 'var(--gold-1)', font: '700 14px var(--font-body)' }}>
+            ✦ Plus ist aktiv{settings.plusUntilISO ? <> · {settings.plusRenews ? 'verlängert sich am' : 'bis'} {bisDatum(settings.plusUntilISO)}</> : null}
+          </div>
+          {settings.plusRenews ? (
+            <>
+              <div style={{ textAlign: 'center', color: 'var(--text-dim)', font: '400 11px/1.5 var(--font-body)', marginTop: 4 }}>
+                Dann werden {settings.plusPlan === 'jahr' ? '39,99 €' : '4,99 €'} über PayPal abgebucht – wir erinnern dich vorher.
+              </div>
+              <button className="link-soft" style={{ marginTop: 8, display: 'block', marginLeft: 'auto', marginRight: 'auto' }} onClick={() => setCancelStep(1)}>
+                Verlängerung kündigen
+              </button>
+            </>
+          ) : (
+            <div style={{ textAlign: 'center', color: 'var(--text-dim)', font: '400 11px/1.5 var(--font-body)', marginTop: 4 }}>
+              Endet automatisch – es wird nichts abgebucht.
+            </div>
+          )}
         </div>
       ) : (
         <>
@@ -306,10 +331,47 @@ export default function PlusDetail() {
       )}
 
       <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10.5px/1.5 var(--font-body)', marginTop: 10 }}>
-        Zugang als <b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Einmalzahlung</b> – kein Abo, keine automatische
-        Verlängerung. Zahlung per PayPal{pay.configured ? '' : ' (wird gerade eingerichtet – nutze solange einen Gutschein-Code)'}.
+        Plus verlängert sich automatisch – <b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>offen angekündigt</b> (14 bzw. 3 Tage
+        vorher) und <b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>jederzeit bis einen Tag vor der Verlängerung kündbar</b>.
+        Gratis-Test und Gutscheine enden von selbst, ohne Abbuchung. Zahlung per
+        PayPal{pay.configured ? '' : ' (wird gerade eingerichtet – nutze solange einen Gutschein-Code)'}.
         {' '}<span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={() => nav('/rechtliches')}>Rechtliches &amp; Datenschutz</span>
       </div>
+
+      {/* Kündigen: zweistufig, mit klarer Folgen-Erklärung */}
+      {cancelStep === 1 && (
+        <div className="overlay" onClick={() => setCancelStep(0)}>
+          <div className="modal pop" onClick={(e) => e.stopPropagation()} style={{ paddingTop: 24 }}>
+            <div className="title-lg" style={{ fontSize: 19, color: 'var(--text)', textAlign: 'center' }}>Verlängerung wirklich kündigen?</div>
+            <div style={{ color: 'var(--text-dim)', font: '400 12.5px/1.65 var(--font-body)', marginTop: 10, textAlign: 'center' }}>
+              Dein Plus bleibt <b style={{ color: 'var(--gold-1)' }}>bis {bisDatum(settings.plusUntilISO)}</b> vollständig aktiv
+              und endet dann. Es wird nichts mehr abgebucht. Dein Tagebuch und alle Daten bleiben selbstverständlich erhalten.
+            </div>
+            <button className="btn-gold" style={{ marginTop: 16 }} onClick={() => setCancelStep(0)}>
+              ✦ Plus behalten
+            </button>
+            <button
+              onClick={doCancel}
+              style={{ marginTop: 10, width: '100%', padding: 12, borderRadius: 12, background: 'rgba(255,122,154,.1)', border: '1px solid rgba(255,122,154,.4)', color: 'var(--danger)', font: '600 13px var(--font-body)', cursor: 'pointer' }}
+            >
+              Ja, Verlängerung beenden
+            </button>
+          </div>
+        </div>
+      )}
+      {cancelStep === 2 && (
+        <div className="overlay" onClick={() => setCancelStep(0)}>
+          <div className="modal pop" onClick={(e) => e.stopPropagation()} style={{ paddingTop: 24, textAlign: 'center' }}>
+            <span style={{ fontSize: 28 }}>🌙</span>
+            <div className="title-lg" style={{ fontSize: 19, color: 'var(--text)', marginTop: 8 }}>Gekündigt ✓</div>
+            <div style={{ color: 'var(--text-dim)', font: '400 12.5px/1.65 var(--font-body)', marginTop: 10 }}>
+              Dein Plus läuft noch bis <b style={{ color: 'var(--gold-1)' }}>{bisDatum(settings.plusUntilISO)}</b> und endet dann von selbst.
+              Du bist jederzeit wieder willkommen – Luna bleibt an deiner Seite, auch ohne Plus.
+            </div>
+            <button className="btn-gold" style={{ marginTop: 16 }} onClick={() => setCancelStep(0)}>Alles klar</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

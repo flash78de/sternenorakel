@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import Luna from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
@@ -14,8 +14,9 @@ const PARTS = [
   { left: '70%', delay: 0.3, size: 15 }, { left: '85%', delay: 0.9, size: 11 },
 ]
 
-// Eine Station der Chakren-Reise: Karte · Summen · Handhaltung ·
-// Affirmationen · Reflexion. Abschluss speichert die Station (+ Notiz).
+// Eine Station der Chakren-Reise: Karte (per Tipp im Vollbild), kompakte
+// Anleitung, Affirmationen, Reflexion. Wischen (links/rechts) wechselt
+// zwischen den offenen Stationen – in Text- UND Vollbild-Ansicht.
 export default function ChakraStation() {
   const nav = useNavigate()
   const { n } = useParams()
@@ -24,12 +25,38 @@ export default function ChakraStation() {
   const c = CHAKREN.find((x) => x.n === num)
 
   const done = reisen.chakren.done || []
-  const [note, setNote] = useState(reisen.chakren.notes?.[num] || '')
-  const [finished, setFinished] = useState(false) // Reise gerade vollendet?
-
-  // Zugang: Station 1 frei, sonst Plus; Reihenfolge einhalten (fertige bleiben offen)
+  const zugang = settings.premium || settings.chakrenOwned
   const next = CHAKREN.find((x) => !done.includes(x.n))?.n ?? 7
-  const allowed = c && (settings.premium || num === 1) && (num <= next || done.includes(num))
+  const maxOpen = zugang ? next : 1 // bis hierhin darf navigiert werden
+
+  const [note, setNote] = useState(reisen.chakren.notes?.[num] || '')
+  const [finished, setFinished] = useState(false)
+  const [lightbox, setLightbox] = useState(false)
+  const [guideOpen, setGuideOpen] = useState(!done.includes(num))
+
+  // Beim Stationswechsel (gleiche Route, anderer Parameter) Zustand nachziehen
+  useEffect(() => {
+    setNote(reisen.chakren.notes?.[num] || '')
+    setGuideOpen(!(reisen.chakren.done || []).includes(num))
+  }, [num]) // eslint-disable-line
+
+  // Wisch-Navigation: gilt für Text- und Vollbild-Ansicht
+  const touch = useRef(null)
+  const goTo = (m) => {
+    if (m >= 1 && m <= 7 && (m <= maxOpen || done.includes(m))) nav(`/reisen/chakren/${m}`, { replace: true })
+  }
+  const onTouchStart = (e) => {
+    touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+  }
+  const onTouchEnd = (e) => {
+    if (!touch.current) return
+    const dx = e.changedTouches[0].clientX - touch.current.x
+    const dy = e.changedTouches[0].clientY - touch.current.y
+    touch.current = null
+    if (Math.abs(dx) > 60 && Math.abs(dx) > 2 * Math.abs(dy)) goTo(dx < 0 ? num + 1 : num - 1)
+  }
+
+  const allowed = c && (zugang || num === 1) && (num <= next || done.includes(num))
   if (!allowed) {
     return (
       <div className="center-col" style={{ padding: 30 }}>
@@ -61,6 +88,7 @@ export default function ChakraStation() {
     }))
     buzz([18, 24, 18])
     if (vollendet) setFinished(true)
+    else if (num < 7 && num + 1 <= 7) nav(`/reisen/chakren/${num + 1}`, { replace: true })
     else nav('/reisen')
   }
 
@@ -92,87 +120,126 @@ export default function ChakraStation() {
       </div>
     )
 
+  const dots = (
+    <div style={{ display: 'flex', justifyContent: 'center', gap: 7, marginTop: 10 }}>
+      {CHAKREN.map((x) => {
+        const reachable = x.n <= maxOpen || done.includes(x.n)
+        return (
+          <button key={x.n} onClick={() => goTo(x.n)} aria-label={`Station ${x.n}`}
+            style={{
+              width: x.n === num ? 20 : 8, height: 8, borderRadius: 4, border: 'none', padding: 0,
+              cursor: reachable ? 'pointer' : 'default', transition: 'all .25s',
+              background: x.n === num ? x.farbe : reachable ? 'rgba(245,244,250,.4)' : 'rgba(245,244,250,.13)',
+            }} />
+        )
+      })}
+    </div>
+  )
+
   return (
-    <div className="screen-scroll" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 20px 24px', background: `radial-gradient(480px 300px at 50% -80px, ${c.farbe}33, transparent 70%)` }}>
+    <div className="screen-scroll" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
+      style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 20px 24px', background: `radial-gradient(480px 300px at 50% -80px, ${c.farbe}33, transparent 70%)` }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <button className="back" onClick={() => nav('/reisen')}>‹</button>
         <span style={{ color: c.farbe, font: '600 10.5px var(--font-body)', letterSpacing: 1.4, textTransform: 'uppercase', filter: 'brightness(1.35)' }}>
-          Station {c.n} von 7
+          Station {c.n} von 7 {done.includes(num) ? '· ✓' : ''}
         </span>
         <span style={{ width: 38 }} />
       </div>
 
-      <div style={{ textAlign: 'center', marginTop: 8 }}>
-        <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 24, color: 'var(--gold-1)', textShadow: '0 2px 14px rgba(232,199,122,.35)' }}>
+      <div style={{ textAlign: 'center', marginTop: 6 }}>
+        <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 23, color: 'var(--gold-1)', textShadow: '0 2px 14px rgba(232,199,122,.35)' }}>
           {c.name} · „{c.bija}“
         </div>
-        <div style={{ color: 'var(--text-dim)', font: '500 12.5px var(--font-body)', marginTop: 3 }}>
-          {c.dt} · {c.steht}
+        <div style={{ color: 'var(--text-dim)', font: '500 12px var(--font-body)', marginTop: 2 }}>
+          {c.dt} · „{c.wort}“ · {c.thema}
         </div>
       </div>
 
-      {/* Die Karte */}
-      <div style={{ textAlign: 'center', marginTop: 14 }}>
-        <img src={asset(chakraBild(c.n, 'md'))} alt={c.dt} className="pop"
-          style={{ width: 'min(300px, 82%)', height: 'auto', borderRadius: 14, filter: `drop-shadow(0 14px 30px rgba(0,0,0,.55)) drop-shadow(0 0 22px ${c.farbe}55)` }} />
+      {/* Karte → Tipp öffnet Vollbild; Pfeile + Punkte + Wischen zum Navigieren */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 12 }}>
+        <button className="back" style={{ opacity: num > 1 && (num - 1 <= maxOpen || done.includes(num - 1)) ? 0.9 : 0.25 }} onClick={() => goTo(num - 1)} aria-label="vorherige Station">‹</button>
+        <button onClick={() => setLightbox(true)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'zoom-in' }} aria-label="Karte im Vollbild ansehen">
+          <img src={asset(chakraBild(c.n, 'md'))} alt={c.dt} className="pop"
+            style={{ width: 'min(250px, 62vw)', height: 'auto', borderRadius: 13, filter: `drop-shadow(0 14px 30px rgba(0,0,0,.55)) drop-shadow(0 0 22px ${c.farbe}55)` }} />
+        </button>
+        <button className="back" style={{ opacity: num < 7 && (num + 1 <= maxOpen || done.includes(num + 1)) ? 0.9 : 0.25 }} onClick={() => goTo(num + 1)} aria-label="nächste Station">›</button>
       </div>
+      <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10px var(--font-body)', marginTop: 6 }}>
+        Tippen für Vollbild · Wischen wechselt die Station
+      </div>
+      {dots}
 
-      {/* So gehst du durch die Station */}
-      <div className="glass" style={{ marginTop: 16, padding: '13px 15px' }}>
-        <div style={{ color: '#7a7494', font: '600 10px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 9 }}>
-          Deine Station · 3–5 Minuten
-        </div>
-        {[
-          ['1', 'Ankommen', 'Setz dich bequem hin. Drei ruhige Atemzüge – länger aus als ein.'],
-          ['2', 'Summen', `Summe auf einem langen Ausatmen den Klang „${c.klang}“ – zwei- oder dreimal. Spür ruhig, wo es im Körper brummt.`],
-          ['3', 'Handhaltung', 'Nimm die Handhaltung von der Karte ein – locker, nichts muss perfekt sein.'],
-          ['4', 'Mitsprechen', 'Sprich die Sätze unten leise oder still mit – such dir den heraus, der heute stimmt.'],
-        ].map(([nr, t, d]) => (
-          <div key={nr} style={{ display: 'flex', gap: 11, alignItems: 'flex-start', marginTop: 8 }}>
-            <span style={{ width: 22, height: 22, flexShrink: 0, borderRadius: '50%', display: 'grid', placeItems: 'center', background: `${c.farbe}2e`, border: `1px solid ${c.farbe}66`, color: 'var(--text)', font: '700 11px var(--font-body)' }}>{nr}</span>
-            <span style={{ color: 'var(--text-dim)', font: '400 12px/1.5 var(--font-body)' }}>
-              <b style={{ color: 'var(--text)', fontWeight: 600 }}>{t}:</b> {d}
-            </span>
+      {/* Kompakte Anleitung – aufklappbar, damit die Seite ruhig bleibt */}
+      <div className="glass" style={{ marginTop: 14, padding: '4px 15px' }}>
+        <button onClick={() => setGuideOpen(!guideOpen)}
+          style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer', padding: '10px 0', color: 'var(--text)', font: '600 12.5px var(--font-body)' }}>
+          <span>☾ So gehst du durch die Station <span style={{ color: '#7a7494', fontWeight: 400 }}>· 3–5 Min</span></span>
+          <span style={{ color: 'var(--gold-1)', transform: guideOpen ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}>▾</span>
+        </button>
+        {guideOpen && (
+          <div style={{ paddingBottom: 11 }}>
+            {[
+              ['1', 'Ankommen', 'Setz dich bequem hin. Drei ruhige Atemzüge – länger aus als ein.'],
+              ['2', 'Summen', `„${c.klang}“ auf einem langen Ausatmen – zwei- oder dreimal. Spür, wo es brummt.`],
+              ['3', 'Handhaltung', 'Wie auf der Karte – locker, nichts muss perfekt sein.'],
+              ['4', 'Mitsprechen', 'Such dir unten den Satz heraus, der heute stimmt.'],
+            ].map(([nr, t, d]) => (
+              <div key={nr} style={{ display: 'flex', gap: 11, alignItems: 'flex-start', marginTop: 7 }}>
+                <span style={{ width: 21, height: 21, flexShrink: 0, borderRadius: '50%', display: 'grid', placeItems: 'center', background: `${c.farbe}2e`, border: `1px solid ${c.farbe}66`, color: 'var(--text)', font: '700 10.5px var(--font-body)' }}>{nr}</span>
+                <span style={{ color: 'var(--text-dim)', font: '400 12px/1.5 var(--font-body)' }}>
+                  <b style={{ color: 'var(--text)', fontWeight: 600 }}>{t}:</b> {d}
+                </span>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
 
       {/* Affirmationen der Karte */}
-      <div style={{ marginTop: 12, background: `linear-gradient(160deg, ${c.farbe}22, ${c.farbe}0d)`, border: `1px solid ${c.farbe}55`, borderRadius: 16, padding: '13px 15px' }}>
+      <div style={{ marginTop: 11, background: `linear-gradient(160deg, ${c.farbe}22, ${c.farbe}0d)`, border: `1px solid ${c.farbe}55`, borderRadius: 16, padding: '13px 15px' }}>
         <div style={{ color: 'var(--text-dim)', font: '600 9.5px var(--font-body)', letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 7 }}>
-          „{c.wort}“ · Affirmationen
+          Affirmationen
         </div>
         {c.affirmationen.map((a) => (
           <div key={a} style={{ fontFamily: 'var(--font-head)', fontStyle: 'italic', fontWeight: 600, fontSize: 14.5, color: 'var(--text)', lineHeight: 1.5, marginTop: 4 }}>
             {a}
           </div>
         ))}
-        <div style={{ marginTop: 9, color: 'var(--text-dim)', font: '400 10.5px/1.45 var(--font-body)' }}>
-          Sinn: {c.sinn} · Element: {c.element} · {c.eigenschaften}
-        </div>
       </div>
 
       {/* Reflexion (bleibt in der Reise gespeichert) */}
-      <div style={{ marginTop: 14 }}>
-        <div style={{ color: '#7a7494', font: '600 10px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Lunas Frage zu dieser Station</div>
-        <div style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 16, color: 'var(--text)', lineHeight: 1.4 }}>
+      <div style={{ marginTop: 13 }}>
+        <div style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 15.5, color: 'var(--text)', lineHeight: 1.4 }}>
           {c.frage}
         </div>
         <textarea
           className="note"
-          style={{ marginTop: 10, minHeight: 90 }}
+          style={{ marginTop: 9, minHeight: 80 }}
           placeholder="Schreib auf, was auftaucht … (optional, bleibt auf deinem Gerät)"
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
       </div>
 
-      <button className="btn-gold" style={{ marginTop: 14 }} onClick={complete}>
+      <button className="btn-gold" style={{ marginTop: 12 }} onClick={complete}>
         {done.includes(num) ? 'Station aktualisieren ✓' : `Station ${c.n} abschließen ✦`}
       </button>
       <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10px/1.5 var(--font-body)', marginTop: 10 }}>
         Symbolsprache, keine Heilslehre – nimm mit, was dir guttut.
       </div>
+
+      {/* Lightbox: Karte im Vollbild, Wischen wechselt auch hier */}
+      {lightbox && (
+        <div onClick={() => setLightbox(false)} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
+          style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(8,7,14,.94)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 18 }}>
+          <img src={asset(chakraBild(c.n, 'md'))} alt={c.dt}
+            style={{ maxWidth: '94vw', maxHeight: '82vh', width: 'auto', height: 'auto', borderRadius: 14, boxShadow: `0 20px 60px rgba(0,0,0,.7), 0 0 40px ${c.farbe}44` }} />
+          <div style={{ marginTop: 12, color: 'var(--text-dim)', font: '500 11.5px var(--font-body)' }}>
+            {c.n}/7 · {c.dt} · Wischen zum Blättern · Tippen schließt
+          </div>
+        </div>
+      )}
     </div>
   )
 }

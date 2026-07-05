@@ -27,10 +27,12 @@
 
 const PAYPAL_API = 'https://api-m.paypal.com'
 
-// Feste Pläne – Preise NIE vom Client übernehmen
+// Feste Pläne – Preise NIE vom Client übernehmen.
+// days: 0 = dauerhafter Einmalkauf (z. B. Chakren-Reise), sonst Laufzeit.
 const PLANS = {
   monat: { amount: '4.99', days: 31, label: 'Sternenluna Plus · 1 Monat' },
   jahr: { amount: '39.99', days: 366, label: 'Sternenluna Plus · 1 Jahr' },
+  chakren: { amount: '9.99', days: 0, label: 'Die Chakren-Reise · Einmalkauf' },
 }
 
 // ---- Gerätekennung: nur als Hash gespeichert (keine Rückverfolgung) ----

@@ -3,7 +3,7 @@ import { IcStart, IcOracle, IcBook, IcMoon, IcUser } from './icons.jsx'
 
 const TABS = [
   { to: '/dashboard', label: 'Start', Icon: IcStart },
-  { to: '/oracle', label: 'Orakel', Icon: IcOracle },
+  { to: '/oracle', label: 'Luna', Icon: IcOracle },
   { to: '/wissen', label: 'Wissen', Icon: IcBook },
   { to: '/tagebuch', label: 'Tagebuch', Icon: IcMoon },
   { to: '/profil', label: 'Profil', Icon: IcUser },
