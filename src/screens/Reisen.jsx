@@ -17,6 +17,9 @@ export default function Reisen() {
   const done = reisen.chakren.done || []
   const complete = done.length >= 7
   const next = CHAKREN.find((c) => !done.includes(c.n))?.n ?? 7
+  // Eine Station pro Tag: nach einer vollendeten Station öffnet die nächste erst morgen
+  const heute = new Date().toISOString().slice(0, 10)
+  const dayLocked = reisen.chakren.lastDoneISO === heute && !complete
 
   // Einmalkauf über PayPal (erscheint, sobald die Zahlung eingerichtet ist)
   const [pay, setPay] = useState({ configured: false })
@@ -56,9 +59,9 @@ export default function Reisen() {
   }, [pay, zugang]) // eslint-disable-line
 
   const open = (n) => {
+    if (done.includes(n)) return nav(`/reisen/chakren/${n}`)
     const unlocked = zugang || n === 1
-    if (!unlocked) return
-    if (n <= next || done.includes(n)) nav(`/reisen/chakren/${n}`)
+    if (unlocked && n === next && !dayLocked) nav(`/reisen/chakren/${n}`)
   }
 
   return (
@@ -74,7 +77,7 @@ export default function Reisen() {
           Die Chakren-Reise
         </div>
         <div style={{ color: 'var(--text-dim)', font: '400 12.5px/1.55 var(--font-body)', marginTop: 6 }}>
-          Sieben Stationen, sieben Lebensbereiche – in deinem Tempo, gern eine pro Tag.
+          Sieben Stationen, sieben Lebensbereiche – eine Station pro Tag.
         </div>
         <button onClick={() => nav('/wissen')} className="link-soft" style={{ marginTop: 6, fontSize: 11.5 }}>
           Was sind Chakren? · Mehr im Wissen ›
@@ -109,14 +112,19 @@ export default function Reisen() {
           ✦ Reise vollendet – jede Station bleibt für dich geöffnet.
         </div>
       )}
+      {dayLocked && (
+        <div style={{ marginTop: 8, textAlign: 'center', color: 'var(--text-dim)', font: '500 11.5px/1.5 var(--font-body)' }}>
+          ☾ Schön, dass du heute hier warst. Deine nächste Station öffnet sich morgen.
+        </div>
+      )}
 
       {/* Stationen */}
       <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 9 }}>
         {CHAKREN.map((c) => {
           const isDone = done.includes(c.n)
           const unlocked = zugang || c.n === 1
-          const inOrder = c.n <= next
-          const openable = unlocked && (inOrder || isDone)
+          const inOrder = c.n === next
+          const openable = isDone || (unlocked && inOrder && !dayLocked)
           return (
             <button key={c.n} onClick={() => open(c.n)}
               style={{
@@ -136,8 +144,8 @@ export default function Reisen() {
                   „{c.wort}“ · {c.thema}
                 </span>
               </span>
-              <span style={{ flexShrink: 0, font: '600 12px var(--font-body)', color: isDone ? 'var(--gold-1)' : unlocked ? (inOrder ? 'var(--purple-2)' : '#7a7494') : 'var(--gold-1)' }}>
-                {isDone ? '✓' : !unlocked ? '🔒' : inOrder ? (c.n === 1 && !zugang ? 'Kostprobe ›' : 'Öffnen ›') : '· · ·'}
+              <span style={{ flexShrink: 0, font: '600 12px var(--font-body)', color: isDone ? 'var(--gold-1)' : !unlocked ? 'var(--gold-1)' : inOrder ? (dayLocked ? '#7a7494' : 'var(--purple-2)') : '#7a7494' }}>
+                {isDone ? '✓' : !unlocked ? '🔒' : inOrder ? (dayLocked ? '☾ morgen' : c.n === 1 && !zugang ? 'Kostprobe ›' : 'Öffnen ›') : '· · ·'}
               </span>
             </button>
           )

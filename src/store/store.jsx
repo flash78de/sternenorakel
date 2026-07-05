@@ -54,7 +54,7 @@ const DEFAULT_STATE = {
   journal: [], // {id, ts, iso, mid, title, symbol, constellation, theme, mantra, text, luck, energy, question, reflection}
   // Reisen: geführte Mehr-Stationen-Programme (Plus). Notizen bleiben lokal.
   reisen: {
-    chakren: { done: [], notes: {}, startISO: null, completedISO: null },
+    chakren: { done: [], notes: {}, startISO: null, completedISO: null, lastDoneISO: null },
   },
   seenReward: null, // id der zuletzt gezeigten Belohnung
   seenReturnISO: null, // Tag, an dem der Rückkehr-Screen zuletzt gezeigt wurde

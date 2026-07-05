@@ -27,7 +27,10 @@ export default function ChakraStation() {
   const done = reisen.chakren.done || []
   const zugang = settings.premium || settings.chakrenOwned
   const next = CHAKREN.find((x) => !done.includes(x.n))?.n ?? 7
-  const maxOpen = zugang ? next : 1 // bis hierhin darf navigiert werden
+  // Eine Station pro Tag: Wurde heute schon eine NEUE Station vollendet,
+  // öffnet sich die nächste erst morgen (fertige bleiben immer besuchbar).
+  const dayLocked = reisen.chakren.lastDoneISO === formatDate().iso
+  const canVisit = (m) => done.includes(m) || (m === next && !dayLocked && (zugang || m === 1))
 
   const [note, setNote] = useState(reisen.chakren.notes?.[num] || '')
   const [finished, setFinished] = useState(false)
@@ -43,7 +46,7 @@ export default function ChakraStation() {
   // Wisch-Navigation: gilt für Text- und Vollbild-Ansicht
   const touch = useRef(null)
   const goTo = (m) => {
-    if (m >= 1 && m <= 7 && (m <= maxOpen || done.includes(m))) nav(`/reisen/chakren/${m}`, { replace: true })
+    if (m >= 1 && m <= 7 && canVisit(m)) nav(`/reisen/chakren/${m}`, { replace: true })
   }
   const onTouchStart = (e) => {
     touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
@@ -56,15 +59,30 @@ export default function ChakraStation() {
     if (Math.abs(dx) > 60 && Math.abs(dx) > 2 * Math.abs(dy)) goTo(dx < 0 ? num + 1 : num - 1)
   }
 
-  const allowed = c && (zugang || num === 1) && (num <= next || done.includes(num))
+  const allowed = c && canVisit(num)
   if (!allowed) {
+    // Unterscheide: Tages-Rhythmus vs. Kauf nötig vs. Reihenfolge
+    const brauchtKauf = c && !zugang && num !== 1
+    const morgen = c && !brauchtKauf && num === next && dayLocked
     return (
       <div className="center-col" style={{ padding: 30 }}>
-        <Luna state="lauschen" width={140} glowSize={170} float />
-        <div className="h-serif" style={{ fontSize: 18, color: 'var(--text)', marginTop: 12, textAlign: 'center' }}>
-          Diese Station ist noch nicht offen.
+        <Luna state={morgen ? 'schlaf' : 'lauschen'} width={140} glowSize={170} float />
+        <div className="h-serif" style={{ fontSize: 18, color: 'var(--text)', marginTop: 12, textAlign: 'center', lineHeight: 1.4 }}>
+          {morgen ? <>Diese Station öffnet sich morgen.</> : brauchtKauf ? <>Hier beginnt der Teil<br />der ganzen Reise.</> : <>Diese Station ist noch nicht offen.</>}
         </div>
-        <button className="btn-gold" style={{ marginTop: 18, width: 'auto', padding: '12px 22px' }} onClick={() => nav('/reisen')}>
+        <div style={{ marginTop: 10, color: 'var(--text-dim)', font: '400 12.5px/1.6 var(--font-body)', textAlign: 'center', maxWidth: 270 }}>
+          {morgen
+            ? 'Eine Station pro Tag – gute Reisen brauchen Zwischenraum. Deine bisherigen Stationen bleiben offen.'
+            : brauchtKauf
+              ? 'Die Stationen 2–7 gehören zur vollständigen Chakren-Reise – einmal 9,99 € oder in Plus enthalten.'
+              : 'Die Reise geht Schritt für Schritt – schließe zuerst die vorherige Station ab.'}
+        </div>
+        {brauchtKauf && (
+          <button className="btn-gold" style={{ marginTop: 18, width: 'auto', padding: '12px 22px' }} onClick={() => nav('/reisen')}>
+            ✦ Reise freischalten
+          </button>
+        )}
+        <button className={brauchtKauf ? 'link-soft' : 'btn-gold'} style={{ marginTop: brauchtKauf ? 12 : 18, width: 'auto', padding: brauchtKauf ? undefined : '12px 22px' }} onClick={() => nav('/reisen')}>
           Zur Reise-Übersicht
         </button>
       </div>
@@ -72,6 +90,7 @@ export default function ChakraStation() {
   }
 
   const complete = () => {
+    const neu = !done.includes(num) // Notiz-Update verbraucht den Tag nicht
     const newDone = [...new Set([...done, num])]
     const vollendet = newDone.length >= 7 && done.length < 7
     patch((s) => ({
@@ -82,13 +101,14 @@ export default function ChakraStation() {
           done: newDone,
           notes: { ...s.reisen.chakren.notes, ...(note.trim() ? { [num]: note.trim() } : {}) },
           startISO: s.reisen.chakren.startISO || formatDate().iso,
+          lastDoneISO: neu ? formatDate().iso : s.reisen.chakren.lastDoneISO,
           completedISO: vollendet ? formatDate().iso : s.reisen.chakren.completedISO,
         },
       },
     }))
     buzz([18, 24, 18])
+    // Kein Auto-Sprung zur nächsten Station: die öffnet sich erst morgen
     if (vollendet) setFinished(true)
-    else if (num < 7 && num + 1 <= 7) nav(`/reisen/chakren/${num + 1}`, { replace: true })
     else nav('/reisen')
   }
 
@@ -123,7 +143,7 @@ export default function ChakraStation() {
   const dots = (
     <div style={{ display: 'flex', justifyContent: 'center', gap: 7, marginTop: 10 }}>
       {CHAKREN.map((x) => {
-        const reachable = x.n <= maxOpen || done.includes(x.n)
+        const reachable = canVisit(x.n)
         return (
           <button key={x.n} onClick={() => goTo(x.n)} aria-label={`Station ${x.n}`}
             style={{
@@ -158,12 +178,12 @@ export default function ChakraStation() {
 
       {/* Karte → Tipp öffnet Vollbild; Pfeile + Punkte + Wischen zum Navigieren */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 12 }}>
-        <button className="back" style={{ opacity: num > 1 && (num - 1 <= maxOpen || done.includes(num - 1)) ? 0.9 : 0.25 }} onClick={() => goTo(num - 1)} aria-label="vorherige Station">‹</button>
+        <button className="back" style={{ opacity: num > 1 && canVisit(num - 1) ? 0.9 : 0.25 }} onClick={() => goTo(num - 1)} aria-label="vorherige Station">‹</button>
         <button onClick={() => setLightbox(true)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'zoom-in' }} aria-label="Karte im Vollbild ansehen">
           <img src={asset(chakraBild(c.n, 'md'))} alt={c.dt} className="pop"
             style={{ width: 'min(250px, 62vw)', height: 'auto', borderRadius: 13, filter: `drop-shadow(0 14px 30px rgba(0,0,0,.55)) drop-shadow(0 0 22px ${c.farbe}55)` }} />
         </button>
-        <button className="back" style={{ opacity: num < 7 && (num + 1 <= maxOpen || done.includes(num + 1)) ? 0.9 : 0.25 }} onClick={() => goTo(num + 1)} aria-label="nächste Station">›</button>
+        <button className="back" style={{ opacity: num < 7 && canVisit(num + 1) ? 0.9 : 0.25 }} onClick={() => goTo(num + 1)} aria-label="nächste Station">›</button>
       </div>
       <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10px var(--font-body)', marginTop: 6 }}>
         Tippen für Vollbild · Wischen wechselt die Station
