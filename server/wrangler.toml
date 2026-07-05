@@ -4,15 +4,14 @@ name = "sternenluna-orakel"
 main = "orakel-worker.js"
 compatibility_date = "2026-06-01"
 
+# Push-Abos (Endpoint, Wunschzeit, Zeitzone – nichts Persönliches).
+# Achtung TOML: MUSS vor der ersten [Sektion] stehen (Top-Level-Schlüssel).
+kv_namespaces = [{ binding = "PUSH", id = "48355a7eff5543d0b9af716b14746970" }]
+
 # Cron für die täglichen Push-Erinnerungen: alle 15 Minuten prüfen,
 # wer gerade seine Wunschzeit (in seiner Zeitzone) erreicht.
 [triggers]
 crons = ["*/15 * * * *"]
-
-# Push-Abos (Endpoint, Wunschzeit, Zeitzone – nichts Persönliches).
-# Namespace anlegen: npx wrangler kv namespace create PUSH
-# → benötigt Token-Berechtigung „Workers KV Storage: Bearbeiten“.
-# kv_namespaces = [{ binding = "PUSH", id = "HIER_NAMESPACE_ID" }]
 
 [vars]
 # Erlaubte Absender (kommagetrennt): eigene Domain + alte GitHub-Adresse.
