@@ -75,11 +75,11 @@ export default function WissenThema() {
         <>
           <div className="card" style={{ marginTop: 14 }}>
             <div className="card-title" style={{ marginBottom: 7 }}>Was diese App sein will</div>
-            <div style={{ color: 'var(--text)', font: '400 12px/1.55 var(--font-body)' }}>
+            <div style={{ color: 'var(--text)', font: '400 13.5px/1.6 var(--font-body)' }}>
               Ein Begleiter, ein Spiegel und eine Quelle der Inspiration – <b style={{ color: 'var(--gold-1)', fontWeight: 600 }}>kein unfehlbares Orakel</b>.
               Luna lädt dich ein, innezuhalten und deinen eigenen Sinn zu finden.
             </div>
-            <div style={{ marginTop: 10, color: '#ffd9a0', font: '400 11.5px/1.5 var(--font-body)', borderLeft: '3px solid #E8C77A', paddingLeft: 12, fontStyle: 'italic' }}>
+            <div style={{ marginTop: 10, color: '#ffd9a0', font: '400 13px/1.55 var(--font-body)', borderLeft: '3px solid #E8C77A', paddingLeft: 12, fontStyle: 'italic' }}>
               Diese App ersetzt keine Therapie oder professionelle Beratung. Wenn es dir nicht gut geht, sprich mit einem
               Menschen, dem du vertraust.
             </div>
@@ -87,7 +87,7 @@ export default function WissenThema() {
 
           <div className="card" style={{ marginTop: 11 }}>
             <div className="card-title" style={{ marginBottom: 7 }}>Wie Botschaften entstehen</div>
-            <div style={{ color: 'var(--text)', font: '400 12px/1.55 var(--font-body)' }}>
+            <div style={{ color: 'var(--text)', font: '400 13.5px/1.6 var(--font-body)' }}>
               Aus Symbolen, warmen Kernaussagen und – wenn verfügbar – KI-Texten. Bewusst allgemein gehalten
               (<b style={{ color: 'var(--purple-2)', fontWeight: 600 }}>Barnum-Effekt</b>), damit du deinen eigenen Sinn
               hineinlegen kannst.
@@ -120,13 +120,13 @@ export default function WissenThema() {
 
       {thema === 'psychologie' && (
         <>
-          <div style={{ color: 'var(--text-dim)', font: '400 12px/1.5 var(--font-body)', marginTop: 12 }}>
+          <div style={{ color: 'var(--text-dim)', font: '400 13.5px/1.55 var(--font-body)', marginTop: 12 }}>
             Vier kurze Grundlagen – ehrlich erklärt, ohne Fachchinesisch.
           </div>
           {ARTIKEL.map((item) => (
             <div key={item.t} className="card" style={{ marginTop: 11 }}>
               <div className="card-title" style={{ marginBottom: 7 }}>{item.t}</div>
-              <div style={{ color: 'var(--text)', font: '400 12px/1.6 var(--font-body)' }}>{item.a}</div>
+              <div style={{ color: 'var(--text)', font: '400 13.5px/1.65 var(--font-body)' }}>{item.a}</div>
             </div>
           ))}
         </>
@@ -134,7 +134,7 @@ export default function WissenThema() {
 
       {thema === 'symbole' && (
         <>
-          <div style={{ color: 'var(--text-dim)', font: '400 12px/1.5 var(--font-body)', marginTop: 12 }}>
+          <div style={{ color: 'var(--text-dim)', font: '400 13.5px/1.55 var(--font-body)', marginTop: 12 }}>
             Alles, was Luna ziehen kann – zum Nachschlagen. Welche Bedeutung ein Symbol
             für <b style={{ color: 'var(--text)' }}>dich</b> trägt, entscheidet wie immer dein Blick darauf.
           </div>
@@ -150,7 +150,7 @@ export default function WissenThema() {
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontFamily: 'var(--font-head)', color: 'var(--gold-1)', fontSize: 14.5, fontWeight: 600 }}>{k.title}</div>
                 <div style={{ color: 'var(--purple-2)', font: '600 10px var(--font-body)', letterSpacing: 0.6, textTransform: 'uppercase', marginTop: 1 }}>{k.thema}</div>
-                <div style={{ color: 'var(--text-dim)', font: '400 11.5px/1.5 var(--font-body)', marginTop: 4 }}>{k.deutung}</div>
+                <div style={{ color: 'var(--text-dim)', font: '400 13px/1.55 var(--font-body)', marginTop: 4 }}>{k.deutung}</div>
               </div>
             </div>
           ))}
@@ -164,10 +164,10 @@ export default function WissenThema() {
                 <span style={{ width: 36, height: 42, flexShrink: 0, borderRadius: '44% 44% 38% 38%', display: 'grid', placeItems: 'center', fontSize: 17, background: 'linear-gradient(160deg,#26382f,#131f19)', border: '1px solid rgba(150,217,180,.3)', color: '#96d9b4', fontFamily: 'var(--font-head)' }}>{r.glyph}</span>
               )}
               <div style={{ minWidth: 0 }}>
-                <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>
-                  {r.name} <span style={{ color: 'var(--purple-2)', fontWeight: 500, fontSize: 11 }}>· {r.bedeutung}</span>
+                <div style={{ color: 'var(--text)', font: '600 14.5px var(--font-body)' }}>
+                  {r.name} <span style={{ color: 'var(--purple-2)', fontWeight: 500, fontSize: 12.5 }}>· {r.bedeutung}</span>
                 </div>
-                <div style={{ color: 'var(--text-dim)', font: '400 11.5px/1.5 var(--font-body)', marginTop: 2 }}>{r.heute}</div>
+                <div style={{ color: 'var(--text-dim)', font: '400 13px/1.55 var(--font-body)', marginTop: 2 }}>{r.heute}</div>
               </div>
             </div>
           ))}
@@ -175,11 +175,11 @@ export default function WissenThema() {
           <SectionLabel>⚔ Die sechs Archetypen des Würfels</SectionLabel>
           {ARCHETYPEN.map((a) => (
             <div key={a.name} className="card" style={{ marginTop: 9 }}>
-              <div style={{ color: 'var(--gold-1)', font: '600 13.5px var(--font-body)' }}>
+              <div style={{ color: 'var(--gold-1)', font: '600 15px var(--font-body)' }}>
                 {a.glyph} {a.name}
               </div>
-              <div style={{ color: 'var(--text-dim)', font: '400 11.5px/1.5 var(--font-body)', marginTop: 4 }}>{a.kern}</div>
-              <div style={{ color: '#9a93b8', font: '400 11px/1.45 var(--font-body)', marginTop: 4 }}>
+              <div style={{ color: 'var(--text-dim)', font: '400 13px/1.55 var(--font-body)', marginTop: 4 }}>{a.kern}</div>
+              <div style={{ color: '#9a93b8', font: '400 12.5px/1.5 var(--font-body)', marginTop: 4 }}>
                 <b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Kleine Handlung:</b> {a.impuls}
               </div>
             </div>
@@ -196,15 +196,15 @@ export default function WissenThema() {
             ))}
           </div>
           <div className="card" style={{ marginTop: 13 }}>
-            <div style={{ color: 'var(--text)', font: '400 12px/1.65 var(--font-body)' }}>{CHAKREN_TEXT}</div>
+            <div style={{ color: 'var(--text)', font: '400 13.5px/1.7 var(--font-body)' }}>{CHAKREN_TEXT}</div>
           </div>
           <div className="card" style={{ marginTop: 11 }}>
             <div className="card-title" style={{ marginBottom: 8 }}>Die sieben Leitsätze</div>
             {CHAKREN.map((c) => (
               <div key={c.n} style={{ display: 'flex', gap: 10, alignItems: 'baseline', marginTop: 5 }}>
                 <span style={{ width: 10, height: 10, borderRadius: '50%', flexShrink: 0, background: c.farbe, alignSelf: 'center' }} />
-                <span style={{ color: 'var(--text)', font: '600 12px var(--font-body)', width: 92, flexShrink: 0 }}>„{c.wort}“</span>
-                <span style={{ color: 'var(--text-dim)', font: '400 11.5px var(--font-body)' }}>{c.dt} · {c.thema}</span>
+                <span style={{ color: 'var(--text)', font: '600 13px var(--font-body)', width: 96, flexShrink: 0 }}>„{c.wort}“</span>
+                <span style={{ color: 'var(--text-dim)', font: '400 13px var(--font-body)' }}>{c.dt} · {c.thema}</span>
               </div>
             ))}
           </div>

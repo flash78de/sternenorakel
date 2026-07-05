@@ -1,25 +1,40 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/store.jsx'
-import { THEMES, MONTHS, zodiacOf, formatDate, isUnder16 } from '../data/library.js'
-import { COMM_STYLES, COPING, generateMessage } from '../data/generator.js'
-import { asset } from '../lib/asset.js'
+import { formatDate } from '../data/library.js'
+import { generateMessage } from '../data/generator.js'
 import { isInstalled, isIOS, canPromptInstall, promptInstall, onInstallChange } from '../lib/install.js'
-import DarkPicker from '../components/DarkPicker.jsx'
 
-const TONES = [
-  { key: 'Sanft', desc: 'Warm und einfühlsam' },
-  { key: 'Poetisch', desc: 'Wie ein kleiner Sternenimpuls' },
-  { key: 'Kurz & klar', desc: 'Direkt und wertschätzend' },
-]
+// Einstellungen-Hub: kurze, gruppierte Reihen (Apple-Stil) – alles
+// Inhaltliche liegt auf Untersektionen (SettingsSektion.jsx).
+
+const Gruppe = ({ label, children }) => (
+  <div style={{ marginTop: 16 }}>
+    <div style={{ color: '#8a83a6', font: '600 11px var(--font-body)', letterSpacing: 1.2, textTransform: 'uppercase', margin: '0 4px 7px' }}>
+      {label}
+    </div>
+    <div className="list">{children}</div>
+  </div>
+)
+
+const Reihe = ({ icon, title, meta, onClick, children }) => (
+  <button className="list-row" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
+    <span style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
+      <span style={{ width: 30, textAlign: 'center', fontSize: 17, flexShrink: 0 }}>{icon}</span>
+      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</span>
+    </span>
+    {children || <span className="meta">{meta ? `${meta} ›` : '›'}</span>}
+  </button>
+)
 
 export default function Settings() {
   const nav = useNavigate()
-  const { settings, updateSettings, profile, updateProfile, patch, journal } = useStore()
+  const { settings, updateSettings, profile, patch, journal } = useStore()
   const [devTaps, setDevTaps] = useState(0)
   const devMode = devTaps >= 5
   const [updating, setUpdating] = useState(false)
-  const [, setInstallTick] = useState(0) // neu rendern, wenn Installierbarkeit sich ändert
+  const [installHint, setInstallHint] = useState(false)
+  const [, setInstallTick] = useState(0)
   useEffect(() => onInstallChange(() => setInstallTick((n) => n + 1)), [])
 
   // Holt die neueste App-Version: Service Worker + Cache verwerfen, frisch laden.
@@ -43,8 +58,6 @@ export default function Settings() {
 
   // ---- Test-Werkzeuge (nur für die Erprobung, erreichbar über 5× Tippen auf die Version) ----
   const seedDemo = () => {
-    // 14 Tage Demo-Tagebuch: gemischte Rituale, Stimmungen & Reflexionen,
-    // damit Woche/Monat/Sternbilder/Glückselemente sofort etwas zeigen.
     const plan = [
       ['Liebe & Beziehungen', 'wuerfel', 'Ich habe heute an unser Gespräch gedacht.'],
       ['Liebe & Beziehungen', 'karten', 'Nähe fällt mir leichter, wenn ich ehrlich bin.'],
@@ -84,297 +97,98 @@ export default function Settings() {
     nav('/dashboard')
   }
   const timeShift = () => {
-    // Alles einen Tag älter machen → „morgen" lässt sich sofort testen
     const shift = (iso) => (iso ? new Date(new Date(iso + 'T12:00').getTime() - 86400000).toISOString().slice(0, 10) : iso)
     patch((s) => ({
       journal: s.journal.map((e) => ({ ...e, ts: e.ts - 86400000, iso: shift(e.iso) })),
       stats: { ...s.stats, lastDrawISO: shift(s.stats.lastDrawISO), moodTodayISO: shift(s.stats.moodTodayISO) },
-      seenReturnISO: formatDate().iso, // kein ungewollter Rückkehr-Screen
+      seenReturnISO: formatDate().iso,
     }))
   }
 
-  const [name, setName] = useState(profile.name || '')
-  const [day, setDay] = useState(profile.birth?.day || '')
-  const [month, setMonth] = useState(profile.birth?.month || '')
-  const [year, setYear] = useState(profile.birth?.year || '')
-
-  const years = useMemo(() => {
-    const now = new Date().getFullYear()
-    return Array.from({ length: 100 }, (_, i) => now - 13 - i)
-  }, [])
-
-  const zodiac = useMemo(() => zodiacOf(Number(day), Number(month)), [day, month])
-
-  const saveBirth = (d, m, y) => {
-    updateProfile({
-      birth: { day: Number(d) || null, month: Number(m) || null, year: Number(y) || null },
-      zodiac: zodiacOf(Number(d), Number(m)),
-    })
-  }
-
-  const toggleTheme = (t) => {
-    const cur = profile.themes || []
-    let next
-    if (cur.includes(t)) next = cur.filter((x) => x !== t)
-    else if (cur.length >= 3) return
-    else next = [...cur, t]
-    updateProfile({ themes: next })
-  }
+  const themenMeta = (profile.themes || []).length ? `${(profile.themes || []).length} von 3` : 'wählen'
+  const kiAn = settings.aiMode && settings.aiConsent === true
 
   return (
-    <div className="screen-scroll" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 20px 18px' }}>
+    <div className="screen-scroll" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 18px 18px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, color: 'var(--text)' }}>
         <button className="back" onClick={() => nav('/profil')}>‹</button>
-        <span className="h-serif" style={{ fontWeight: 600, fontSize: 18 }}>Einstellungen</span>
+        <span className="h-serif" style={{ fontWeight: 600, fontSize: 19 }}>Einstellungen</span>
       </div>
 
-      {/* Über dich – editierbar */}
-      <div className="glass" style={{ marginTop: 14, padding: '14px 15px' }}>
-        <div style={{ color: '#7a7494', font: '600 10px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10 }}>Über dich</div>
+      <Gruppe label="Dein Profil">
+        <Reihe icon="👤" title="Über dich" meta={profile.name || 'Name · Geburtstag'} onClick={() => nav('/profil/settings/du')} />
+        <Reihe icon="✨" title="Deine Themen" meta={themenMeta} onClick={() => nav('/profil/settings/themen')} />
+        <Reihe icon="🗣" title="Lunas Ton & Stil" meta={settings.tone} onClick={() => nav('/profil/settings/ton')} />
+      </Gruppe>
 
-        <div style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)', marginBottom: 6 }}>Name</div>
-        <input className="field" placeholder="Dein Name (optional)"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onBlur={() => updateProfile({ name: name.trim() })} />
-
-        <div style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)', margin: '14px 0 6px' }}>Geburtstag</div>
-        <div className="dob">
-          <DarkPicker label="TAG" ariaLabel="Tag" value={day} onChange={(v) => { setDay(v); saveBirth(v, month, year) }}
-            options={Array.from({ length: 31 }, (_, i) => ({ value: i + 1, label: String(i + 1) }))} />
-          <DarkPicker label="MONAT" ariaLabel="Monat" flex={1.6} valueSize={16} value={month} onChange={(v) => { setMonth(v); saveBirth(day, v, year) }}
-            options={MONTHS.map((m, i) => ({ value: i + 1, label: m }))} />
-          <DarkPicker label="JAHR" ariaLabel="Jahr" flex={1.2} value={year} onChange={(v) => { setYear(v); saveBirth(day, month, v) }}
-            options={years.map((y) => ({ value: y, label: String(y) }))} />
-        </div>
-        {zodiac && day && month && (
-          <div className="zodiac-card" style={{ marginTop: 14 }}>
-            <span style={{ fontSize: 26, lineHeight: 1 }}>{zodiac.symbol}</span>
-            <div>
-              <div style={{ color: '#7a7494', font: '600 9px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>Dein Sternzeichen · automatisch</div>
-              <div style={{ fontFamily: 'var(--font-head)', color: 'var(--gold-1)', fontSize: 18, fontWeight: 600, marginTop: 2 }}>{zodiac.name}</div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Themen – editierbar (max 3) */}
-      <div className="glass" style={{ marginTop: 12, padding: '14px 15px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <span style={{ color: '#7a7494', font: '600 10px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>Deine Themen</span>
-          <span style={{ color: 'var(--purple-2)', font: '600 11px var(--font-body)' }}>bis zu 3</span>
-        </div>
-        <div style={{ marginTop: 12, display: 'flex', flexWrap: 'wrap', gap: 9 }}>
-          {THEMES.map((t) => (
-            <span key={t} className={'chip' + ((profile.themes || []).includes(t) ? ' sel' : '')} onClick={() => toggleTheme(t)}>{t}</span>
-          ))}
-        </div>
-        <div style={{ marginTop: 10, color: 'var(--text-dim)', font: '400 11.5px var(--font-body)' }}>Luna stimmt deine Botschaften darauf ab.</div>
-      </div>
-
-      {/* Ton – editierbar */}
-      <div className="glass" style={{ marginTop: 12, padding: '14px 15px' }}>
-        <div style={{ color: '#7a7494', font: '600 10px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10 }}>Stimmung & Ton</div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          {TONES.map((t) => (
-            <button key={t.key}
-              onClick={() => updateSettings({ tone: t.key })}
-              style={{
-                flex: 1, textAlign: 'left', cursor: 'pointer', borderRadius: 14, padding: '11px 12px',
-                background: settings.tone === t.key ? 'rgba(166,107,255,.16)' : 'rgba(10,10,31,.5)',
-                border: '1px solid ' + (settings.tone === t.key ? 'var(--gold-1)' : 'rgba(167,139,250,.28)'),
-              }}>
-              <div style={{ color: settings.tone === t.key ? 'var(--gold-1)' : 'var(--text)', font: '600 12.5px var(--font-body)' }}>{t.key}</div>
-              <div style={{ color: 'var(--text-dim)', font: '400 10px/1.35 var(--font-body)', marginTop: 3 }}>{t.desc}</div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Kommunikationsstil & Umgang – editierbar */}
-      <div className="glass" style={{ marginTop: 12, padding: '14px 15px' }}>
-        <div style={{ color: '#7a7494', font: '600 10px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10 }}>Wie Luna mit dir spricht</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {COMM_STYLES.map((s) => {
-            const cur = profile.commStyles || []
-            const on = cur.includes(s.key)
-            return (
-              <span key={s.key} className={'chip' + (on ? ' sel' : '')}
-                onClick={() => {
-                  const next = on ? cur.filter((x) => x !== s.key) : cur.length >= 2 ? cur : [...cur, s.key]
-                  updateProfile({ commStyles: next })
-                }}>{s.label}</span>
-            )
-          })}
-        </div>
-        <div style={{ margin: '12px 0 8px', color: '#7a7494', font: '600 10px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>Was dir bei Schwierigem hilft</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {COPING.map((c) => (
-            <span key={c.key} className={'chip' + (profile.coping === c.key ? ' sel' : '')}
-              onClick={() => updateProfile({ coping: profile.coping === c.key ? null : c.key })}>{c.glyph} {c.label}</span>
-          ))}
-        </div>
-      </div>
-
-      {/* KI-Modus – der Schalter genügt, der KI-Server ist fest eingebaut */}
-      <div className="glass" style={{ marginTop: 12, padding: '13px 15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ flex: 1, paddingRight: 10 }}>
-          <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>KI-Modus</div>
-          <div style={{ color: 'var(--text-dim)', font: '400 10.5px/1.45 var(--font-body)', marginTop: 2 }}>
-            Luna formuliert deine Botschaft live mit KI – passend zu deinem gezogenen Ergebnis.
-            Ohne Verbindung nutzt sie automatisch die Offline-Sternenbibliothek.
-            Übertragen werden nur Stimmung, Themen und das Ritual-Ergebnis – nie dein Name oder deine Notizen.
-          </div>
-          {isUnder16(profile.birth) && (
-            <div style={{ color: 'var(--gold-1)', font: '500 10.5px/1.45 var(--font-body)', marginTop: 6 }}>
-              🛡️ Unter 16: Bitte nur gemeinsam mit einem Erziehungsberechtigten einschalten –
-              das Aktivieren gilt als dessen Zustimmung zur Datenübertragung.
-            </div>
-          )}
-        </div>
-        {/* Aktives Einschalten = Einwilligung, Ausschalten = Widerruf (DSGVO) */}
-        <span className={'toggle' + (settings.aiMode && settings.aiConsent === true ? ' on' : '')}
-          onClick={() => (settings.aiMode && settings.aiConsent === true
-            ? updateSettings({ aiMode: false, aiConsent: false })
-            : updateSettings({ aiMode: true, aiConsent: true }))}>
-          <span className="knob" />
-        </span>
-      </div>
-
-      {/* Startanimation „Luna erwacht" */}
-      <div className="glass" style={{ marginTop: 12, padding: '13px 15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>„Luna erwacht"-Start</div>
-          <div style={{ color: 'var(--text-dim)', font: '400 10.5px/1.4 var(--font-body)', marginTop: 2 }}>Kurze Startanimation beim Öffnen der App</div>
-        </div>
-        <span className={'toggle' + (settings.splash !== false ? ' on' : '')} onClick={() => updateSettings({ splash: settings.splash === false })}>
-          <span className="knob" />
-        </span>
-      </div>
-
-      {/* Tägliche Erinnerung → eigener Screen */}
-      <div onClick={() => nav('/profil/erinnerung')} style={{ marginTop: 12, cursor: 'pointer', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 16, padding: '13px 15px', display: 'flex', alignItems: 'center', gap: 11 }}>
-        <img src={asset('uploads/opt/luna-schlaf-transparent-sm.webp')} alt="" style={{ width: 40, height: 40, objectFit: 'contain' }} />
-        <div style={{ flex: 1 }}>
-          <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>Erinnerung</div>
-          <div style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)', marginTop: 1 }}>
-            {settings.reminder ? <>Aktiv um <b style={{ color: 'var(--gold-1)' }}>{settings.reminderTime}</b> · {settings.reminderWhen}</> : 'Aus'}
-          </div>
-        </div>
-        <span className="meta">›</span>
-      </div>
-
-      {/* Premium */}
-      <div style={{ marginTop: 12, background: 'linear-gradient(150deg,rgba(232,199,122,.2),rgba(232,199,122,.05))', border: '1px solid rgba(232,199,122,.4)', borderRadius: 18, padding: '14px 16px', boxShadow: '0 8px 26px rgba(232,199,122,.12)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ color: 'var(--gold-1)', fontSize: 16 }}>✦</span>
-          <span style={{ fontFamily: 'var(--font-head)', fontWeight: 600, fontSize: 16, color: 'var(--gold-1)' }}>Sternenluna Plus</span>
-        </div>
-        <div style={{ marginTop: 8, color: 'var(--text)', font: '400 12px/1.7 var(--font-body)' }}>
-          Alle drei Rituale · freie Impulse · Monatsbild · KI ohne Begrenzung · Vorlesen
-        </div>
-        <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ color: 'var(--text-dim)', font: '500 12px var(--font-body)' }}>
-            {settings.premium
-              ? <b style={{ color: 'var(--gold-1)' }}>✦ aktiv{settings.plusUntilISO ? ` bis ${settings.plusUntilISO.split('-').reverse().join('.')}` : ''}</b>
-              : <>ab <b style={{ color: 'var(--text)' }}>4,99 € / Monat</b></>}
+      <Gruppe label="Luna & Botschaften">
+        <Reihe icon="🔮" title="KI-Botschaften" meta={kiAn ? 'An' : 'Aus'} onClick={() => nav('/profil/settings/ki')} />
+        <Reihe icon="🔔" title="Erinnerung" meta={settings.reminder ? `täglich ${settings.reminderTime || '21:00'}` : 'aus'} onClick={() => nav('/profil/erinnerung')} />
+        <Reihe icon="🌙" title="„Luna erwacht“-Start">
+          <span className={'toggle' + (settings.splash !== false ? ' on' : '')} onClick={(e) => { e.stopPropagation(); updateSettings({ splash: settings.splash === false }) }}>
+            <span className="knob" />
           </span>
-          <button onClick={() => nav('/profil/plus')} style={{ background: 'linear-gradient(135deg,#E8C77A,#D9B45A)', color: 'var(--gold-ink)', font: '700 12px var(--font-body)', padding: '9px 18px', borderRadius: 12, border: 'none', boxShadow: '0 6px 16px rgba(232,199,122,.3)', cursor: 'pointer' }}>
-            {settings.premium ? 'Verwalten' : 'Plus entdecken'}
-          </button>
-        </div>
-      </div>
+        </Reihe>
+      </Gruppe>
 
-      {/* Privatsphäre & Rechtliches */}
-      <div className="list" style={{ marginTop: 12 }}>
-        <button className="list-row" onClick={() => nav('/profil/erinnerung')}>
-          <span>🔔 Erinnerung &amp; Benachrichtigung</span>
-          <span className="meta">{settings.reminder ? `täglich ${settings.reminderTime || '21:00'}` : 'aus'} ›</span>
-        </button>
-        <button className="list-row" onClick={() => nav('/profil/privacy')}>
-          <span>🔒 Daten &amp; Privatsphäre</span>
-          <span className="meta">Export · Löschen ›</span>
-        </button>
-        <button className="list-row" onClick={() => nav('/rechtliches')}>
-          <span>§ Rechtliches</span>
-          <span className="meta">Impressum · Datenschutz · Haftung ›</span>
-        </button>
-        {/* Beta-Feedback: öffnet die Mail-App mit vorbereiteter Nachricht + Versions-Kennung */}
-        <button className="list-row" onClick={() => {
+      <Gruppe label="Plus & Käufe">
+        <Reihe icon="✦" title="Sternenluna Plus"
+          meta={settings.premium ? `aktiv${settings.plusUntilISO ? ` bis ${settings.plusUntilISO.split('-').reverse().join('.')}` : ''}` : 'ab 4,99 € / Monat'}
+          onClick={() => nav('/profil/plus')} />
+        <Reihe icon="🎟" title="Gutschein einlösen" onClick={() => nav('/profil/plus', { state: { coupon: true } })} />
+      </Gruppe>
+
+      <Gruppe label="Daten & Rechtliches">
+        <Reihe icon="🔒" title="Daten & Privatsphäre" meta="Backup · Löschen" onClick={() => nav('/profil/privacy')} />
+        <Reihe icon="§" title="Rechtliches" meta="Impressum · Kündigung" onClick={() => nav('/rechtliches')} />
+        <Reihe icon="💬" title="Feedback senden" onClick={() => {
           const build = typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev'
           const body = `Hallo Marcel,\n\nmein Feedback zu Sternenluna:\n\n(Was gefällt dir? Was klemmt? Was fehlt?)\n\n—\nVersion: ${build}\nGerät: ${navigator.userAgent}`
-          window.location.href = `mailto:ml@mittel-bar.com?subject=${encodeURIComponent('Sternenluna Beta-Feedback')}&body=${encodeURIComponent(body)}`
-        }}>
-          <span>💬 Feedback senden</span>
-          <span className="meta">hilf Luna zu wachsen ›</span>
-        </button>
-      </div>
+          window.location.href = `mailto:ml@mittel-bar.com?subject=${encodeURIComponent('Sternenluna Feedback')}&body=${encodeURIComponent(body)}`
+        }} />
+      </Gruppe>
 
-      {/* Therapie-Hinweis */}
-      <div className="glass-purple" style={{ marginTop: 12, padding: '11px 13px' }}>
-        <div style={{ color: 'var(--gold-1)', font: '600 11px var(--font-body)', marginBottom: 3 }}>Ein ehrliches Wort von Luna</div>
-        <div style={{ color: 'var(--text-dim)', font: '400 11px/1.5 var(--font-body)' }}>
-          Ich bin ein weiser Begleiter – kein Ersatz für Therapie. Wenn es dir schwer fällt, sprich mit einem Menschen.{' '}
+      <Gruppe label="App">
+        {!isInstalled() && (
+          <>
+            <Reihe icon="📲" title="Als App installieren" meta="wichtig" onClick={() => (canPromptInstall() ? promptInstall() : setInstallHint(!installHint))} />
+            {installHint && !canPromptInstall() && (
+              <div style={{ padding: '4px 15px 13px 56px', color: 'var(--gold-1)', font: '500 12.5px/1.55 var(--font-body)' }}>
+                {isIOS()
+                  ? <>So geht’s: <b>Teilen-Symbol</b> (□↑) tippen → „<b>Zum Home-Bildschirm</b>“ wählen. Nur als
+                    installierte App ist dein Tagebuch dauerhaft sicher.</>
+                  : <>So geht’s: Browser-Menü (⋮) öffnen → „<b>App installieren</b>“ bzw. „Zum Startbildschirm hinzufügen“.</>}
+              </div>
+            )}
+          </>
+        )}
+        <Reihe icon="↻" title={updating ? 'Aktualisiert …' : 'Nach Update suchen'} meta="Daten bleiben" onClick={updating ? undefined : forceUpdate} />
+      </Gruppe>
+
+      {/* Test-Werkzeuge — erscheinen nach 5× Tippen auf die Versionszeile */}
+      {devMode && (
+        <div className="glass" style={{ marginTop: 14, padding: '13px 15px', border: '1px dashed rgba(255,122,154,.5)' }}>
+          <div style={{ color: 'var(--danger)', font: '600 11px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>🧪 Test-Werkzeuge · nur Demo</div>
+          <button className="list-row" style={{ marginTop: 8, borderRadius: 12, background: 'rgba(255,255,255,.05)' }} onClick={seedDemo}>
+            <span>📖 Demo-Tagebuch laden (14 Tage)</span><span className="meta">›</span>
+          </button>
+          <button className="list-row" style={{ marginTop: 6, borderRadius: 12, background: 'rgba(255,255,255,.05)' }} onClick={timeShift}>
+            <span>⏪ Alles 1 Tag zurückdatieren</span><span className="meta">›</span>
+          </button>
+          <button className="list-row" style={{ marginTop: 6, borderRadius: 12, background: 'rgba(255,255,255,.05)' }} disabled={journal.length === 0} onClick={simulateReturn}>
+            <span>💜 Rückkehr nach Pause simulieren</span><span className="meta">›</span>
+          </button>
+        </div>
+      )}
+
+      <div className="glass-purple" style={{ marginTop: 14, padding: '11px 13px' }}>
+        <div style={{ color: 'var(--text-dim)', font: '400 12.5px/1.55 var(--font-body)' }}>
+          Luna ist ein weiser Begleiter – kein Ersatz für Therapie. Wenn es dir schwer fällt, sprich mit einem Menschen.{' '}
           <b style={{ color: 'var(--text)', fontWeight: 600 }}>Telefonseelsorge: 0800 111 0 111</b>
         </div>
       </div>
 
-      {/* PWA-Installation: schützt den lokalen Speicher (iOS räumt Browser-Tabs nach ~7 Tagen auf) */}
-      {!isInstalled() && (
-        <div className="glass" style={{ marginTop: 12, padding: '13px 15px', border: '1px solid rgba(232,199,122,.35)' }}>
-          <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>📲 Als App installieren – wichtig!</div>
-          <div style={{ color: 'var(--text-dim)', font: '400 10.5px/1.5 var(--font-body)', marginTop: 3 }}>
-            Nur als installierte App ist dein Tagebuch dauerhaft sicher – im Browser-Tab kann iOS
-            gespeicherte Daten nach längerer Pause automatisch löschen.
-          </div>
-          {canPromptInstall() ? (
-            <button className="btn-gold" style={{ marginTop: 10, padding: 11, fontSize: 13 }} onClick={() => promptInstall()}>
-              Jetzt installieren
-            </button>
-          ) : (
-            <div style={{ marginTop: 8, color: 'var(--gold-1)', font: '500 11px/1.5 var(--font-body)' }}>
-              {isIOS()
-                ? <>So geht's: <b>Teilen-Symbol</b> (□↑) tippen → „<b>Zum Home-Bildschirm</b>" wählen.</>
-                : <>So geht's: Browser-Menü (⋮) öffnen → „<b>App installieren</b>" bzw. „Zum Startbildschirm hinzufügen".</>}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* App-Update: Cache & Service Worker erneuern – Tagebuch bleibt unberührt */}
-      <div className="glass" style={{ marginTop: 12, padding: '13px 15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>App aktualisieren</div>
-          <div style={{ color: 'var(--text-dim)', font: '400 10.5px/1.45 var(--font-body)', marginTop: 2 }}>
-            Holt sofort die neueste Version. Dein Tagebuch und alle Einstellungen bleiben erhalten.
-          </div>
-        </div>
-        <button onClick={forceUpdate} disabled={updating}
-          style={{ flexShrink: 0, padding: '10px 14px', borderRadius: 12, border: '1px solid rgba(232,199,122,.4)', background: 'rgba(232,199,122,.1)', color: 'var(--gold-1)', font: '600 12px var(--font-body)', cursor: 'pointer', opacity: updating ? 0.6 : 1 }}>
-          {updating ? 'Lädt …' : '↻ Nach Update suchen'}
-        </button>
-      </div>
-
-      {/* Test-Werkzeuge — erscheinen nach 5× Tippen auf die Versionszeile */}
-      {devMode && (
-        <div className="glass" style={{ marginTop: 12, padding: '13px 15px', border: '1px dashed rgba(255,122,154,.5)' }}>
-          <div style={{ color: 'var(--danger)', font: '600 11px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase' }}>🧪 Test-Werkzeuge · nur Demo</div>
-          <div style={{ color: 'var(--text-dim)', font: '400 11px/1.5 var(--font-body)', marginTop: 4 }}>
-            Zum Ausprobieren aller Funktionen ohne 14 Tage Wartezeit. Verändert nur lokale Daten.
-          </div>
-          <button className="list-row" style={{ marginTop: 8, borderRadius: 12, background: 'rgba(255,255,255,.05)' }} onClick={seedDemo}>
-            <span>📖 Demo-Tagebuch laden (14 Tage)</span><span className="meta">Woche · Monat · Sternbilder ›</span>
-          </button>
-          <button className="list-row" style={{ marginTop: 6, borderRadius: 12, background: 'rgba(255,255,255,.05)' }} onClick={timeShift}>
-            <span>⏪ Alles 1 Tag zurückdatieren</span><span className="meta">„Morgen" sofort testen ›</span>
-          </button>
-          <button className="list-row" style={{ marginTop: 6, borderRadius: 12, background: 'rgba(255,255,255,.05)' }} disabled={journal.length === 0} onClick={simulateReturn}>
-            <span>💜 Rückkehr nach Pause simulieren</span><span className="meta">{journal.length === 0 ? 'braucht Einträge' : 'zum Dashboard ›'}</span>
-          </button>
-        </div>
-      )}
-
-      <div onClick={() => setDevTaps((n) => n + 1)} style={{ textAlign: 'center', color: '#7a7494', font: '400 10px var(--font-body)', paddingTop: 12, cursor: 'default', userSelect: 'none' }}>
+      <div onClick={() => setDevTaps((n) => n + 1)} style={{ textAlign: 'center', color: '#8a83a6', font: '400 11px/1.6 var(--font-body)', paddingTop: 12, cursor: 'default', userSelect: 'none' }}>
         Sternenluna · v1.0 · local-first{devMode ? ' · 🧪' : ''}
         <br />Stand: {typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev'}
       </div>

@@ -101,7 +101,7 @@
 .card-title {
   font-family: var(--font-head);
   color: var(--gold-1);
-  font-size: 14px;
+  font-size: 15.5px;
   font-weight: 600;
 }
 
@@ -208,7 +208,7 @@
   justify-content: space-between;
   gap: 10px;
   color: var(--text);
-  font: 500 13.5px var(--font-body);
+  font: 500 15px var(--font-body);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   width: 100%;
   background: none;
@@ -222,8 +222,8 @@
   border-bottom: none;
 }
 .list-row .meta {
-  color: #7a7494;
-  font-size: 11px;
+  color: #8a83a6;
+  font-size: 12.5px;
 }
 .list-row .chev {
   color: #7a7494;
@@ -318,7 +318,7 @@
   padding: 12px 0;
   color: var(--text);
   font-family: var(--font-head);
-  font-size: 13.5px;
+  font-size: 15px;
   cursor: pointer;
   border-top: 1px solid rgba(167, 139, 250, 0.16);
 }
@@ -331,7 +331,7 @@
 }
 .faq-a {
   color: var(--text-dim);
-  font: 400 12px/1.55 var(--font-body);
+  font: 400 13.5px/1.6 var(--font-body);
   padding-bottom: 12px;
   animation: fadeUp 0.25s ease both;
 }

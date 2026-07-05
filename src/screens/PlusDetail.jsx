@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import Luna from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
 import { buzz } from '../lib/haptics.js'
@@ -39,13 +39,14 @@ const PARTS = [
 
 export default function PlusDetail() {
   const nav = useNavigate()
+  const loc = useLocation()
   const { settings, updateSettings } = useStore()
   const active = settings.premium
   // Direkt nach der Aktivierung: eigener Erfolgs-Moment statt Scroll-Gymnastik
   const [justActivated, setJustActivated] = useState(null) // {until, quelle}
 
-  // Gutschein-Einlösung
-  const [couponOpen, setCouponOpen] = useState(false)
+  // Gutschein-Einlösung (direkt geöffnet, wenn über „Gutschein einlösen" angesteuert)
+  const [couponOpen, setCouponOpen] = useState(Boolean(loc.state?.coupon))
   const [couponCode, setCouponCode] = useState('')
   const [couponBusy, setCouponBusy] = useState(false)
   const [couponMsg, setCouponMsg] = useState('')

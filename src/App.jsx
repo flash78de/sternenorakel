@@ -18,6 +18,7 @@ import Tagebuch from './screens/Tagebuch.jsx'
 import JournalEntry from './screens/JournalEntry.jsx'
 import Profil from './screens/Profil.jsx'
 import Settings from './screens/Settings.jsx'
+import SettingsSektion from './screens/SettingsSektion.jsx'
 import Privacy from './screens/Privacy.jsx'
 import Sternbilder from './screens/Sternbilder.jsx'
 import RankLadder from './screens/RankLadder.jsx'
@@ -77,6 +78,7 @@ export default function App() {
             </Gate>
           }
         />
+        <Route path="/profil/settings/:sektion" element={<Gate><SettingsSektion /></Gate>} />
         <Route path="/tagebuch/:id" element={<Gate><JournalEntry /></Gate>} />
         <Route path="/profil/sternbilder" element={<Gate><Sternbilder /></Gate>} />
         <Route path="/profil/raenge" element={<Gate><RankLadder /></Gate>} />

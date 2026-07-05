@@ -261,7 +261,7 @@ img {
 }
 .link-soft {
   color: var(--text-dim);
-  font: 500 13px var(--font-body);
+  font: 500 14px var(--font-body);
   cursor: pointer;
   background: none;
   border: none;

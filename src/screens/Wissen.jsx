@@ -29,7 +29,7 @@ export default function Wissen() {
         <div style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 21, color: 'var(--gold-1)' }}>
           Wissen
         </div>
-        <div style={{ color: 'var(--text-dim)', font: '400 11.5px/1.4 var(--font-body)', marginTop: 2 }}>
+        <div style={{ color: 'var(--text-dim)', font: '400 13px/1.45 var(--font-body)', marginTop: 3 }}>
           Verstehen macht die Magie nicht kleiner – nur ehrlicher.
         </div>
       </div>
@@ -41,10 +41,10 @@ export default function Wissen() {
           <img src={asset('uploads/opt/luna-freude-transparent-sm.webp')} alt=""
             style={{ width: 84, height: 'auto', flexShrink: 0, filter: 'drop-shadow(0 6px 16px rgba(0,0,0,.45))' }} />
           <span style={{ flex: 1, minWidth: 0 }}>
-            <span style={{ display: 'block', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 18, color: 'var(--gold-1)' }}>
+            <span style={{ display: 'block', fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 19, color: 'var(--gold-1)' }}>
               Über Sternenluna
             </span>
-            <span style={{ display: 'block', color: 'var(--text-dim)', font: '400 11.5px/1.45 var(--font-body)', marginTop: 4 }}>
+            <span style={{ display: 'block', color: 'var(--text-dim)', font: '400 13px/1.5 var(--font-body)', marginTop: 5 }}>
               Was die App sein will, wie Botschaften entstehen – und wer Luna ist.
             </span>
           </span>
@@ -55,8 +55,8 @@ export default function Wissen() {
         <div style={{ flex: 2.4, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 11 }}>
           <button onClick={() => nav('/wissen/psychologie')} style={kachel}>
             <span style={{ width: 52, height: 52, borderRadius: 16, display: 'grid', placeItems: 'center', fontSize: 26, background: 'radial-gradient(circle at 50% 30%,rgba(166,107,255,.4),rgba(40,30,70,.4))', border: '1px solid rgba(167,139,250,.35)' }}>🧠</span>
-            <span style={{ color: 'var(--text)', font: '600 13.5px var(--font-body)' }}>Psychologie<br />dahinter</span>
-            <span style={{ color: 'var(--text-dim)', font: '400 10.5px/1.35 var(--font-body)' }}>Warum Reflexion &amp; Rituale wirken</span>
+            <span style={{ color: 'var(--text)', font: '600 15px var(--font-body)' }}>Psychologie<br />dahinter</span>
+            <span style={{ color: 'var(--text-dim)', font: '400 12px/1.4 var(--font-body)' }}>Warum Reflexion &amp; Rituale wirken</span>
           </button>
 
           <button onClick={() => nav('/wissen/symbole')} style={kachel}>
@@ -66,8 +66,8 @@ export default function Wissen() {
               <img src={asset('uploads/opt/rune-fehu-sm.webp')} alt=""
                 style={{ position: 'absolute', left: 28, top: 6, width: 30, transform: 'rotate(10deg)', filter: 'drop-shadow(0 5px 10px rgba(0,0,0,.55))' }} />
             </span>
-            <span style={{ color: 'var(--text)', font: '600 13.5px var(--font-body)' }}>Symbol-<br />Lexikon</span>
-            <span style={{ color: 'var(--text-dim)', font: '400 10.5px/1.35 var(--font-body)' }}>Karten, Runen &amp; Archetypen</span>
+            <span style={{ color: 'var(--text)', font: '600 15px var(--font-body)' }}>Symbol-<br />Lexikon</span>
+            <span style={{ color: 'var(--text-dim)', font: '400 12px/1.4 var(--font-body)' }}>Karten, Runen &amp; Archetypen</span>
           </button>
 
           <button onClick={() => nav('/wissen/chakren')} style={kachel}>
@@ -77,14 +77,14 @@ export default function Wissen() {
               <img src={asset('uploads/opt/chakra-6-sm.webp')} alt=""
                 style={{ position: 'absolute', left: 27, top: 0, width: 33, transform: 'rotate(9deg)', borderRadius: 4, filter: 'drop-shadow(0 5px 10px rgba(0,0,0,.55))' }} />
             </span>
-            <span style={{ color: 'var(--text)', font: '600 13.5px var(--font-body)' }}>Chakren</span>
-            <span style={{ color: 'var(--text-dim)', font: '400 10.5px/1.35 var(--font-body)' }}>Sieben Lebensbereiche &amp; die Reise</span>
+            <span style={{ color: 'var(--text)', font: '600 15px var(--font-body)' }}>Chakren</span>
+            <span style={{ color: 'var(--text-dim)', font: '400 12px/1.4 var(--font-body)' }}>Sieben Lebensbereiche &amp; die Reise</span>
           </button>
 
           <button onClick={() => nav('/wissen/faq')} style={kachel}>
             <span style={{ width: 52, height: 52, borderRadius: 16, display: 'grid', placeItems: 'center', fontSize: 24, background: 'radial-gradient(circle at 50% 30%,rgba(232,199,122,.35),rgba(60,45,25,.35))', border: '1px solid rgba(232,199,122,.35)', color: 'var(--gold-1)', fontFamily: 'var(--font-head)', fontWeight: 700 }}>?</span>
-            <span style={{ color: 'var(--text)', font: '600 13.5px var(--font-body)' }}>Häufige<br />Fragen</span>
-            <span style={{ color: 'var(--text-dim)', font: '400 10.5px/1.35 var(--font-body)' }}>Ehrliche Antworten, kurz &amp; klar</span>
+            <span style={{ color: 'var(--text)', font: '600 15px var(--font-body)' }}>Häufige<br />Fragen</span>
+            <span style={{ color: 'var(--text-dim)', font: '400 12px/1.4 var(--font-body)' }}>Ehrliche Antworten, kurz &amp; klar</span>
           </button>
         </div>
       </div>

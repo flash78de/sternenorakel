@@ -116,15 +116,18 @@ await page.evaluate(() => {
 await page.reload(); await page.waitForTimeout(600)
 check('Monat: Plus-Gate ohne Premium', await bodyHas('Monatsbild wartet') || await bodyHas('Plus entdecken'))
 
-// --- 5) Settings: KI-Modus (Server fest eingebaut, nur Toggle) ---
+// --- 5) Settings: Hub + KI-Untersektion (Server fest eingebaut, nur Toggle) ---
 await page.goto('http://localhost:4173/#/profil/settings')
 await page.waitForTimeout(500)
-check('Settings: KI-Modus vorhanden, kein "kein Server"-Hinweis', await bodyHas('KI-Modus') && !(await bodyHas('kein Server verbunden')))
-check('Settings: keine sichtbare Server-Adresse', !(await bodyHas('KI-Server-Adresse')) && !(await bodyHas('workers.dev')))
-await page.locator('text=KI-Modus').locator('..').locator('..').locator('.toggle').first().click()
+check('Settings-Hub: KI-Botschaften-Reihe vorhanden', await bodyHas('KI-Botschaften'))
+await page.goto('http://localhost:4173/#/profil/settings/ki')
+await page.waitForTimeout(500)
+check('Settings/KI: KI-Modus vorhanden, kein "kein Server"-Hinweis', await bodyHas('KI-Modus') && !(await bodyHas('kein Server verbunden')))
+check('Settings/KI: keine sichtbare Server-Adresse', !(await bodyHas('KI-Server-Adresse')) && !(await bodyHas('workers.dev')))
+await page.locator('.toggle').first().click()
 await page.waitForTimeout(400)
 const aiOn = await page.evaluate(() => JSON.parse(localStorage.getItem('sternenorakel.v1')).settings.aiMode)
-check('Settings: Toggle aktiviert KI-Modus', aiOn === true)
+check('Settings/KI: Toggle aktiviert KI-Modus', aiOn === true)
 
 // --- 6) Ziehung offline (KI-Modus an, Endpunkt unerreichbar → Fallback) ---
 await page.evaluate(() => {
