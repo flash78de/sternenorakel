@@ -190,11 +190,14 @@ export async function handlePush(request, env, url, json) {
 export async function pushScheduled(env) {
   if (!env.PUSH || !env.VAPID_PRIVATE_JWK) return
   const now = Date.now()
+  let seen = 0
+  let sent = 0
   let cursor
   do {
     const page = await env.PUSH.list({ prefix: 'sub:', cursor })
     cursor = page.list_complete ? undefined : page.cursor
     for (const { name } of page.keys) {
+      seen++
       try {
         const raw = await env.PUSH.get(name)
         if (!raw) continue
@@ -209,6 +212,7 @@ export async function pushScheduled(env) {
         if (!due) continue
         const dayIdx = Math.floor(now / 86400000)
         const status = await sendPush(rec.sub, payloadForDay(dayIdx), env).catch(() => 0)
+        sent++
         if (status === 404 || status === 410) {
           await env.PUSH.delete(name) // Abo existiert nicht mehr
         } else {
@@ -220,4 +224,6 @@ export async function pushScheduled(env) {
       }
     }
   } while (cursor)
+  // Betriebssignal ohne Personenbezug (sichtbar via `wrangler tail`)
+  console.log(`push-cron: ${seen} Abos geprüft, ${sent} gesendet`)
 }
