@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Luna from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
 import { buzz } from '../lib/haptics.js'
+import { formatDate } from '../data/library.js'
+import { redeemCoupon, payConfig, createPayOrder, capturePayOrder, loadPayPalSdk, bisDatum } from '../lib/plus.js'
 
 // Free-vs-Plus auf einen Blick (Conversion: Wert sofort sichtbar machen).
 // Nur echte, vorhandene Funktionen – keine Versprechen, die die App nicht hält.
@@ -38,13 +40,87 @@ export default function PlusDetail() {
   const { settings, updateSettings } = useStore()
   const active = settings.premium
   // Direkt nach der Aktivierung: eigener Erfolgs-Moment statt Scroll-Gymnastik
-  const [justActivated, setJustActivated] = useState(false)
+  const [justActivated, setJustActivated] = useState(null) // {until, quelle}
 
-  const activate = () => {
-    updateSettings({ premium: true })
-    setJustActivated(true)
+  // Gutschein-Einlösung
+  const [couponOpen, setCouponOpen] = useState(false)
+  const [couponCode, setCouponCode] = useState('')
+  const [couponBusy, setCouponBusy] = useState(false)
+  const [couponMsg, setCouponMsg] = useState('')
+
+  // PayPal (erscheint erst, wenn serverseitig eingerichtet)
+  const [pay, setPay] = useState({ configured: false })
+  const [payMsg, setPayMsg] = useState('')
+  const paypalRef = useRef(null)
+
+  useEffect(() => {
+    payConfig().then(setPay).catch(() => {})
+  }, [])
+
+  // Plus gutschreiben: verlängert ab heute bzw. ab aktuellem Ablaufdatum
+  const grantPlus = (days, source) => {
+    const today = formatDate().iso
+    const base = settings.premium && settings.plusUntilISO && settings.plusUntilISO >= today
+      ? new Date(settings.plusUntilISO + 'T12:00').getTime()
+      : Date.now()
+    const until = new Date(base + days * 86400000).toISOString().slice(0, 10)
+    updateSettings({ premium: true, plusSource: source, plusUntilISO: until, plusExpiredSeenISO: null })
+    setJustActivated({ until, quelle: source })
     buzz([20, 30, 20])
+    return until
   }
+
+  const startTrial = () => {
+    updateSettings({ trialUsedISO: formatDate().iso })
+    grantPlus(7, 'trial')
+  }
+
+  const submitCoupon = async () => {
+    if (couponBusy || !couponCode.trim()) return
+    setCouponBusy(true)
+    setCouponMsg('')
+    try {
+      const { days } = await redeemCoupon(couponCode)
+      grantPlus(days, 'coupon')
+    } catch (e) {
+      setCouponMsg(e.message)
+    } finally {
+      setCouponBusy(false)
+    }
+  }
+
+  // PayPal-Buttons rendern, sobald konfiguriert (Einmalzahlung, kein Abo)
+  useEffect(() => {
+    if (!pay.configured || !pay.clientId || active || justActivated || !paypalRef.current) return
+    let cancelled = false
+    loadPayPalSdk(pay.clientId)
+      .then((paypal) => {
+        if (cancelled || !paypalRef.current) return
+        paypalRef.current.innerHTML = ''
+        for (const plan of ['monat', 'jahr']) {
+          const host = document.createElement('div')
+          host.style.marginTop = '8px'
+          paypalRef.current.appendChild(host)
+          paypal.Buttons({
+            style: { layout: 'horizontal', color: 'gold', height: 42, label: 'paypal', tagline: false },
+            createOrder: () => createPayOrder(plan),
+            onApprove: async (data) => {
+              try {
+                const grant = await capturePayOrder(data.orderID)
+                grantPlus(grant.days, 'paypal')
+              } catch (e) {
+                setPayMsg(e.message || 'Zahlung nicht bestätigt – du wurdest nicht freigeschaltet.')
+              }
+            },
+            onError: () => setPayMsg('PayPal hat gerade ein Problem – versuche es später oder nutze einen Gutschein.'),
+          }).render(host)
+        }
+      })
+      .catch(() => setPayMsg('PayPal ließ sich nicht laden.'))
+    return () => {
+      cancelled = true
+    }
+  }, [pay, active, justActivated]) // eslint-disable-line
 
   if (justActivated)
     return (
@@ -57,7 +133,7 @@ export default function PlusDetail() {
         ))}
         <div style={{ position: 'relative', textAlign: 'center' }}>
           <div style={{ color: 'var(--gold-1)', font: '600 12px var(--font-body)', letterSpacing: 2, textTransform: 'uppercase' }}>
-            Plus aktiviert ✦
+            {justActivated.quelle === 'paypal' ? 'Zahlung bestätigt · Plus aktiviert ✦' : justActivated.quelle === 'coupon' ? 'Gutschein eingelöst ✦' : 'Plus aktiviert ✦'}
           </div>
           <Luna state="freude" width="min(200px, 52vw)" glowSize={230} burst style={{ marginTop: 10 }} />
           <div className="pop" style={{ fontFamily: 'var(--font-head)', fontWeight: 700, fontSize: 25, color: 'var(--gold-1)', marginTop: 8, textShadow: '0 2px 18px rgba(232,199,122,.45)' }}>
@@ -66,7 +142,7 @@ export default function PlusDetail() {
           <div style={{ color: 'var(--text)', font: '400 13.5px/1.7 var(--font-body)', marginTop: 12, maxWidth: 280 }}>
             ✦ Sternenkarten &amp; Runen freigeschaltet<br />
             ✦ Freie Impulse, wann du magst<br />
-            ✦ Dein Monatsbild wächst ab jetzt mit
+            ✦ Plus gilt bis <b style={{ color: 'var(--gold-1)' }}>{bisDatum(justActivated.until)}</b>
           </div>
           <button className="btn-gold" style={{ marginTop: 24, width: 'auto', padding: '15px 28px' }} onClick={() => nav('/oracle', { replace: true })}>
             ✦ Zum Orakel – Karten &amp; Runen entdecken
@@ -95,30 +171,72 @@ export default function PlusDetail() {
         </div>
       </div>
 
-      {/* Preis prominent OBEN (Conversion): erst wissen, was es kostet – dann entscheiden */}
+      {/* Preis prominent OBEN: Einmalzahlung, kein Abo – endet automatisch */}
       <div style={{ marginTop: 12, textAlign: 'center' }}>
         <span style={{ display: 'inline-block', padding: '7px 16px', borderRadius: 999, background: 'rgba(232,199,122,.12)', border: '1px solid rgba(232,199,122,.35)', color: 'var(--text)', font: '600 12.5px var(--font-body)' }}>
-          Beta: <b style={{ color: 'var(--gold-1)' }}>derzeit kostenfrei</b>
-          <span style={{ color: '#7a7494' }}> · danach </span>
-          <b style={{ color: 'var(--gold-1)' }}>4,99 €</b>/Monat
+          <b style={{ color: 'var(--gold-1)' }}>4,99 €</b> / Monat
+          <span style={{ color: '#7a7494' }}> · oder </span>
+          <b style={{ color: 'var(--gold-1)' }}>39,99 €</b> / Jahr
         </span>
         <div style={{ marginTop: 6, color: 'var(--text-dim)', font: '500 11px var(--font-body)' }}>
-          oder <b style={{ color: 'var(--text)' }}>39,99 € / Jahr</b>
-          <span style={{ color: 'var(--gold-1)', fontWeight: 700 }}> · 4 Monate geschenkt</span>
+          Jahres-Zugang = <span style={{ color: 'var(--gold-1)', fontWeight: 700 }}>4 Monate geschenkt</span>
+          <span style={{ color: '#7a7494' }}> · Einmalzahlung, kein Abo – endet automatisch</span>
         </div>
       </div>
 
-      {/* CTA ganz oben: aktivieren ohne Scrollen (Vergleich & Vorteile stehen darunter) */}
-      {!active && (
-        <button className="btn-gold" style={{ marginTop: 12 }} onClick={activate}>
-          ✧ Plus kostenfrei testen · Beta
-        </button>
-      )}
-      {active && (
+      {active ? (
         <div style={{ marginTop: 12, textAlign: 'center', color: 'var(--gold-1)', font: '700 14px var(--font-body)' }}>
-          ✦ Plus ist aktiv – alle Sterne stehen dir offen.
+          ✦ Plus ist aktiv{settings.plusUntilISO ? <> · bis {bisDatum(settings.plusUntilISO)}</> : null}
         </div>
+      ) : (
+        <>
+          {/* Einmaliger Gratis-Test */}
+          {!settings.trialUsedISO && (
+            <button className="btn-gold" style={{ marginTop: 12 }} onClick={startTrial}>
+              ✧ 7 Tage kostenfrei testen
+            </button>
+          )}
+
+          {/* PayPal – erscheint automatisch, sobald die Zahlung eingerichtet ist */}
+          {pay.configured && <div ref={paypalRef} style={{ marginTop: 10 }} />}
+          {payMsg && (
+            <div style={{ marginTop: 8, textAlign: 'center', color: 'var(--danger)', font: '500 11.5px/1.5 var(--font-body)' }}>{payMsg}</div>
+          )}
+        </>
       )}
+
+      {/* Gutschein-Code: auch mit aktivem Plus einlösbar (verlängert) */}
+      <div style={{ marginTop: 10 }}>
+        {!couponOpen ? (
+          <button
+            onClick={() => setCouponOpen(true)}
+            style={{ width: '100%', padding: 12, borderRadius: 12, background: 'rgba(166,107,255,.14)', border: '1px solid rgba(167,139,250,.4)', color: 'var(--text)', font: '600 13px var(--font-body)', cursor: 'pointer' }}
+          >
+            🎟 Gutschein-Code einlösen
+          </button>
+        ) : (
+          <div className="glass" style={{ padding: '12px 13px' }}>
+            <div style={{ color: '#7a7494', font: '600 10px var(--font-body)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Gutschein-Code</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input
+                className="field"
+                style={{ flex: 1, textTransform: 'uppercase' }}
+                placeholder="z. B. LUNA-…"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && submitCoupon()}
+                autoCapitalize="characters"
+                autoCorrect="off"
+              />
+              <button className="btn-gold" style={{ width: 'auto', padding: '0 18px', opacity: couponBusy ? 0.6 : 1 }} disabled={couponBusy} onClick={submitCoupon}>
+                {couponBusy ? '…' : 'Einlösen'}
+              </button>
+            </div>
+            {couponMsg && <div style={{ marginTop: 8, color: 'var(--danger)', font: '500 11.5px/1.5 var(--font-body)' }}>{couponMsg}</div>}
+            {active && <div style={{ marginTop: 8, color: '#7a7494', font: '400 10.5px var(--font-body)' }}>Ein Code verlängert dein bestehendes Plus.</div>}
+          </div>
+        )}
+      </div>
 
       {/* Free vs. Plus – der Wert auf einen Blick */}
       <div className="glass" style={{ marginTop: 14, padding: '12px 15px 6px' }}>
@@ -138,9 +256,6 @@ export default function PlusDetail() {
             </span>
           </div>
         ))}
-        <div style={{ padding: '8px 0 6px', color: '#7a7494', font: '400 9.5px/1.4 var(--font-body)' }}>
-          Während der Beta sind KI-Botschaften für alle frei.
-        </div>
       </div>
 
       <div className="glass" style={{ marginTop: 12, padding: '6px 15px' }}>
@@ -155,24 +270,27 @@ export default function PlusDetail() {
         ))}
       </div>
 
-      {/* Zweiter CTA am Ende der Liste – wer bis hier liest, will nicht zurückscrollen */}
-      {!active && (
-        <button className="btn-gold" style={{ marginTop: 14 }} onClick={activate}>
-          ✧ Plus kostenfrei testen · Beta
+      {/* Zweiter Einstieg am Ende der Liste – wer bis hier liest, will nicht zurückscrollen */}
+      {!active && !settings.trialUsedISO && (
+        <button className="btn-gold" style={{ marginTop: 14 }} onClick={startTrial}>
+          ✧ 7 Tage kostenfrei testen
+        </button>
+      )}
+      {!active && settings.trialUsedISO && (
+        <button
+          onClick={() => { setCouponOpen(true); window.scrollTo?.(0, 0) }}
+          className="btn-gold"
+          style={{ marginTop: 14 }}
+        >
+          🎟 Mit Gutschein-Code weitermachen
         </button>
       )}
 
-      {active ? (
-        <button className="link-soft" style={{ marginTop: 12 }} onClick={() => updateSettings({ premium: false })}>
-          Plus deaktivieren (Demo)
-        </button>
-      ) : (
-        <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10.5px/1.5 var(--font-body)', marginTop: 10 }}>
-          <b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Beta-Test-Phase:</b> derzeit ohne Berechnung –
-          probiere Plus für kurze Zeit kostenfrei aus. Nach der Beta: 7 Tage gratis, dann 4,99 € / Monat
-          oder 39,99 € / Jahr · jederzeit kündbar · <span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={() => nav('/rechtliches')}>Rechtliches &amp; Datenschutz</span>
-        </div>
-      )}
+      <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10.5px/1.5 var(--font-body)', marginTop: 10 }}>
+        Zugang als <b style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Einmalzahlung</b> – kein Abo, keine automatische
+        Verlängerung. Zahlung per PayPal{pay.configured ? '' : ' (wird gerade eingerichtet – nutze solange einen Gutschein-Code)'}.
+        {' '}<span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={() => nav('/rechtliches')}>Rechtliches &amp; Datenschutz</span>
+      </div>
     </div>
   )
 }

@@ -12,8 +12,23 @@ const WD = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
 export default function Dashboard() {
   const nav = useNavigate()
   const loc = useLocation()
-  const { profile, stats, journal, rank, drawnToday, moodToday, pausedReturn, settings } = useStore()
+  const { profile, stats, journal, rank, drawnToday, moodToday, pausedReturn, settings, updateSettings } = useStore()
   const [reward, setReward] = useState(loc.state?.reward || null)
+
+  // 7-Tage-Backup-Popup (P3): regt regelmäßig die Sicherung an – höchstens
+  // alle 7 Tage, nur mit Einträgen und nur wenn das letzte Backup älter ist.
+  const [backupNudge, setBackupNudge] = useState(false)
+  useEffect(() => {
+    const stale = (iso, days) => !iso || Date.now() - new Date(iso + 'T12:00').getTime() > days * 86400000
+    if (journal.length > 0 && stale(settings.lastBackupISO, 7) && stale(settings.backupNudgeISO, 7)) {
+      setBackupNudge(true)
+    }
+  }, []) // eslint-disable-line
+  const closeBackupNudge = (goBackup) => {
+    updateSettings({ backupNudgeISO: formatDate().iso })
+    setBackupNudge(false)
+    if (goBackup) nav('/profil/privacy')
+  }
 
   // Tagesziehung: erst Befinden (falls heute noch nicht abgefragt), dann Ritual.
   // Bereits gezogen → direkt die heutige Botschaft erneut ansehen.
@@ -156,17 +171,20 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Backup-Erinnerung: ab 7 Einträgen ohne frisches Backup (max. alle 14 Tage) */}
-        {journal.length >= 7 && (!settings.lastBackupISO || (Date.now() - new Date(settings.lastBackupISO + 'T12:00').getTime()) > 14 * 86400000) && (
-          <div className="card" style={{ marginTop: 10, borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, border: '1px solid rgba(232,199,122,.35)' }} onClick={() => nav('/profil/privacy')}>
-            <span style={{ width: 40, height: 40, borderRadius: 12, flexShrink: 0, display: 'grid', placeItems: 'center', fontSize: 18, background: 'radial-gradient(circle,rgba(232,199,122,.25),rgba(40,30,70,.5))', border: '1px solid rgba(232,199,122,.35)' }}>🛡️</span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>Sichere dein Sternenband</div>
+        {/* Backup-Anregung läuft jetzt als 7-Tage-Popup (siehe unten) */}
+
+        {/* Plus abgelaufen: einmaliger, sanfter Hinweis mit Weg zurück (Gutschein/Zahlung) */}
+        {!settings.premium && settings.plusSource && settings.plusUntilISO && settings.plusExpiredSeenISO !== settings.plusUntilISO && (
+          <div className="card" style={{ marginTop: 10, borderRadius: 16, display: 'flex', alignItems: 'center', gap: 12, border: '1px solid rgba(232,199,122,.35)' }}>
+            <span style={{ width: 40, height: 40, borderRadius: 12, flexShrink: 0, display: 'grid', placeItems: 'center', fontSize: 18, background: 'radial-gradient(circle,rgba(232,199,122,.25),rgba(40,30,70,.5))', border: '1px solid rgba(232,199,122,.35)' }}>✧</span>
+            <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => nav('/profil/plus')}>
+              <div style={{ color: 'var(--text)', font: '600 13px var(--font-body)' }}>Dein Plus-Zeitraum ist beendet</div>
               <div style={{ color: 'var(--text-dim)', font: '400 11px/1.4 var(--font-body)', marginTop: 1 }}>
-                {settings.lastBackupISO ? 'Dein letztes Backup ist über zwei Wochen alt.' : `${journal.length} Einträge – noch kein Backup. Ein Tipp genügt.`}
+                Dein Tagebuch bleibt vollständig. Mit Gutschein-Code oder Zahlung geht es weiter ›
               </div>
             </div>
-            <span style={{ color: 'var(--gold-1)', fontSize: 16 }}>›</span>
+            <button aria-label="Hinweis schließen" onClick={() => updateSettings({ plusExpiredSeenISO: settings.plusUntilISO })}
+              style={{ background: 'none', border: 'none', color: '#7a7494', fontSize: 16, cursor: 'pointer', padding: 4 }}>×</button>
           </div>
         )}
 
@@ -221,6 +239,28 @@ export default function Dashboard() {
       </div>
 
       <RewardModal reward={reward} onClose={() => { setReward(null); nav('.', { replace: true, state: {} }) }} />
+
+      {/* 7-Tage-Backup-Popup: sanfte, wiederkehrende Sicherungs-Anregung */}
+      {backupNudge && !reward && (
+        <div className="overlay" onClick={() => closeBackupNudge(false)}>
+          <div className="modal pop" onClick={(e) => e.stopPropagation()} style={{ paddingTop: 24, textAlign: 'center' }}>
+            <span style={{ fontSize: 30 }}>🛡️</span>
+            <div className="title-lg" style={{ fontSize: 19, color: 'var(--text)', marginTop: 8 }}>Sichere dein Sternenband</div>
+            <div style={{ color: 'var(--text-dim)', font: '400 12.5px/1.6 var(--font-body)', marginTop: 10 }}>
+              {journal.length} {journal.length === 1 ? 'Eintrag' : 'Einträge'} ·{' '}
+              {settings.lastBackupISO ? `letzte Sicherung am ${settings.lastBackupISO}` : 'noch nie gesichert'}.
+              Ein Backup per E-Mail an dich selbst dauert nur einen Moment – und dein Tagebuch ist sicher,
+              was auch immer mit diesem Gerät passiert.
+            </div>
+            <button className="btn-gold" style={{ marginTop: 16 }} onClick={() => closeBackupNudge(true)}>
+              ✉️ Jetzt sichern
+            </button>
+            <button className="link-soft" style={{ marginTop: 12 }} onClick={() => closeBackupNudge(false)}>
+              Später · in 7 Tagen erinnern
+            </button>
+          </div>
+        </div>
+      )}
     </>
   )
 }

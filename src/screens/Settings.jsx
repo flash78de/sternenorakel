@@ -275,7 +275,9 @@ export default function Settings() {
         </div>
         <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ color: 'var(--text-dim)', font: '500 12px var(--font-body)' }}>
-            {settings.premium ? <b style={{ color: 'var(--gold-1)' }}>✦ Plus ist aktiv</b> : <>Beta · <b style={{ color: 'var(--text)' }}>kostenfrei testen</b></>}
+            {settings.premium
+              ? <b style={{ color: 'var(--gold-1)' }}>✦ aktiv{settings.plusUntilISO ? ` bis ${settings.plusUntilISO.split('-').reverse().join('.')}` : ''}</b>
+              : <>ab <b style={{ color: 'var(--text)' }}>4,99 € / Monat</b></>}
           </span>
           <button onClick={() => nav('/profil/plus')} style={{ background: 'linear-gradient(135deg,#E8C77A,#D9B45A)', color: 'var(--gold-ink)', font: '700 12px var(--font-body)', padding: '9px 18px', borderRadius: 12, border: 'none', boxShadow: '0 6px 16px rgba(232,199,122,.3)', cursor: 'pointer' }}>
             {settings.premium ? 'Verwalten' : 'Plus entdecken'}
@@ -304,7 +306,7 @@ export default function Settings() {
           window.location.href = `mailto:ml@mittel-bar.com?subject=${encodeURIComponent('Sternenluna Beta-Feedback')}&body=${encodeURIComponent(body)}`
         }}>
           <span>💬 Feedback senden</span>
-          <span className="meta">Beta · hilf Luna zu wachsen ›</span>
+          <span className="meta">hilf Luna zu wachsen ›</span>
         </button>
       </div>
 

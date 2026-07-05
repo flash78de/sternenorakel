@@ -18,7 +18,7 @@ export default defineConfig(() => ({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['uploads/luna-icon.png'],
+      includeAssets: ['uploads/luna-icon.png', 'apple-touch-icon.png', 'luna-icon-512.png'],
       // Lokale Schriften mit vorab cachen → Typografie auch offline.
       // push-sw.js hängt die Push-Handler (Erinnerungen) an den Service Worker.
       workbox: { globPatterns: ['**/*.{js,css,html,woff2}'], importScripts: ['push-sw.js'] },
@@ -35,8 +35,8 @@ export default defineConfig(() => ({
         orientation: 'portrait',
         start_url: '/',
         icons: [
-          { src: 'uploads/luna-icon.png', sizes: '512x512', type: 'image/png' },
-          { src: 'uploads/luna-icon.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+          { src: 'luna-icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'luna-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
         ]
       }
     })

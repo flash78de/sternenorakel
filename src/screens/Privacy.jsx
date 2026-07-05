@@ -12,24 +12,40 @@ export default function Privacy() {
   const fileRef = useRef(null)
 
   // Vollständiges Backup: Tagebuch + Profil + Fortschritt + Einstellungen.
+  const makeBackup = () =>
+    JSON.stringify(
+      { app: 'sternenluna', version: 1, exportedAt: new Date().toISOString(), profile, stats, settings, journal },
+      null,
+      2
+    )
+
   const exportData = () => {
-    const backup = {
-      app: 'sternenluna',
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      profile,
-      stats,
-      settings,
-      journal,
-    }
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
+    const blob = new Blob([makeBackup()], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'sternenluna-backup.json'
+    a.download = `sternenluna-backup-${formatDate().iso}.json`
     a.click()
     URL.revokeObjectURL(url)
     updateSettings({ lastBackupISO: formatDate().iso })
+  }
+
+  // Backup per E-Mail (P3): Teilen-Menü mit der Datei öffnen → „Mail" wählen
+  // und an die eigene Adresse schicken. Fallback ohne Teilen-API: Download.
+  const mailBackup = async () => {
+    const file = new File([makeBackup()], `sternenluna-backup-${formatDate().iso}.json`, { type: 'application/json' })
+    if (navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: 'Sternenluna Backup' })
+        updateSettings({ lastBackupISO: formatDate().iso })
+        setImportMsg('✓ Backup geteilt – am sichersten: an deine eigene E-Mail-Adresse senden.')
+      } catch {
+        /* abgebrochen – kein Fehler */
+      }
+      return
+    }
+    exportData()
+    setImportMsg('✓ Backup heruntergeladen – hänge die Datei an eine E-Mail an dich selbst.')
   }
 
   // Backup-Datei einlesen & prüfen (akzeptiert auch alte Sternenorakel-Exporte).
@@ -117,9 +133,13 @@ export default function Privacy() {
 
       {/* Export / Import / Suche */}
       <div className="list" style={{ marginTop: 12, background: 'linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.03))', border: '1px solid rgba(255,255,255,.1)' }}>
-        <button className="list-row" onClick={exportData}>
-          <span>⬇ Backup erstellen (Export)</span>
+        <button className="list-row" onClick={mailBackup}>
+          <span>✉️ Backup per E-Mail sichern</span>
           <span className="meta">{settings.lastBackupISO ? `zuletzt ${settings.lastBackupISO}` : 'noch nie'} ›</span>
+        </button>
+        <button className="list-row" onClick={exportData}>
+          <span>⬇ Backup als Datei (Export)</span>
+          <span className="chev">›</span>
         </button>
         <button className="list-row" onClick={() => fileRef.current?.click()}>
           <span>⬆ Backup wiederherstellen (Import)</span>

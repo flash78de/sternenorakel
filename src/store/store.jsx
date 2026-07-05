@@ -36,9 +36,14 @@ const DEFAULT_STATE = {
     reminderTime: '21:00',
     reminderWhen: 'abends', // morgens | mittags | abends | aus
     tone: 'Sanft',
-    premium: false, // Sternenluna Plus (Beta)
+    premium: false, // Sternenluna Plus – aktiv (abgeleitet aus Quelle + Ablaufdatum)
+    plusSource: null, // trial | coupon | paypal | beta – woher kommt das Plus?
+    plusUntilISO: null, // letzter gültiger Tag (null = unbefristet)
+    trialUsedISO: null, // Tag, an dem der einmalige Gratis-Test gestartet wurde
+    plusExpiredSeenISO: null, // Ablauf-Hinweis für dieses Enddatum bereits gezeigt
     splash: true, // „Luna erwacht"-Startanimation
     lastBackupISO: null, // Tag des letzten Exports (für die Backup-Erinnerung)
+    backupNudgeISO: null, // Tag des letzten Backup-Popups (max. alle 7 Tage)
   },
   journal: [], // {id, ts, iso, mid, title, symbol, constellation, theme, mantra, text, luck, energy, question, reflection}
   seenReward: null, // id der zuletzt gezeigten Belohnung
@@ -59,9 +64,31 @@ function load() {
       settings: { ...DEFAULT_STATE.settings, ...(parsed.settings || {}) },
       journal: parsed.journal || [],
     }
-    return migrateThemes(state)
+    return migratePlus(migrateThemes(state))
   } catch {
     return structuredClone(DEFAULT_STATE)
+  }
+}
+
+// Plus-Lebenszyklus: Aus der kostenlosen Beta wird ein befristetes Modell
+// (Test / Gutschein / Zahlung). Beim Laden wird geprüft, ob das Plus noch gilt.
+function migratePlus(state) {
+  try {
+    const s = state.settings
+    const today = new Date().toISOString().slice(0, 10)
+    // Bestands-Beta-Nutzer (premium ohne Quelle): großzügige Übergangsfrist,
+    // danach geht es mit Gutschein-Code oder Zahlung weiter.
+    if (s.premium && !s.plusSource) {
+      s.plusSource = 'beta'
+      s.plusUntilISO = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10)
+    }
+    // Abgelaufen? Plus-Funktionen einschränken (der sanfte Hinweis kommt im Dashboard).
+    if (s.premium && s.plusUntilISO && s.plusUntilISO < today) {
+      s.premium = false
+    }
+    return state
+  } catch {
+    return state // Migration darf nie Daten kosten
   }
 }
 

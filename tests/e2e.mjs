@@ -154,7 +154,7 @@ await page.goto('http://localhost:4173/#/profil/privacy')
 await page.waitForTimeout(500)
 const [download] = await Promise.all([
   page.waitForEvent('download', { timeout: 5000 }).catch(() => null),
-  page.click('text=Backup erstellen'),
+  page.click('text=Backup als Datei'),
 ])
 if (download) {
   const file = await download.path()
