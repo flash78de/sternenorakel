@@ -8,9 +8,15 @@
 //
 // Gutscheine liegen im selben KV wie die Push-Abos, Schlüssel:
 //   coupon:<CODE IN GROSSBUCHSTABEN>
-//   Wert: {"days":31,"maxUses":100,"used":0,"validUntilISO":"2026-08-31","note":"Beta-Runde Juli"}
+//   Wert: {"days":31,"maxUsers":20,"oncePerDevice":true,"devices":[],
+//          "used":0,"validUntilISO":"2026-08-31","note":"Beta-Runde Juli"}
+//   maxUsers   = wie viele VERSCHIEDENE Geräte einlösen dürfen
+//   oncePerDevice = true → jedes Gerät nur einmal; false → Gerät darf
+//                   mehrfach einlösen (verlängern), zählt aber nur 1 Nutzer
 // Marcel kann Codes jederzeit im Cloudflare-Dashboard anlegen/löschen:
 //   Compute (Workers) → KV → Namespace „PUSH" → Eintrag hinzufügen/entfernen.
+// Der 7-Tage-Gratis-Test läuft über dieselbe Schiene (/coupon/trial):
+//   einmal pro Gerät, serverseitig gemerkt unter trial:<geräte-hash>.
 //
 // PayPal: Einmalzahlungen (KEIN Abo, endet automatisch) über die
 // offiziellen Orders-API-Endpunkte. Benötigt Secrets PAYPAL_CLIENT_ID
@@ -27,10 +33,21 @@ const PLANS = {
   jahr: { amount: '39.99', days: 366, label: 'Sternenluna Plus · 1 Jahr' },
 }
 
+// ---- Gerätekennung: nur als Hash gespeichert (keine Rückverfolgung) ----
+async function deviceHash(device) {
+  const d = String(device || '').trim()
+  if (d.length < 8 || d.length > 80) return null
+  const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(d))
+  return btoa(String.fromCharCode(...new Uint8Array(h).slice(0, 15)))
+    .replace(/\+/g, '-').replace(/\//g, '_')
+}
+
 // ---- Gutscheine ----
-async function redeemCoupon(env, code) {
+async function redeemCoupon(env, code, device) {
   const norm = String(code || '').trim().toUpperCase()
   if (!/^[A-Z0-9ÄÖÜ_-]{4,40}$/.test(norm)) return { status: 400, body: { error: 'Bitte gib einen gültigen Code ein.' } }
+  const dev = await deviceHash(device)
+  if (!dev) return { status: 400, body: { error: 'Bitte aktualisiere die App und versuche es erneut.' } }
   const key = 'coupon:' + norm
   const raw = await env.PUSH.get(key)
   if (!raw) return { status: 404, body: { error: 'Diesen Code kennt Luna nicht (mehr).' } }
@@ -42,12 +59,31 @@ async function redeemCoupon(env, code) {
   }
   const today = new Date().toISOString().slice(0, 10)
   if (c.validUntilISO && c.validUntilISO < today) return { status: 410, body: { error: 'Dieser Code ist abgelaufen.' } }
-  if (c.maxUses && (c.used || 0) >= c.maxUses) return { status: 410, body: { error: 'Dieser Code wurde schon zu oft eingelöst.' } }
   const days = Number(c.days)
   if (!Number.isFinite(days) || days < 1 || days > 3700) return { status: 500, body: { error: 'Code fehlerhaft hinterlegt.' } }
+
+  const devices = Array.isArray(c.devices) ? c.devices : []
+  const known = devices.includes(dev)
+  if (known && c.oncePerDevice) return { status: 409, body: { error: 'Dieser Code wurde auf diesem Gerät schon eingelöst.' } }
+  if (!known) {
+    const maxUsers = Number(c.maxUsers || c.maxUses || 0)
+    if (maxUsers && devices.length >= maxUsers) return { status: 410, body: { error: 'Dieser Code wurde schon zu oft eingelöst.' } }
+    devices.push(dev)
+  }
+  c.devices = devices
   c.used = (c.used || 0) + 1
   await env.PUSH.put(key, JSON.stringify(c))
   return { status: 200, body: { ok: true, days, note: c.note || null } }
+}
+
+// ---- 7-Tage-Gratis-Test: gleiche Systematik, fest ein Mal pro Gerät ----
+async function redeemTrial(env, device) {
+  const dev = await deviceHash(device)
+  if (!dev) return { status: 400, body: { error: 'Bitte aktualisiere die App und versuche es erneut.' } }
+  const key = 'trial:' + dev
+  if (await env.PUSH.get(key)) return { status: 409, body: { error: 'Der Gratis-Test wurde auf diesem Gerät schon genutzt.' } }
+  await env.PUSH.put(key, JSON.stringify({ iso: new Date().toISOString().slice(0, 10) }))
+  return { status: 200, body: { ok: true, days: 7 } }
 }
 
 // ---- PayPal (Orders API v2, Einmalzahlung) ----
@@ -123,7 +159,12 @@ export async function handlePlus(request, env, url, json) {
   try {
     if (url.pathname === '/coupon/redeem') {
       if (!env.PUSH) return json({ error: 'Gutscheine nicht konfiguriert.' }, 500)
-      const r = await redeemCoupon(env, body.code)
+      const r = await redeemCoupon(env, body.code, body.device)
+      return json(r.body, r.status)
+    }
+    if (url.pathname === '/coupon/trial') {
+      if (!env.PUSH) return json({ error: 'Gutscheine nicht konfiguriert.' }, 500)
+      const r = await redeemTrial(env, body.device)
       return json(r.body, r.status)
     }
     if (url.pathname === '/pay/config') {

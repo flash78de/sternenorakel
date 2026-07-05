@@ -44,7 +44,16 @@ export default function Dashboard() {
   const firstDay = journal.length === 0 && stats.streak === 0
 
   const todayIdx = (new Date().getDay() + 6) % 7 // Mo=0
-  const filled = Math.min(stats.streak, 7)
+  // Wochenstreifen datenbasiert: Stern nur an Tagen mit ECHTER Ziehung
+  // (stats.drawDays), Tage vor dem ersten App-Start werden ausgekreuzt –
+  // sonst leuchtet nach dem Sonntags-Onboarding fälschlich der Montag.
+  const weekISO = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date()
+    d.setHours(12, 0, 0, 0)
+    d.setDate(d.getDate() - todayIdx + i)
+    return d.toISOString().slice(0, 10)
+  })
+  const drawSet = new Set(stats.drawDays || [])
   const cstat = constellationStatus(journal)
 
   if (firstDay) return <EmptyDashboard />
@@ -148,13 +157,17 @@ export default function Dashboard() {
           <div className="streak-row">
             {WD.map((d, i) => {
               const isToday = i === todayIdx
-              const on = i < filled || (isToday && drawnToday)
+              const iso = weekISO[i]
+              const drawn = drawSet.has(iso) || (isToday && drawnToday)
+              const vorher = stats.installISO && iso < stats.installISO // vor dem ersten App-Tag
               return (
                 <div key={d} className={'streak-day' + (isToday ? ' is-today' : '')}>
-                  {isToday ? (
-                    <span className="today">★</span>
+                  {vorher ? (
+                    <span className="star off" style={{ fontSize: 13, opacity: 0.45 }}>×</span>
+                  ) : isToday ? (
+                    <span className={drawn ? 'today' : 'star off'}>★</span>
                   ) : (
-                    <span className={'star' + (on ? '' : ' off')}>★</span>
+                    <span className={'star' + (drawn ? '' : ' off')}>★</span>
                   )}
                   <label>{d}</label>
                 </div>
@@ -255,7 +268,10 @@ export default function Dashboard() {
             <button className="btn-gold" style={{ marginTop: 16 }} onClick={() => closeBackupNudge(true)}>
               ✉️ Jetzt sichern
             </button>
-            <button className="link-soft" style={{ marginTop: 12 }} onClick={() => closeBackupNudge(false)}>
+            <button
+              onClick={() => closeBackupNudge(false)}
+              style={{ marginTop: 10, width: '100%', padding: 12, borderRadius: 12, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.16)', color: 'var(--text-dim)', font: '600 13px var(--font-body)', cursor: 'pointer' }}
+            >
               Später · in 7 Tagen erinnern
             </button>
           </div>

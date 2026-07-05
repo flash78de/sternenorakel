@@ -11,17 +11,50 @@ const api = (path, body) =>
     body: JSON.stringify(body || {}),
   })
 
+// Anonyme Gerätekennung (eigener Speicher-Schlüssel, übersteht „Alles löschen"
+// bewusst – sonst ließe sich der Gratis-Test durch Zurücksetzen wiederholen).
+export function deviceId() {
+  const KEY = 'sternenluna.device'
+  try {
+    let id = localStorage.getItem(KEY)
+    if (!id) {
+      id = crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`
+      localStorage.setItem(KEY, id)
+    }
+    return id
+  } catch {
+    return 'ohne-speicher'
+  }
+}
+
 // Gutschein einlösen → {ok, days, note} oder Error mit verständlicher Meldung
 export async function redeemCoupon(code) {
   let res
   try {
-    res = await api('/coupon/redeem', { code })
+    res = await api('/coupon/redeem', { code, device: deviceId() })
   } catch {
     throw new Error('Keine Verbindung – bitte später erneut versuchen.')
   }
   const data = await res.json().catch(() => ({}))
   if (!res.ok || !data.ok) throw new Error(data.error || 'Das hat nicht geklappt.')
   return data
+}
+
+// 7-Tage-Gratis-Test starten (serverseitig: nur einmal pro Gerät)
+export async function redeemTrial() {
+  let res
+  try {
+    res = await api('/coupon/trial', { device: deviceId() })
+  } catch {
+    throw new Error('Keine Verbindung – der Gratis-Test braucht einmal kurz Internet.')
+  }
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.ok) {
+    const err = new Error(data.error || 'Das hat nicht geklappt.')
+    err.used = res.status === 409
+    throw err
+  }
+  return data // {days: 7}
 }
 
 // Ist die PayPal-Zahlung serverseitig eingerichtet?

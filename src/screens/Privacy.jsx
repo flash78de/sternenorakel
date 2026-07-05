@@ -142,15 +142,16 @@ export default function Privacy() {
           <span className="chev">›</span>
         </button>
         <button className="list-row" onClick={() => fileRef.current?.click()}>
-          <span>⬆ Backup wiederherstellen (Import)</span>
-          <span className="chev">›</span>
+          <span>⬆ Backup wiederherstellen</span>
+          <span className="meta">Import von Datei · iPhone: „Dateien" ›</span>
         </button>
         <button className="list-row" onClick={() => nav('/tagebuch')}>
           <span>Tagebuch durchsuchen</span>
           <span className="chev">›</span>
         </button>
       </div>
-      <input ref={fileRef} type="file" accept="application/json,.json" style={{ display: 'none' }} onChange={onImportFile} />
+      {/* .json + text/plain: manche Mail-Apps liefern die Datei als Text aus */}
+      <input ref={fileRef} type="file" accept=".json,application/json,text/json,text/plain" style={{ display: 'none' }} onChange={onImportFile} />
       {importMsg && (
         <div style={{ marginTop: 8, textAlign: 'center', color: importMsg.startsWith('✓') ? 'var(--gold-1)' : 'var(--danger)', font: '500 11.5px var(--font-body)' }}>
           {importMsg}

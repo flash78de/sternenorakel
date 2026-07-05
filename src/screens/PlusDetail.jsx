@@ -4,7 +4,7 @@ import Luna from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
 import { buzz } from '../lib/haptics.js'
 import { formatDate } from '../data/library.js'
-import { redeemCoupon, payConfig, createPayOrder, capturePayOrder, loadPayPalSdk, bisDatum } from '../lib/plus.js'
+import { redeemCoupon, redeemTrial, payConfig, createPayOrder, capturePayOrder, loadPayPalSdk, bisDatum } from '../lib/plus.js'
 
 // Free-vs-Plus auf einen Blick (Conversion: Wert sofort sichtbar machen).
 // Nur echte, vorhandene Funktionen – keine Versprechen, die die App nicht hält.
@@ -70,9 +70,23 @@ export default function PlusDetail() {
     return until
   }
 
-  const startTrial = () => {
-    updateSettings({ trialUsedISO: formatDate().iso })
-    grantPlus(7, 'trial')
+  // Gratis-Test läuft über den Server (einmal pro Gerät, wie ein Gutschein)
+  const [trialBusy, setTrialBusy] = useState(false)
+  const [trialMsg, setTrialMsg] = useState('')
+  const startTrial = async () => {
+    if (trialBusy) return
+    setTrialBusy(true)
+    setTrialMsg('')
+    try {
+      const { days } = await redeemTrial()
+      updateSettings({ trialUsedISO: formatDate().iso })
+      grantPlus(days, 'trial')
+    } catch (e) {
+      if (e.used) updateSettings({ trialUsedISO: formatDate().iso }) // Knopf ausblenden
+      setTrialMsg(e.message)
+    } finally {
+      setTrialBusy(false)
+    }
   }
 
   const submitCoupon = async () => {
@@ -190,11 +204,14 @@ export default function PlusDetail() {
         </div>
       ) : (
         <>
-          {/* Einmaliger Gratis-Test */}
+          {/* Einmaliger Gratis-Test (serverseitig: einmal pro Gerät) */}
           {!settings.trialUsedISO && (
-            <button className="btn-gold" style={{ marginTop: 12 }} onClick={startTrial}>
-              ✧ 7 Tage kostenfrei testen
+            <button className="btn-gold" style={{ marginTop: 12, opacity: trialBusy ? 0.6 : 1 }} disabled={trialBusy} onClick={startTrial}>
+              {trialBusy ? '✦ Einen Moment …' : '✧ 7 Tage kostenfrei testen'}
             </button>
+          )}
+          {trialMsg && (
+            <div style={{ marginTop: 8, textAlign: 'center', color: 'var(--danger)', font: '500 11.5px/1.5 var(--font-body)' }}>{trialMsg}</div>
           )}
 
           {/* PayPal – erscheint automatisch, sobald die Zahlung eingerichtet ist */}
