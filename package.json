@@ -1,6 +1,7 @@
 {
   "name": "sternenorakel",
   "private": true,
+  "license": "UNLICENSED",
   "version": "1.1.0",
   "type": "module",
   "description": "Sternenorakel — eine local-first Begleiter-App mit dem Sternenwesen Luna (PWA)",
