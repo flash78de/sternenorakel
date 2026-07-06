@@ -145,7 +145,7 @@ export default function Settings() {
         <Reihe icon="💬" title="Feedback senden" onClick={() => {
           const build = typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev'
           const body = `Hallo Marcel,\n\nmein Feedback zu Sternenluna:\n\n(Was gefällt dir? Was klemmt? Was fehlt?)\n\n—\nVersion: ${build}\nGerät: ${navigator.userAgent}`
-          window.location.href = `mailto:ml@mittel-bar.com?subject=${encodeURIComponent('Sternenluna Feedback')}&body=${encodeURIComponent(body)}`
+          window.location.href = `mailto:sternenluna.app@gmail.com?subject=${encodeURIComponent('Sternenluna Feedback')}&body=${encodeURIComponent(body)}`
         }} />
       </Gruppe>
 

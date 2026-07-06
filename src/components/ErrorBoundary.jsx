@@ -34,7 +34,7 @@ export default class ErrorBoundary extends Component {
           ✦ Neu starten
         </button>
         <a
-          href={`mailto:ml@mittel-bar.com?subject=${encodeURIComponent('Sternenluna – Fehlerbericht')}&body=${encodeURIComponent(`Hallo Marcel,\n\nLuna ist bei mir gestolpert.\n\nWas ich gerade getan habe:\n(bitte kurz beschreiben)\n\n—\nVersion: ${build}`)}`}
+          href={`mailto:sternenluna.app@gmail.com?subject=${encodeURIComponent('Sternenluna – Fehlerbericht')}&body=${encodeURIComponent(`Hallo Marcel,\n\nLuna ist bei mir gestolpert.\n\nWas ich gerade getan habe:\n(bitte kurz beschreiben)\n\n—\nVersion: ${build}`)}`}
           style={{ marginTop: 16, color: '#a66bff', font: '500 12px inherit', textDecoration: 'none' }}
         >
           Fehler melden
