@@ -140,6 +140,7 @@ export default function Settings() {
 
       <Gruppe label="Daten & Rechtliches">
         <Reihe icon="🔒" title="Daten & Privatsphäre" meta="Backup · Löschen" onClick={() => nav('/profil/privacy')} />
+        <Reihe icon="☁" title="Konto & Cloud-Sync" meta="in Vorbereitung" onClick={() => nav('/auth/account')} />
         <Reihe icon="§" title="Rechtliches" meta="Impressum · Kündigung" onClick={() => nav('/rechtliches')} />
         <Reihe icon="💬" title="Feedback senden" onClick={() => {
           const build = typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev'
