@@ -132,7 +132,7 @@ export default {
     ctx.waitUntil(pushScheduled(env))
   },
 
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(env, request) })
     if (request.method !== 'POST') return json({ error: 'Nur POST.' }, 405, env, request)
 
@@ -147,7 +147,7 @@ export default {
     }
     // Plus-Freischaltung (Gutscheine, PayPal) + Kündigungsbutton (§ 312k BGB)
     if (url.pathname.startsWith('/coupon/') || url.pathname.startsWith('/pay/') || url.pathname === '/kuendigen') {
-      return handlePlus(request, env, url, (body, status) => json(body, status, env, request))
+      return handlePlus(request, env, url, (body, status) => json(body, status, env, request), ctx)
     }
 
     if (!env.ANTHROPIC_API_KEY) return json({ error: 'ANTHROPIC_API_KEY fehlt.' }, 500, env, request)

@@ -25,7 +25,27 @@
 // Gutschein-Weg als einzige Option.
 // ============================================================
 
+import { sendPush } from './push.js'
+
 const PAYPAL_API = 'https://api-m.paypal.com'
+
+// ---- Admin-Info: Push an Marcels Gerät(e) bei Gutschein-Einlösung ----
+// KV-Schlüssel admin:push = Array von Push-Abos ({endpoint, keys:{p256dh,auth}}).
+// Nur Betriebszähler, keine Personendaten. Fehler hier dürfen die
+// Einlösung der Nutzerin niemals stören.
+export async function adminNotify(env, title, text) {
+  try {
+    if (!env.PUSH || !env.VAPID_PRIVATE_JWK) return
+    const raw = await env.PUSH.get('admin:push')
+    if (!raw) return
+    const subs = JSON.parse(raw)
+    for (const sub of Array.isArray(subs) ? subs : [subs]) {
+      await sendPush(sub, { title, body: text }, env).catch(() => 0)
+    }
+  } catch {
+    /* still – Admin-Info ist nie kritisch */
+  }
+}
 
 // Feste Pläne – Preise NIE vom Client übernehmen.
 // days: 0 = dauerhafter Einmalkauf (z. B. Chakren-Reise), sonst Laufzeit.
@@ -75,7 +95,14 @@ async function redeemCoupon(env, code, device) {
   c.devices = devices
   c.used = (c.used || 0) + 1
   await env.PUSH.put(key, JSON.stringify(c))
-  return { status: 200, body: { ok: true, days, note: c.note || null } }
+  // Admin-Meldung (geht NICHT an die Nutzerin – nur ins body-lose Feld)
+  const max = Number(c.maxUsers || c.maxUses || 0)
+  const voll = max && devices.length >= max
+  const adminMsg =
+    `${norm}: ${devices.length}${max ? ` von ${max}` : ''} Plätzen vergeben` +
+    (c.oncePerDevice ? '' : ` · ${c.used}. Einlösung`) +
+    (voll ? ' – der Code ist damit voll! ✦' : '.')
+  return { status: 200, body: { ok: true, days, note: c.note || null }, adminMsg }
 }
 
 // ---- 7-Tage-Gratis-Test: gleiche Systematik, fest ein Mal pro Gerät ----
@@ -173,7 +200,7 @@ async function kuendigungEinreichen(env, body) {
 }
 
 // ---- HTTP-Routing (json(body, status) kommt vom Haupt-Worker) ----
-export async function handlePlus(request, env, url, json) {
+export async function handlePlus(request, env, url, json, ctx) {
   let body
   try {
     body = await request.json()
@@ -185,6 +212,10 @@ export async function handlePlus(request, env, url, json) {
     if (url.pathname === '/coupon/redeem') {
       if (!env.PUSH) return json({ error: 'Gutscheine nicht konfiguriert.' }, 500)
       const r = await redeemCoupon(env, body.code, body.device)
+      if (r.status === 200 && r.adminMsg) {
+        const p = adminNotify(env, '✦ Gutschein eingelöst', r.adminMsg)
+        ctx?.waitUntil ? ctx.waitUntil(p) : await p
+      }
       return json(r.body, r.status)
     }
     if (url.pathname === '/kuendigen') {
