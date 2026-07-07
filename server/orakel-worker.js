@@ -15,7 +15,7 @@
 
 import { handlePush, pushScheduled } from './push.js'
 import { handlePlus } from './plus.js'
-import { handlePing } from './zaehler.js'
+import { handlePing, morgenBericht } from './zaehler.js'
 
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages'
 const DEFAULT_MODEL = 'claude-opus-4-8'
@@ -131,6 +131,7 @@ export default {
   // Cron (*/15): tägliche Erinnerungen zur Wunschzeit der Nutzerin
   async scheduled(event, env, ctx) {
     ctx.waitUntil(pushScheduled(env))
+    ctx.waitUntil(morgenBericht(env)) // täglicher Admin-Bericht ~08:00 dt. Zeit
   },
 
   async fetch(request, env, ctx) {
