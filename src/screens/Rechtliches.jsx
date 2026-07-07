@@ -101,6 +101,14 @@ export default function Rechtliches() {
           Server gelöscht.
         </P>
         <P>
+          <b style={{ color: 'var(--text)' }}>Anonyme Tageszählung:</b> Damit wir wissen, ob Sternenluna genutzt
+          wird, sendet die App höchstens einmal pro Tag ein zählendes Signal an unseren Server. Es enthält
+          <b style={{ color: 'var(--text)' }}> keine Kennung, kein Cookie und keinen Personenbezug</b> – gespeichert
+          wird ausschließlich ein Tages-Zähler („heute X Starts, davon Y Erststarts"). Eine Wiedererkennung
+          einzelner Personen oder Geräte ist damit nicht möglich (Art. 6 Abs. 1 lit. f DSGVO – berechtigtes
+          Interesse an minimaler, anonymer Reichweitenmessung).
+        </P>
+        <P>
           <b style={{ color: 'var(--text)' }}>Hosting:</b> Die App wird über GitHub Pages (GitHub Inc., USA)
           ausgeliefert. Beim Aufruf verarbeitet GitHub technisch notwendige Verbindungsdaten (z.&nbsp;B. IP-Adresse)
           in Server-Protokollen. Diese App setzt <b style={{ color: 'var(--text)' }}>keine Cookies</b> ein und

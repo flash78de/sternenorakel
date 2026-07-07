@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useStore } from './store/store.jsx'
+import { tagesPing } from './lib/zaehler.js'
 import { TabLayout, PlainLayout } from './components/Layout.jsx'
 
 import Splash from './screens/Splash.jsx'
@@ -45,6 +46,11 @@ function Gate({ children }) {
 export default function App() {
   const { onboarded, settings } = useStore()
   const [splash, setSplash] = useState(settings.splash !== false)
+
+  // Sternenzähler: ein anonymes +1 pro Gerät und Tag (siehe lib/zaehler.js)
+  useEffect(() => {
+    tagesPing()
+  }, [])
 
   if (splash) return <Splash onDone={() => setSplash(false)} />
 

@@ -15,6 +15,7 @@
 
 import { handlePush, pushScheduled } from './push.js'
 import { handlePlus } from './plus.js'
+import { handlePing } from './zaehler.js'
 
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages'
 const DEFAULT_MODEL = 'claude-opus-4-8'
@@ -144,6 +145,10 @@ export default {
     const url = new URL(request.url)
     if (url.pathname.startsWith('/push/')) {
       return handlePush(request, env, url, (body, status) => json(body, status, env, request))
+    }
+    // Sternenzähler: anonyme Tageszählung (kein Personenbezug)
+    if (url.pathname === '/ping') {
+      return handlePing(request, env, (body, status) => json(body, status, env, request))
     }
     // Plus-Freischaltung (Gutscheine, PayPal) + Kündigungsbutton (§ 312k BGB)
     if (url.pathname.startsWith('/coupon/') || url.pathname.startsWith('/pay/') || url.pathname === '/kuendigen') {
