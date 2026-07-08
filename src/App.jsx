@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useStore } from './store/store.jsx'
 import { tagesPing } from './lib/zaehler.js'
+import UpdateHinweis from './components/UpdateHinweis.jsx'
 import { TabLayout, PlainLayout } from './components/Layout.jsx'
 
 import Splash from './screens/Splash.jsx'
@@ -55,6 +56,8 @@ export default function App() {
   if (splash) return <Splash onDone={() => setSplash(false)} />
 
   return (
+    <>
+    <UpdateHinweis />
     <Routes>
       <Route
         path="/"
@@ -122,5 +125,6 @@ export default function App() {
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   )
 }

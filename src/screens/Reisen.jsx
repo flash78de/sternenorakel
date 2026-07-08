@@ -25,6 +25,7 @@ export default function Reisen() {
   const [pay, setPay] = useState({ configured: false })
   const [payMsg, setPayMsg] = useState('')
   const [gekauft, setGekauft] = useState(false)
+  const [anleitung, setAnleitung] = useState(false) // Lese-Anleitung im Vollbild
   const paypalRef = useRef(null)
   useEffect(() => {
     if (!zugang) payConfig().then(setPay).catch(() => {})
@@ -95,6 +96,20 @@ export default function Reisen() {
         </span>
         <span style={{ color: 'var(--gold-1)', font: '600 9.5px var(--font-body)', letterSpacing: 0.8, textTransform: 'uppercase', border: '1px solid rgba(232,199,122,.4)', borderRadius: 999, padding: '3px 8px', flexShrink: 0 }}>in Kürze</span>
       </div>
+
+      {/* Lese-Anleitung: Marcels Legende zu den Kartenelementen (Tipp → Vollbild) */}
+      <button onClick={() => setAnleitung(true)}
+        style={{ marginTop: 10, width: '100%', display: 'flex', gap: 12, alignItems: 'center', textAlign: 'left', cursor: 'zoom-in', borderRadius: 15, padding: '10px 14px', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(232,199,122,.22)' }}>
+        <img src={asset('uploads/opt/chakra-anleitung-sm.webp')} alt=""
+          style={{ width: 42, borderRadius: 6, flexShrink: 0, boxShadow: '0 4px 12px rgba(0,0,0,.5)' }} />
+        <span style={{ flex: 1 }}>
+          <span style={{ display: 'block', color: 'var(--text)', font: '600 13px var(--font-body)' }}>So liest du die Karten</span>
+          <span style={{ display: 'block', color: 'var(--text-dim)', font: '400 11px/1.4 var(--font-body)', marginTop: 1 }}>
+            Die Legende zu allen sieben Stationen – was Zeichen, Laut und Farbe bedeuten.
+          </span>
+        </span>
+        <span style={{ color: 'var(--gold-1)', fontSize: 15, flexShrink: 0 }}>›</span>
+      </button>
 
       {/* Ehrliche Rahmung – derselbe Geist wie der Barnum-Hinweis */}
       <div style={{ marginTop: 10, display: 'flex', gap: 8, alignItems: 'flex-start', background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 12, padding: '10px 12px' }}>
@@ -191,6 +206,17 @@ export default function Reisen() {
       <div style={{ textAlign: 'center', color: '#7a7494', font: '400 10px/1.5 var(--font-body)', marginTop: 12 }}>
         Symbolsprache, keine Heilslehre – nimm mit, was dir guttut.
       </div>
+      {/* Lese-Anleitung im Vollbild – Tippen schließt */}
+      {anleitung && (
+        <div onClick={() => setAnleitung(false)}
+          style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(8,7,14,.94)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 18 }}>
+          <img src={asset('uploads/opt/chakra-anleitung-md.webp')} alt="So liest du die Chakren-Karten"
+            style={{ maxWidth: '94vw', maxHeight: '84vh', width: 'auto', height: 'auto', borderRadius: 14, boxShadow: '0 20px 60px rgba(0,0,0,.7)' }} />
+          <div style={{ marginTop: 12, color: 'var(--text-dim)', font: '500 11.5px var(--font-body)' }}>
+            Gilt für alle 7 Stationen · Tippen schließt
+          </div>
+        </div>
+      )}
     </div>
   )
 }

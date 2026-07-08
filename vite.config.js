@@ -17,7 +17,7 @@ export default defineConfig(() => ({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt', // Update erst nach Zustimmung (Popup in der App)
       includeAssets: ['uploads/luna-icon.png', 'apple-touch-icon.png', 'luna-icon-512.png'],
       // Lokale Schriften mit vorab cachen → Typografie auch offline.
       // push-sw.js hängt die Push-Handler (Erinnerungen) an den Service Worker.
