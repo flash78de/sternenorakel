@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import Luna from '../components/Luna.jsx'
 import { useStore } from '../store/store.jsx'
-import { formatDate, isUnder16 } from '../data/library.js'
+import { formatDate, isUnder16, constellationStatus } from '../data/library.js'
 import { fetchMessage } from '../lib/ai.js'
 import { speak, speechSupported } from '../lib/audio.js'
 import { asset } from '../lib/asset.js'
@@ -58,6 +58,8 @@ export default function OracleDraw() {
   }
 
   const todaysEntry = journal.find((e) => e.iso === formatDate().iso)
+  // Sternbild-Status für den Reflexions-Anreiz (nächstes Ziel + Rest-Distanz)
+  const cstat = constellationStatus(journal)
 
   // Freier Impuls (Entscheidung 2a): Die Tagesbotschaft bleibt 1×/Tag.
   // Wer mit Plus BEWUSST ein Ritual wählt (Route-State), darf zusätzlich ziehen –
@@ -486,6 +488,22 @@ export default function OracleDraw() {
             <span style={{ color: '#7a7494', font: '400 11px var(--font-body)' }}>Nur für dich · local-first gespeichert</span>
             <span style={{ color: 'var(--text-dim)', font: '500 11px var(--font-body)' }}>{note.length} Zeichen</span>
           </div>
+
+          {/* Sternbild-Anreiz: NUR festgehaltene Reflexionen lassen Sternbilder
+              entstehen – sanftes FOMO solange das Feld leer ist, Bestätigung
+              sobald geschrieben wird. */}
+          {cstat?.next && (
+            <div style={{ marginTop: 10, display: 'flex', gap: 9, alignItems: 'center', borderRadius: 12, padding: '9px 12px', background: note.trim() ? 'rgba(166,107,255,.12)' : 'rgba(232,199,122,.08)', border: `1px solid ${note.trim() ? 'rgba(166,107,255,.4)' : 'rgba(232,199,122,.28)'}`, transition: 'background .3s, border-color .3s' }}>
+              <span style={{ fontSize: 15 }}>{note.trim() ? '✨' : '☆'}</span>
+              <span style={{ color: 'var(--text-dim)', font: '400 11.5px/1.45 var(--font-body)', flex: 1 }}>
+                {note.trim() ? (
+                  <>Schön – diese Reflexion zählt für deine <b style={{ color: 'var(--text)' }}>Sternbilder</b>. „{cstat.next.name}" ist nur noch {cstat.missing} {cstat.missing === 1 ? 'Reflexion' : 'Reflexionen'} entfernt.</>
+                ) : (
+                  <>Sternbilder entstehen <b style={{ color: 'var(--text)' }}>nur aus festgehaltenen Reflexionen</b> – ein Satz genügt. Dein nächstes wartet: „{cstat.next.name}" (noch {cstat.missing}).</>
+                )}
+              </span>
+            </div>
+          )}
 
           <button className="btn-gold" style={{ marginTop: 12 }} onClick={saveReflection}>
             {note.trim() ? 'Reflexion speichern' : 'Fertig'}
