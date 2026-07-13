@@ -288,7 +288,9 @@
 
 /* ---------- Overlay / Modal (Belohnung, Dialog) ---------- */
 .overlay {
-  position: absolute;
+  /* fixed statt absolute: Popups erscheinen im sichtbaren Ausschnitt,
+     auch wenn die Seite gescrollt ist (z. B. „i" am Wochenband) */
+  position: fixed;
   inset: 0;
   z-index: 50;
   display: flex;
