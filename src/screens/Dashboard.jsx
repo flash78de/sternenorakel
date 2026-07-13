@@ -54,6 +54,9 @@ export default function Dashboard() {
     if (verlaengern) nav('/profil/plus')
   }
 
+  // Erklärung zum Wochenband (das „i“): Montag = frisches Band, nichts geht verloren
+  const [serieInfo, setSerieInfo] = useState(false)
+
   // Sofort-Hilfe: Button ist schon da, Inhalte kommen im nächsten Sprint
 
   // Tagesziehung: erst Befinden (falls heute noch nicht abgefragt), dann Ritual.
@@ -179,7 +182,8 @@ export default function Dashboard() {
         <div className="card" style={{ marginTop: 10, borderRadius: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span className="card-title" style={{ fontSize: 13 }}>Deine 7-Tage-Serie</span>
-            <span style={{ width: 17, height: 17, borderRadius: '50%', border: '1px solid rgba(182,176,206,.4)', color: 'var(--text-dim)', font: '600 10px var(--font-body)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>i</span>
+            <button onClick={() => setSerieInfo(true)} aria-label="Wie das Wochenband funktioniert"
+              style={{ width: 20, height: 20, borderRadius: '50%', border: '1px solid rgba(182,176,206,.4)', background: 'none', color: 'var(--text-dim)', font: '600 11px var(--font-body)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>i</button>
           </div>
           <div style={{ color: 'var(--text-dim)', font: '400 10.5px var(--font-body)', marginTop: 3 }}>
             Jeder Tag ist ein kleiner Stern. Keine Pflicht. Nur ein Pfad.
@@ -318,6 +322,31 @@ export default function Dashboard() {
             >
               Alles klar
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Wochenband erklärt: Montag = frisches Band, verloren geht nichts */}
+      {serieInfo && (
+        <div className="overlay" onClick={() => setSerieInfo(false)}>
+          <div className="modal pop" onClick={(e) => e.stopPropagation()} style={{ paddingTop: 22 }}>
+            <div className="title-lg" style={{ fontSize: 19, color: 'var(--text)', textAlign: 'center' }}>Dein Wochenband</div>
+            <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 9, color: 'var(--text-dim)', font: '400 12.5px/1.55 var(--font-body)' }}>
+              <div><b style={{ color: 'var(--gold-1)' }}>★</b> <b style={{ color: 'var(--text)' }}>Ein Stern</b> leuchtet an jedem Tag, an dem du eine Botschaft empfangen hast.</div>
+              <div><b style={{ color: 'var(--text)' }}>×</b> markiert Tage vor deinem allerersten Sternentag.</div>
+              <div>Das Band zeigt immer die <b style={{ color: 'var(--text)' }}>aktuelle Woche</b> (Mo–So). Am Montag beginnt ein frisches Band – <b style={{ color: 'var(--text)' }}>verloren geht dabei nichts</b>: Deine Serie zählt über Wochen hinweg weiter, und jeder Stern bleibt in deinem Tagebuch.</div>
+            </div>
+            <div style={{ marginTop: 14, display: 'flex', gap: 10, textAlign: 'center' }}>
+              <div style={{ flex: 1, background: 'rgba(232,199,122,.1)', border: '1px solid rgba(232,199,122,.3)', borderRadius: 12, padding: '10px 8px' }}>
+                <div style={{ color: 'var(--gold-1)', font: '700 19px var(--font-body)' }}>{stats.streak}</div>
+                <div style={{ color: 'var(--text-dim)', font: '500 10px var(--font-body)' }}>{stats.streak === 1 ? 'Tag' : 'Tage'} Serie – läuft ✦</div>
+              </div>
+              <div style={{ flex: 1, background: 'rgba(166,107,255,.1)', border: '1px solid rgba(166,107,255,.3)', borderRadius: 12, padding: '10px 8px' }}>
+                <div style={{ color: 'var(--purple-2)', font: '700 19px var(--font-body)' }}>{(stats.drawDays || []).length}</div>
+                <div style={{ color: 'var(--text-dim)', font: '500 10px var(--font-body)' }}>Sterne insgesamt</div>
+              </div>
+            </div>
+            <button className="btn-gold" style={{ marginTop: 14 }} onClick={() => setSerieInfo(false)}>Alles klar ✦</button>
           </div>
         </div>
       )}
