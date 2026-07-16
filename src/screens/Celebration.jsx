@@ -21,8 +21,14 @@ const PARTS = [
 export default function Celebration() {
   const nav = useNavigate()
   const loc = useLocation()
-  const { rank, stats } = useStore()
-  const reward = loc.state?.reward
+  const { rank, stats, clearFeier } = useStore()
+  // Belohnung aus der Navigation ODER nachgeholt aus dem Speicher
+  // (falls die App vor der Feier geschlossen wurde). Einmal gelesen,
+  // dann als gefeiert markiert.
+  const [reward] = useState(() => loc.state?.reward || stats.feierPending || null)
+  useEffect(() => {
+    if (reward) clearFeier()
+  }, [reward, clearFeier])
 
   const constObj = reward?.constellationName
     ? CONSTELLATIONS.find((c) => c.name === reward.constellationName)

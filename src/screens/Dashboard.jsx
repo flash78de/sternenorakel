@@ -63,6 +63,12 @@ export default function Dashboard() {
   // Bereits gezogen → direkt die heutige Botschaft erneut ansehen.
   const goDraw = () => nav(drawnToday ? '/oracle/draw' : moodToday ? '/oracle' : '/oracle/befinden')
 
+  // Verpasste Feier (Rangaufstieg/Sternbild) nachholen – große Momente
+  // dürfen nicht verloren gehen, auch wenn die App zwischendurch zu war.
+  useEffect(() => {
+    if (stats.feierPending) nav('/feier', { replace: false })
+  }, []) // eslint-disable-line
+
   // Rückkehr nach Pause → eigener Screen (23)
   useEffect(() => {
     if (pausedReturn) nav('/rueckkehr', { replace: true })

@@ -285,10 +285,17 @@ export function StoreProvider({ children }) {
           lastDrawISO: today,
           drawDays,
           constellationsDone,
+          // Große Momente sind unverlierbar: Wird die App vor der Feier
+          // geschlossen, holt das Dashboard sie beim nächsten Besuch nach.
+          ...(rankUp ? { feierPending: { rankUp, gainedDust: gain, newStreak: streak } } : {}),
         },
       }
     })
     return result
+  }, [])
+
+  const clearFeier = useCallback(() => {
+    setState((s) => (s.stats.feierPending ? { ...s, stats: { ...s.stats, feierPending: null } } : s))
   }, [])
 
   const dismissReward = useCallback((id) => {
@@ -326,6 +333,7 @@ export function StoreProvider({ children }) {
     setState((cur) => ({
       ...cur,
       journal: cur.journal.map((e) => (e.id === id ? { ...e, reflection: trimmed } : e)),
+      stats: unlockedName ? { ...cur.stats, feierPending: { constellationName: unlockedName } } : cur.stats,
     }))
     return unlockedName
   }, [])
@@ -356,6 +364,7 @@ export function StoreProvider({ children }) {
       updateReflection,
       deleteEntry,
       dismissReward,
+      clearFeier,
       markReturnSeen,
       pausedReturn,
       resetAll,
@@ -374,6 +383,7 @@ export function StoreProvider({ children }) {
       updateReflection,
       deleteEntry,
       dismissReward,
+      clearFeier,
       markReturnSeen,
       pausedReturn,
       resetAll,
